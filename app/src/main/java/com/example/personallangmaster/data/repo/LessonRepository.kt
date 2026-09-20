@@ -108,7 +108,51 @@ class LessonRepository(
         val audioOffsetMs: Long?,
     )
 
-    /** Транскрипт сохраняется пачкой в конце урока: по реплике в базу ходить незачем. */
+    /**
+     * Дописывает одну реплику сразу, как только она закончилась.
+     *
+     * Раньше транскрипт копился в памяти и сохранялся в конце урока — и если
+     * систему не устраивало фоновое приложение, урок пропадал целиком. Одна
+     * короткая вставка на реплику стоит дёшево, а терять разговор нельзя.
+     */
+    suspend fun appendTurn(lessonId: Long, index: Int, turn: TurnRecord) {
+        lessonDao.insertTurns(
+            listOf(
+                TurnEntity(
+                    lessonId = lessonId,
+                    index = index,
+                    speaker = turn.speaker,
+                    text = turn.text,
+                    startMs = turn.startMs,
+                    audioOffsetMs = turn.audioOffsetMs,
+                )
+            )
+        )
+    }
+
+    /**
+     * Закрывает уроки, оставшиеся в состоянии ACTIVE.
+     *
+     * Такое бывает, когда систему не устроило фоновое приложение и процесс
+     * убили прямо во время разговора: реплики уже сохранены, а сам урок висит
+     * незакрытым и не попадает ни в историю, ни в разбор.
+     */
+    suspend fun closeStuckLessons(profileId: Long) {
+        lessonDao.getByStatus(profileId, LessonStatus.ACTIVE, limit = 20).forEach { lesson ->
+            val turns = lessonDao.getTurns(lesson.id)
+            val durationSec = (turns.maxOfOrNull { it.startMs } ?: 0L) / 1000
+
+            lessonDao.update(
+                lesson.copy(
+                    endedAt = lesson.startedAt + durationSec * 1000,
+                    durationSec = durationSec.toInt(),
+                    status = if (turns.isEmpty()) LessonStatus.FAILED else LessonStatus.COMPLETED,
+                )
+            )
+        }
+    }
+
+    /** Транскрипт целиком — на случай, если реплики почему-то не дописались по ходу. */
     suspend fun saveTurns(lessonId: Long, turns: List<TurnRecord>) {
         if (turns.isEmpty()) return
         lessonDao.insertTurns(

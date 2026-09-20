@@ -34,7 +34,9 @@ import kotlinx.coroutines.launch
 class AppContainer(context: Context) {
 
     private val appContext = context.applicationContext
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    /** Область, живущая столько же, сколько процесс: фоновая дозапись данных. */
+    val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val scope = appScope
 
     val database: AppDatabase by lazy { AppDatabase.build(appContext) }
     val keyVault: KeyVault by lazy { KeyVault() }
@@ -92,6 +94,8 @@ class AppContainer(context: Context) {
     fun warmUp() {
         scope.launch {
             seedLoader.seedIfNeeded()
+            // Урок мог остаться незакрытым, если процесс убили во время разговора.
+            profileRepository.current()?.let { lessonRepository.closeStuckLessons(it.id) }
             Notifications.ensureChannel(appContext)
             WorkScheduler.sync(appContext, settingsRepository.current())
         }

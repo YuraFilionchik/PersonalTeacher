@@ -48,7 +48,6 @@ object TutorPromptBuilder {
                 appendLine("You are ${settings.tutorName}, a personal English tutor talking to " +
                     "the student by voice. ${persona.promptStyle}")
                 appendLine(accentLine(settings.accent))
-                appendLine(paceLine(settings.speechRate))
                 appendLine(verbosityLine(settings.verbosity))
             }
 
@@ -122,6 +121,20 @@ object TutorPromptBuilder {
                 appendLine("Call these tools silently: never mention tools, never read them out loud.")
             }
 
+            // Темп идёт последним разделом и повторяется отдельно: в native-audio
+            // моделях это единственный доступный рычаг, и ближе к концу инструкции
+            // он соблюдается заметно лучше.
+            appendSection("SPEAKING PACE") {
+                appendLine(paceLine(settings.speechRate))
+                if (settings.speechRate <= 2) {
+                    appendLine(
+                        "This is the single most important instruction about your delivery. " +
+                            "Keep this pace for the entire lesson and never drift back to your " +
+                            "normal speed, even when the student answers quickly."
+                    )
+                }
+            }
+
             appendSection("NEVER") {
                 appendLine("Never praise mechanically — praise only real, specific progress.")
                 appendLine("Never switch to Russian for whole turns.")
@@ -173,8 +186,10 @@ object TutorPromptBuilder {
     }
 
     private fun paceLine(rate: Int): String = when (rate.coerceIn(1, 5)) {
-        1 -> "Speak very slowly and clearly, with pauses between phrases, as if to a beginner."
-        2 -> "Speak slowly and clearly."
+        1 -> "Speak extremely slowly — about half your normal speed. Leave a clear pause " +
+            "between every sentence and stretch your words, as if talking to someone who has " +
+            "just started learning English."
+        2 -> "Speak noticeably slower than usual, with clear pauses between sentences."
         3 -> "Speak at a normal, relaxed pace."
         4 -> "Speak at a brisk natural pace."
         else -> "Speak at full native speed, as you would with another native speaker."

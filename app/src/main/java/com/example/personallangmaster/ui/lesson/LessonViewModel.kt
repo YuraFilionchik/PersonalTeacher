@@ -103,6 +103,8 @@ class LessonViewModel(
     private val statsRepository: com.example.personallangmaster.data.repo.StatsRepository,
     private val audioFileStore: com.example.personallangmaster.core.audio.AudioFileStore,
     private val tts: com.example.personallangmaster.core.speech.TtsController,
+    /** Живёт дольше экрана: в нём дописывается урок, если модель успели очистить. */
+    private val appScope: kotlinx.coroutines.CoroutineScope,
 ) : ViewModel() {
 
     private val session = LiveSession(viewModelScope)
@@ -319,6 +321,20 @@ class LessonViewModel(
 
     // --- Карточки ---
 
+    /**
+     * Карточка исчезает сама.
+     *
+     * Во время разговора некогда закрывать всплывшие поправки руками, а
+     * висящая карточка закрывает субтитры — поэтому она живёт несколько секунд
+     * и уходит. Всё равно все ошибки целиком собраны в разборе урока.
+     */
+    private fun autoDismiss(item: CorrectionItem) {
+        viewModelScope.launch {
+            delay(CORRECTION_VISIBLE_MS)
+            dismissCorrection(item.id)
+        }
+    }
+
     /** Проговаривает правильный вариант системным голосом — бесплатно и сразу. */
     fun speakCorrection(text: String) = tts.speak(text)
 
@@ -361,11 +377,10 @@ class LessonViewModel(
         val audioPath = audioFileStore.finish()
         session.audioSink = null
 
-        viewModelScope.launch {
+        // Дописываем в живущей дольше экрана области: пользователь может уйти
+        // с экрана сразу после нажатия «Завершить».
+        appScope.launch {
             if (lesson != null) {
-                if (settings.transcriptRetentionAllowed) {
-                    lessonRepository.saveTurns(lesson, transcript.toList())
-                }
                 lessonRepository.finishLesson(
                     lessonId = lesson,
                     durationSec = elapsed,
@@ -426,11 +441,35 @@ class LessonViewModel(
         )
     }
 
+    /**
+     * Экран уничтожен вместе с моделью — например, система убила приложение
+     * в фоне. Урок при этом уже наполовину прожит, поэтому закрываем его
+     * в живущей дольше области, а не теряем.
+     */
     override fun onCleared() {
         timerJob?.cancel()
         tts.stop()
-        audioFileStore.finish()
         session.stop()
+
+        val lesson = lessonId
+        val elapsed = _state.value.elapsedSeconds
+        val cost = _state.value.costUsd
+        val audioPath = audioFileStore.finish()
+
+        if (lesson != null && !_state.value.finished) {
+            appScope.launch {
+                lessonRepository.finishLesson(
+                    lessonId = lesson,
+                    durationSec = elapsed,
+                    userSpeakSec = 0,
+                    aiSpeakSec = 0,
+                    tokensIn = tokensIn,
+                    tokensOut = tokensOut,
+                    costUsd = cost,
+                    audioPath = audioPath,
+                )
+            }
+        }
         super.onCleared()
     }
 
@@ -512,16 +551,20 @@ class LessonViewModel(
                             phoneme = call.string("phoneme"),
                             severity = call.int("severity"),
                         )
+                        val item = CorrectionItem(
+                            id = id,
+                            original = original,
+                            corrected = corrected,
+                            // Длинное объяснение читать некогда: разговор идёт.
+                            explanation = call.string("explanation")?.take(EXPLANATION_LIMIT),
+                        )
                         _state.update { current ->
                             current.copy(
-                                corrections = (current.corrections + CorrectionItem(
-                                    id = id,
-                                    original = original,
-                                    corrected = corrected,
-                                    explanation = call.string("explanation"),
-                                )).takeLast(MAX_VISIBLE_CORRECTIONS)
+                                corrections = (current.corrections + item)
+                                    .takeLast(MAX_VISIBLE_CORRECTIONS)
                             )
                         }
+                        autoDismiss(item)
                     }
                 }
 
@@ -574,7 +617,7 @@ class LessonViewModel(
         }
 
         if (!isPartial) {
-            transcript += LessonRepository.TurnRecord(
+            val record = LessonRepository.TurnRecord(
                 speaker = speaker,
                 text = text,
                 startMs = elapsedMillis(),
@@ -582,7 +625,15 @@ class LessonViewModel(
                 // разбор урока потом находит нужное место в аудио.
                 audioOffsetMs = turnAudioStartMs.takeIf { audioFileStore.isRecording },
             )
+            transcript += record
             turnAudioStartMs = audioFileStore.positionMs
+
+            // Пишем реплику сразу: если процесс убьют, разговор не пропадёт.
+            val lesson = lessonId
+            if (lesson != null && settings.transcriptRetentionAllowed) {
+                val index = transcript.size - 1
+                appScope.launch { lessonRepository.appendTurn(lesson, index, record) }
+            }
         }
     }
 
@@ -648,7 +699,9 @@ class LessonViewModel(
 
     companion object {
         private const val MAX_SUBTITLES = 50
-        private const val MAX_VISIBLE_CORRECTIONS = 2
+        private const val MAX_VISIBLE_CORRECTIONS = 1
+        private const val CORRECTION_VISIBLE_MS = 12_000L
+        private const val EXPLANATION_LIMIT = 90
         private const val MAX_VISIBLE_HINTS = 2
         private const val LESSON_GRACE_SECONDS = 60
         private const val PLACEMENT_MINUTES = 5
@@ -660,11 +713,12 @@ class LessonViewModel(
             statsRepository: com.example.personallangmaster.data.repo.StatsRepository,
             audioFileStore: com.example.personallangmaster.core.audio.AudioFileStore,
             tts: com.example.personallangmaster.core.speech.TtsController,
+            appScope: kotlinx.coroutines.CoroutineScope,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T = LessonViewModel(
                 settingsRepository, profileRepository, lessonRepository, statsRepository,
-                audioFileStore, tts,
+                audioFileStore, tts, appScope,
             ) as T
         }
     }

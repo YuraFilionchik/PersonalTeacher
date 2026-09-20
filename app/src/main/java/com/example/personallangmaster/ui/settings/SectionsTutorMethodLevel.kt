@@ -96,6 +96,11 @@ fun TutorSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                 optionLabel = ::accentTitle,
                 onSelect = { value -> viewModel.update { setAccent(value) } },
             )
+            SettingsNote(
+                "Темп — это указание модели, а не регулятор скорости: голосовые модели " +
+                    "иногда возвращаются к своей обычной манере. Если тренер снова частит, " +
+                    "попросите его прямо в разговоре говорить медленнее."
+            )
             SettingsSliderRow(
                 title = stringResource(R.string.settings_tutor_rate_title),
                 valueLabel = speechRateTitle(settings.speechRate),

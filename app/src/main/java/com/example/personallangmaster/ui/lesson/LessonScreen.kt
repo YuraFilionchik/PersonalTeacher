@@ -81,6 +81,7 @@ fun LessonScreen(
             container.statsRepository,
             container.audioFileStore,
             container.ttsController,
+            container.appScope,
         )
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
