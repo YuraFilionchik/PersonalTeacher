@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.personallangmaster.data.db.LessonStatus
 import com.example.personallangmaster.di.LocalAppContainer
 import com.example.personallangmaster.ui.components.LevelBadge
 import com.example.personallangmaster.ui.components.StreakRing
@@ -167,10 +168,13 @@ fun HomeScreen(
             }
 
             state.lastLesson?.let { lesson ->
+                val analyzed = lesson.status == LessonStatus.ANALYZED
                 ActionCard(
-                    title = "Разбор прошлого урока",
-                    subtitle = lesson.summaryRu?.take(80) ?: "Урок ещё не разобран",
+                    title = if (analyzed) "Разбор прошлого урока" else "Разобрать прошлый урок",
+                    subtitle = lesson.summaryRu?.take(80)
+                        ?: "Разговор сохранён, разбор ещё не сделан",
                     icon = Icons.Rounded.RecordVoiceOver,
+                    highlighted = !analyzed,
                     onClick = { onOpenReview(lesson.id) },
                 )
             }

@@ -113,16 +113,22 @@ class HomeViewModel(
     private suspend fun refreshSuggestions(profileId: Long) {
         val month = System.currentTimeMillis() - 30 * StatsRepository.DAY_MILLIS
         val recommended = contentRepository.recommendedTopics(profileId, since = month, limit = 1)
+        // Берём последний урок в любом состоянии: карточка одинаково нужна и
+        // чтобы запустить разбор, и чтобы перечитать уже готовый.
         val lessons = lessonDao.getByStatus(
             profileId = profileId,
             status = com.example.personallangmaster.data.db.LessonStatus.COMPLETED,
+            limit = 1,
+        ) + lessonDao.getByStatus(
+            profileId = profileId,
+            status = com.example.personallangmaster.data.db.LessonStatus.ANALYZED,
             limit = 1,
         )
 
         _state.update {
             it.copy(
                 recommendedTopic = recommended.firstOrNull()?.topic,
-                lastLesson = lessons.firstOrNull(),
+                lastLesson = lessons.maxByOrNull { lesson -> lesson.startedAt },
             )
         }
     }

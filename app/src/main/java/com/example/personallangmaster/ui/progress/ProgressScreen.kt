@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.personallangmaster.R
 import com.example.personallangmaster.core.cost.CostCalculator
+import com.example.personallangmaster.data.db.LessonStatus
 import com.example.personallangmaster.data.db.UsageKind
 import com.example.personallangmaster.di.LocalAppContainer
 import com.example.personallangmaster.ui.components.StatTile
@@ -195,7 +196,7 @@ fun ProgressScreen(onOpenReview: (Long) -> Unit) {
             }
 
             if (state.recentLessons.isNotEmpty()) {
-                SectionTitle("История уроков")
+                SectionTitle("История уроков (${state.recentLessons.size})")
                 state.recentLessons.forEach { lesson ->
                     Card(
                         modifier = Modifier
@@ -222,6 +223,19 @@ fun ProgressScreen(onOpenReview: (Long) -> Unit) {
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
+
+                            // Состояние видно сразу: неразобранный урок — это
+                            // предложение открыть его и разобрать, а не потеря.
+                            Text(
+                                text = ProgressViewModel.lessonStatusTitle(lesson.status),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = when (lesson.status) {
+                                    LessonStatus.ANALYZED -> MaterialTheme.colorScheme.primary
+                                    LessonStatus.FAILED -> MaterialTheme.colorScheme.onSurfaceVariant
+                                    else -> MaterialTheme.colorScheme.tertiary
+                                },
+                            )
+
                             lesson.summaryRu?.let { summary ->
                                 Text(
                                     text = summary.take(100),

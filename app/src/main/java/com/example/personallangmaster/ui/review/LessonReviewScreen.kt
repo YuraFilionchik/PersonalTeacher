@@ -99,6 +99,36 @@ fun LessonReviewScreen(lessonId: Long, onBack: () -> Unit) {
             }
 
             state.lesson?.let { lesson ->
+                // Разобранным урок становится только после успешного разбора —
+                // поэтому состояние видно прямо здесь, а не угадывается.
+                if (lesson.status != com.example.personallangmaster.data.db.LessonStatus.ANALYZED) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                    ) {
+                        Column(Modifier.padding(12.dp)) {
+                            Text(
+                                "Урок ещё не разобран",
+                                style = MaterialTheme.typography.titleSmall,
+                            )
+                            Text(
+                                text = state.error
+                                    ?: "Нажмите, чтобы разобрать разговор — это займёт несколько секунд.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            OutlinedButton(onClick = { viewModel.retry(lessonId) }) {
+                                Text("Разобрать урок")
+                            }
+                        }
+                    }
+                }
+
                 lesson.summaryRu?.let { summary ->
                     Text(
                         text = summary,

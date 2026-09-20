@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.personallangmaster.data.db.MistakeType
+import com.example.personallangmaster.data.db.LessonStatus
 import com.example.personallangmaster.data.db.VocabState
 import com.example.personallangmaster.data.db.dao.LessonDao
 
@@ -127,6 +128,19 @@ class ProgressViewModel(
             .launchIn(viewModelScope)
 
         profiles
+            .flatMapLatest { profile -> lessonDao.observeRecent(profile.id, limit = 30) }
+            .onEach { lessons ->
+                _state.update { current ->
+                    // Урок в состоянии ACTIVE — это либо идущий прямо сейчас разговор,
+                    // либо след убитого процесса: в истории ему делать нечего.
+                    current.copy(
+                        recentLessons = lessons.filter { it.status != LessonStatus.ACTIVE }
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
+
+        profiles
             .onEach { profile -> refreshLessons(profile.id) }
             .launchIn(viewModelScope)
     }
@@ -143,11 +157,6 @@ class ProgressViewModel(
                         .map { (type, rows) -> MistakeTotal(type, rows.sumOf { it.total }) }
                         .sortedByDescending { it.total }
                         .take(5),
-                    recentLessons = lessonDao.getByStatus(
-                        profileId = profileId,
-                        status = com.example.personallangmaster.data.db.LessonStatus.ANALYZED,
-                        limit = 10,
-                    ),
                 )
             }
         }
@@ -165,6 +174,14 @@ class ProgressViewModel(
             MistakeType.TENSE -> "Времена"
             MistakeType.PREPOSITION -> "Предлоги"
             MistakeType.STYLE -> "Стиль"
+        }
+
+        /** Подпись состояния урока в истории. */
+        fun lessonStatusTitle(status: LessonStatus): String = when (status) {
+            LessonStatus.ANALYZED -> "Разобран"
+            LessonStatus.COMPLETED -> "Не разобран"
+            LessonStatus.FAILED -> "Не состоялся"
+            LessonStatus.ACTIVE -> "Идёт"
         }
 
         fun vocabStateTitle(state: VocabState): String = when (state) {
