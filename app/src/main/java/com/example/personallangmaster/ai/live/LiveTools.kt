@@ -20,7 +20,6 @@ object LiveTools {
     const val SET_DIFFICULTY = "set_difficulty"
     const val SHOW_CARD = "show_card"
     const val SUGGEST_DRILL = "suggest_drill"
-    const val END_LESSON = "end_lesson"
 
     /** Объявления инструментов для `setup.tools`. */
     val declarations: List<Tool> = listOf(
@@ -82,13 +81,6 @@ object LiveTools {
                     description = "Suggest a drill for after the lesson: a sound or a grammar topic.",
                     parameters = objectSchema(required = listOf("target")) {
                         stringProperty("target", "IPA phoneme or grammar topic code")
-                        stringProperty("reason", "Short reason in Russian")
-                    },
-                ),
-                FunctionDeclaration(
-                    name = END_LESSON,
-                    description = "End the lesson when the planned time is over or the goal is reached.",
-                    parameters = objectSchema(required = emptyList()) {
                         stringProperty("reason", "Short reason in Russian")
                     },
                 ),

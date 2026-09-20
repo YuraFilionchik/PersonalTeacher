@@ -9,6 +9,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -200,7 +201,7 @@ private fun LessonHeader(state: LessonUiState) {
 private fun SubtitleStream(state: LessonUiState) {
     val listState = rememberLazyListState()
 
-    LaunchedEffect(state.subtitles.size) {
+    LaunchedEffect(state.subtitles.size, state.subtitles.lastOrNull()?.text) {
         if (state.subtitles.isNotEmpty()) {
             listState.animateScrollToItem(state.subtitles.lastIndex)
         }
@@ -213,6 +214,7 @@ private fun SubtitleStream(state: LessonUiState) {
                 .weight(1f)
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(state.subtitles) { item ->

@@ -20,6 +20,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 /** Всё, что нужно знать сессии перед подключением. */
 data class LiveSessionConfig(
@@ -74,6 +77,7 @@ class LiveSession(
     private var config: LiveSessionConfig? = null
 
     private var resumptionHandle: String? = null
+    private var lastFailureReason: String? = null
     private var stopped = false
     private var talking = false
     private var reconnectAttempt = 0
@@ -88,6 +92,7 @@ class LiveSession(
         this.config = config
         stopped = false
         reconnectAttempt = 0
+        resumptionHandle = null
         player.start(
             volume = config.tutorVolume,
             // В hands-free микрофон открыт всегда, и эхоподавлению нужен разговорный поток.
@@ -135,14 +140,38 @@ class LiveSession(
             LiveSocketEvent.Opened -> sendSetup(config)
             is LiveSocketEvent.Message -> handleServerMessage(event.message)
             is LiveSocketEvent.Failure -> {
+                val detail = serverDetail(event.body) ?: event.error.message ?: "нет связи"
+                lastFailureReason = listOfNotNull(event.httpCode?.let { "HTTP $it" }, detail)
+                    .joinToString(": ")
+
                 when (event.httpCode) {
-                    401, 403 -> fail(LiveErrorKind.INVALID_KEY, "Ключ не принят сервером")
-                    429 -> fail(LiveErrorKind.QUOTA, "Квота исчерпана")
-                    else -> scheduleReconnect(event.error.message ?: "нет связи")
+                    400 -> fail(LiveErrorKind.PROTOCOL, "Сервер отклонил запрос. $detail")
+                    401, 403 -> fail(LiveErrorKind.INVALID_KEY, "Ключ не принят сервером. $detail")
+                    429 -> fail(
+                        LiveErrorKind.QUOTA,
+                        "Лимит запросов исчерпан. Живой режим у бесплатного ключа " +
+                            "ограничен жёстче обычного. $detail",
+                    )
+                    else -> scheduleReconnect(lastFailureReason ?: detail)
                 }
             }
             is LiveSocketEvent.Closed -> {
-                if (!stopped) scheduleReconnect("соединение закрыто (${event.code})")
+                if (stopped) return
+                // Код закрытия и текст причины — единственное, что объясняет,
+                // почему сессия не поднялась: без них остаётся «нет связи».
+                lastFailureReason = buildString {
+                    append("код ${event.code}")
+                    if (event.reason.isNotBlank()) append(": ${event.reason}")
+                }
+                
+                // Если сервер ругается на некорректное состояние (1007) или упал (1011),
+                // скорее всего текущий resumptionHandle "протух" или сломан. 
+                // Сбрасываем его, чтобы следующая попытка переподключения начала чистую сессию.
+                if (event.code == 1007 || event.code == 1011) {
+                    resumptionHandle = null
+                }
+                
+                scheduleReconnect(lastFailureReason!!)
             }
         }
     }
@@ -180,7 +209,8 @@ class LiveSession(
             outputAudioTranscription = if (config.transcription) Empty() else null,
         )
 
-        client?.send(SetupMessage(setup))
+        val sent = client?.send(SetupMessage(setup)) ?: false
+        Log.i(TAG, "setup отправлен=$sent model=${config.model} voice=${config.voiceName}")
     }
 
     private fun handleServerMessage(message: ServerMessage) {
@@ -368,8 +398,9 @@ class LiveSession(
 
     private fun scheduleReconnect(reason: String) {
         if (stopped) return
+        Log.w(TAG, "Переподключение (${reconnectAttempt + 1}): $reason")
         if (reconnectAttempt >= MAX_RECONNECT_ATTEMPTS) {
-            fail(LiveErrorKind.NETWORK, "Не удалось восстановить соединение: $reason")
+            fail(LiveErrorKind.NETWORK, "Не удалось подключиться. $reason")
             return
         }
         reconnectAttempt++
@@ -380,7 +411,20 @@ class LiveSession(
         }
     }
 
+    /** Вытаскивает человеческую причину из JSON-ошибки Google. */
+    private fun serverDetail(body: String?): String? {
+        val raw = body?.takeIf { it.isNotBlank() } ?: return null
+        val parsed = runCatching {
+            val error = liveJson.parseToJsonElement(raw).jsonObject["error"]?.jsonObject
+            val status = error?.get("status")?.jsonPrimitive?.contentOrNull
+            val message = error?.get("message")?.jsonPrimitive?.contentOrNull
+            listOfNotNull(status, message).joinToString(": ").ifBlank { null }
+        }.getOrNull()
+        return parsed ?: raw.take(300)
+    }
+
     private fun fail(kind: LiveErrorKind, message: String) {
+        Log.w(TAG, "Сессия остановлена: $kind — $message")
         _state.value = LiveSessionState.Error(kind, message)
         emit(LiveEvent.Failed(kind, message))
     }

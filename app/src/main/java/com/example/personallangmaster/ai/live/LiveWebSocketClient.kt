@@ -16,7 +16,13 @@ import java.util.concurrent.TimeUnit
 sealed interface LiveSocketEvent {
     data object Opened : LiveSocketEvent
     data class Message(val message: ServerMessage) : LiveSocketEvent
-    data class Failure(val error: Throwable, val httpCode: Int?) : LiveSocketEvent
+    data class Failure(
+        val error: Throwable,
+        val httpCode: Int?,
+        /** Тело ответа сервера: именно там лежит настоящая причина отказа. */
+        val body: String? = null,
+    ) : LiveSocketEvent
+
     data class Closed(val code: Int, val reason: String) : LiveSocketEvent
 }
 
@@ -45,6 +51,7 @@ class LiveWebSocketClient(
 
         val listener = object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
+                Log.i(TAG, "Соединение открыто (${response.code})")
                 trySend(LiveSocketEvent.Opened)
             }
 
@@ -58,15 +65,21 @@ class LiveWebSocketClient(
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                trySend(LiveSocketEvent.Failure(t, response?.code))
+                // Тело читаем один раз и сразу: без него причина отказа теряется,
+                // а «не удалось подключиться» ничего не объясняет.
+                val body = runCatching { response?.body?.string() }.getOrNull()
+                Log.w(TAG, "Обрыв: code=${response?.code} ${t.message} body=${body?.take(500)}")
+                trySend(LiveSocketEvent.Failure(t, response?.code, body))
                 close()
             }
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+                Log.i(TAG, "Сервер закрывает соединение: code=$code reason=$reason")
                 webSocket.close(NORMAL_CLOSE, null)
             }
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+                Log.i(TAG, "Соединение закрыто: code=$code reason=$reason")
                 trySend(LiveSocketEvent.Closed(code, reason))
                 close()
             }
@@ -81,7 +94,10 @@ class LiveWebSocketClient(
     }
 
     /** Отправляет уже сериализованное сообщение. Возвращает false, если сокет закрыт. */
-    fun sendRaw(json: String): Boolean = webSocket?.send(json) ?: false
+    fun sendRaw(json: String): Boolean {
+        val socket = webSocket ?: return false
+        return socket.send(json)
+    }
 
     inline fun <reified T> send(message: T): Boolean =
         sendRaw(liveJson.encodeToString(message))

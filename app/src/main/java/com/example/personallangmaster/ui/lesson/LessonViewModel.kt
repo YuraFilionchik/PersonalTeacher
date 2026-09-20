@@ -442,8 +442,6 @@ class LessonViewModel(
                     }
                 }
 
-                LiveTools.END_LESSON -> endLesson()
-
                 // set_difficulty и suggest_drill пока только подтверждаем:
                 // их эффект появится вместе с разбором урока.
                 else -> Unit

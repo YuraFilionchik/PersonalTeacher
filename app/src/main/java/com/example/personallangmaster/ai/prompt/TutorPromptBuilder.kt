@@ -110,7 +110,7 @@ object TutorPromptBuilder {
                 if (settings.lessonMinutes > 0) {
                     appendLine(
                         "The lesson is planned for about ${settings.lessonMinutes} minutes; " +
-                            "wrap up naturally when the time is nearly over and call end_lesson."
+                            "start wrapping up naturally when the student mentions they are done."
                     )
                 }
             }
