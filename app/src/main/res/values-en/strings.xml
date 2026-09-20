@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">PersonalLangMaster</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_lesson">Lesson</string>
+    <string name="nav_practice">Practice</string>
+    <string name="nav_progress">Progress</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Tutor Personas -->
+    <string name="persona_friendly_buddy_title">Friendly Buddy</string>
+    <string name="persona_friendly_buddy_desc">Relaxed, supportive friend for casual conversation and free topics.</string>
+    <string name="persona_strict_teacher_title">Strict Teacher</string>
+    <string name="persona_strict_teacher_desc">Academic, demanding tutor focused on accuracy and rules.</string>
+    <string name="persona_business_coach_title">Business Coach</string>
+    <string name="persona_business_coach_desc">Business English, professional vocabulary, negotiations and presentations.</string>
+    <string name="persona_chatty_native_title">Chatty Native</string>
+    <string name="persona_chatty_native_desc">Fast natural native speech, modern slang, idioms and phrasal verbs.</string>
+    <string name="persona_kids_tutor_title">Kids Tutor</string>
+    <string name="persona_kids_tutor_desc">Simple words, slow pace, plenty of praise and playful examples.</string>
+
+    <!-- Strictness Levels -->
+    <string name="strictness_level_0_title">Flow</string>
+    <string name="strictness_level_0_desc">Does not correct aloud at all, all errors collected in post-lesson review.</string>
+    <string name="strictness_level_1_title">Gentle</string>
+    <string name="strictness_level_1_desc">Subtle recast: repeats your thought correctly without emphasizing mistakes.</string>
+    <string name="strictness_level_2_title">Balanced</string>
+    <string name="strictness_level_2_desc">Provides one main correction at the end of response and continues conversation.</string>
+    <string name="strictness_level_3_title">Strict</string>
+    <string name="strictness_level_3_desc">Corrects all noticeable errors and asks you to repeat the correct version.</string>
+    <string name="strictness_level_4_title">Drill</string>
+    <string name="strictness_level_4_desc">Interrupts immediately, insists on exact repetition including phonemes and intonation.</string>
+
+    <!-- Connection & Network Errors (ErrorKind) -->
+    <string name="error_no_key_title">No API Key</string>
+    <string name="error_no_key_desc">Enter your Google Gemini API key in app settings.</string>
+    <string name="error_invalid_key_title">Invalid API Key</string>
+    <string name="error_invalid_key_desc">Check your Google Gemini API key for errors.</string>
+    <string name="error_quota_title">Quota Exceeded</string>
+    <string name="error_quota_desc">Request quota exceeded. Wait or check your account limits.</string>
+    <string name="error_network_title">Network Error</string>
+    <string name="error_network_desc">Check your internet connection and try again.</string>
+    <string name="error_protocol_title">Protocol Error</string>
+    <string name="error_protocol_desc">Communication error with Gemini Live server.</string>
+    <string name="error_audio_device_title">Microphone Error</string>
+    <string name="error_audio_device_desc">Failed to access microphone. Check app permissions.</string>
+    <string name="error_budget_limit_title">Budget Limit Reached</string>
+    <string name="error_budget_limit_desc">You have reached your daily spending limit set in settings.</string>
+
+    <!-- Lesson Screen -->
+    <string name="lesson_title">Lesson</string>
+    <string name="lesson_mode_free_talk">Free Talk</string>
+    <string name="lesson_mode_scenario">Scenario</string>
+    <string name="lesson_mode_placement">Placement Test</string>
+    <string name="lesson_mode_drill">Drill</string>
+    <string name="lesson_state_connecting">Connecting...</string>
+    <string name="lesson_state_ready">Ready to speak</string>
+    <string name="lesson_state_listening">Listening...</string>
+    <string name="lesson_state_thinking">Thinking...</string>
+    <string name="lesson_state_speaking">Speaking...</string>
+    <string name="lesson_state_reconnecting">Reconnecting (%1$d)...</string>
+    <string name="lesson_mic_hold_hint">Hold to speak</string>
+    <string name="lesson_mic_tap_hint">Tap to speak</string>
+    <string name="lesson_mic_speaking_hint">Interrupt</string>
+    <string name="lesson_btn_pause">Pause</string>
+    <string name="lesson_btn_resume">Resume</string>
+    <string name="lesson_btn_end">End Lesson</string>
+    <string name="lesson_btn_text_input">Text</string>
+    <string name="lesson_card_listen">Listen</string>
+    <string name="lesson_card_add_vocab">Add to Vocab</string>
+    <string name="lesson_card_dismiss">Dismiss</string>
+    <string name="lesson_slow_repeat">Repeat slower</string>
+    <string name="lesson_cost_estimate">≈ %1$s for %2$d mins</string>
+
+    <!-- Settings: Sections -->
+    <string name="settings_section_tutor">Tutor</string>
+    <string name="settings_section_method">Methodology</string>
+    <string name="settings_section_level">Language Level</string>
+    <string name="settings_section_audio">Audio &amp; Microphone</string>
+    <string name="settings_section_model">Model &amp; API Key</string>
+    <string name="settings_section_budget">Budget &amp; Limits</string>
+    <string name="settings_section_data">Data &amp; Privacy</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_section_notifications">Notifications</string>
+
+    <!-- Settings: Tutor -->
+    <string name="settings_tutor_persona_title">Tutor Persona</string>
+    <string name="settings_tutor_persona_subtitle">Communication style and personality</string>
+    <string name="settings_tutor_voice_title">Voice</string>
+    <string name="settings_tutor_voice_subtitle">Voice selection and preview</string>
+    <string name="settings_tutor_accent_title">Accent</string>
+    <string name="settings_tutor_accent_subtitle">American, British, or Neutral</string>
+    <string name="settings_tutor_rate_title">Speech Rate</string>
+    <string name="settings_tutor_rate_subtitle">Tutor speaking speed</string>
+    <string name="settings_tutor_verbosity_title">Verbosity</string>
+    <string name="settings_tutor_verbosity_subtitle">Length of tutor responses</string>
+    <string name="settings_tutor_name_title">Name &amp; Address</string>
+    <string name="settings_tutor_name_subtitle">Tutor\'s name and how to address you</string>
+    <string name="settings_tutor_custom_prompt_title">Custom System Prompt</string>
+    <string name="settings_tutor_custom_prompt_subtitle">Additional instructions for AI</string>
+
+    <!-- Settings: Methodology -->
+    <string name="settings_method_strictness_title">Correction Strictness</string>
+    <string name="settings_method_strictness_subtitle">How actively tutor corrects mistakes</string>
+    <string name="settings_method_targets_title">What to Correct</string>
+    <string name="settings_method_targets_subtitle">Grammar, pronunciation, articles, prepositions</string>
+    <string name="settings_method_lang_title">Correction Language</string>
+    <string name="settings_method_lang_subtitle">Language for comments and explanations</string>
+    <string name="settings_method_allow_ru_title">Russian from Student</string>
+    <string name="settings_method_allow_ru_subtitle">Whether asking in Russian is allowed</string>
+    <string name="settings_method_initiative_title">Tutor Initiative</string>
+    <string name="settings_method_initiative_subtitle">Who leads the conversation</string>
+    <string name="settings_method_lesson_length_title">Default Lesson Duration</string>
+    <string name="settings_method_auto_analysis_title">Automatic Review</string>
+    <string name="settings_method_auto_analysis_subtitle">Generate review immediately after lesson</string>
+
+    <!-- Settings: Level -->
+    <string name="settings_level_cefr_title">Current CEFR Level</string>
+    <string name="settings_level_lock_title">Lock Level Manually</string>
+    <string name="settings_level_lock_subtitle">Disable automatic level adjustment</string>
+    <string name="settings_level_pace_title">Progression Pace</string>
+    <string name="settings_level_retest_title">Retake Placement Test</string>
+
+    <!-- Settings: Audio & Microphone -->
+    <string name="settings_audio_mic_mode_title">Microphone Mode</string>
+    <string name="settings_audio_mic_mode_subtitle">Hold, tap, or hands-free</string>
+    <string name="settings_audio_vad_sensitivity_title">VAD Sensitivity</string>
+    <string name="settings_audio_barge_in_title">Barge-in</string>
+    <string name="settings_audio_barge_in_subtitle">Allow speaking while AI responds</string>
+    <string name="settings_audio_noise_suppression_title">Noise Suppression</string>
+    <string name="settings_audio_output_device_title">Audio Output Device</string>
+
+    <!-- Settings: Model & API Key -->
+    <string name="settings_model_api_key_title">Gemini API Key</string>
+    <string name="settings_model_api_key_subtitle">Encrypted Google AI Studio Key</string>
+    <string name="settings_model_test_key">Test API Key</string>
+    <string name="settings_model_live_model_title">Live Model</string>
+    <string name="settings_model_text_model_title">Text Model</string>
+
+    <!-- Settings: Budget & Limits -->
+    <string name="settings_budget_daily_title">Daily Limit</string>
+    <string name="settings_budget_monthly_title">Monthly Limit</string>
+    <string name="settings_budget_behavior_title">Action on Limit</string>
+    <string name="settings_budget_parental_pin_title">Parental PIN</string>
+
+    <!-- Settings: Data & Privacy -->
+    <string name="settings_data_transcripts_title">Keep Transcripts</string>
+    <string name="settings_data_audio_recording_title">Record Audio</string>
+    <string name="settings_data_export_title">Export Data</string>
+    <string name="settings_data_import_title">Import Data</string>
+    <string name="settings_data_clear_title">Clear All Data</string>
+
+    <!-- Settings: Appearance -->
+    <string name="settings_appearance_theme_title">App Theme</string>
+    <string name="settings_appearance_dynamic_color_title">Dynamic Colors</string>
+    <string name="settings_appearance_subtitles_title">Subtitles</string>
+
+    <!-- Settings: Notifications -->
+    <string name="settings_section_notifications_title">Notifications</string>
+    <string name="settings_notifications_daily_title">Daily Reminder</string>
+    <string name="settings_notifications_review_title">Review Reminder</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_title">Welcome to PersonalLangMaster</string>
+    <string name="onboarding_step_name">What is your name?</string>
+    <string name="onboarding_step_interests">Interests &amp; Goals</string>
+    <string name="onboarding_step_persona">Choose your Tutor</string>
+    <string name="onboarding_step_key">Gemini API Key</string>
+    <string name="onboarding_api_key_help">Get a free API key in Google AI Studio</string>
+    <string name="onboarding_permission_mic">Microphone Permission</string>
+    <string name="onboarding_btn_next">Next</string>
+    <string name="onboarding_btn_start">Start Learning</string>
+
+    <!-- Lesson Review -->
+    <string name="review_title">Lesson Review</string>
+    <string name="review_summary">Lesson Summary</string>
+    <string name="review_cefr_estimate">Lesson CEFR Score</string>
+    <string name="review_fluency">Fluency</string>
+    <string name="review_accuracy">Accuracy</string>
+    <string name="review_vocab_range">Vocabulary Range</string>
+    <string name="review_mistakes_title">Mistakes &amp; Corrections</string>
+    <string name="review_mistakes_empty">Great job! No noticeable mistakes in this lesson.</string>
+    <string name="review_vocab_title">New Vocabulary</string>
+    <string name="review_btn_add_all_vocab">Add All to Vocabulary</string>
+    <string name="review_btn_generate_exercises">Generate Exercises</string>
+
+    <!-- Module Screens -->
+    <string name="vocab_title">Vocabulary</string>
+    <string name="vocab_due_today">Due Today</string>
+    <string name="vocab_empty">No cards due today!</string>
+    <string name="vocab_grade_again">Again</string>
+    <string name="vocab_grade_hard">Hard</string>
+    <string name="vocab_grade_good">Good</string>
+    <string name="vocab_grade_easy">Easy</string>
+    <string name="pronunciation_title">Pronunciation</string>
+    <string name="pronunciation_phonemes_map">Phoneme Map</string>
+    <string name="pronunciation_minimal_pairs">Minimal Pairs</string>
+    <string name="grammar_title">Grammar</string>
+    <string name="grammar_recommended">Recommended Topics</string>
+    <string name="progress_title">Progress</string>
+    <string name="progress_streak_days">%1$d day streak</string>
+    <string name="progress_total_time">Total Time Spoken</string>
+    <string name="progress_usage_cost">Monthly Usage Cost</string>
+
+    <!-- Dialogs -->
+    <string name="dialog_confirm">Confirm</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_delete">Delete</string>
+    <string name="dialog_clear_all_title">Clear All Data?</string>
+    <string name="dialog_clear_all_msg">This action cannot be undone. All history and vocabulary will be wiped.</string>
+
+    <!-- Plurals -->
+    <plurals name="plurals_words">
+        <item quantity="one">%1$d word</item>
+        <item quantity="other">%1$d words</item>
+    </plurals>
+
+    <plurals name="plurals_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+
+    <plurals name="plurals_lessons">
+        <item quantity="one">%1$d lesson</item>
+        <item quantity="other">%1$d lessons</item>
+    </plurals>
+
+    <plurals name="plurals_cards">
+        <item quantity="one">%1$d card</item>
+        <item quantity="other">%1$d cards</item>
+    </plurals>
+</resources>

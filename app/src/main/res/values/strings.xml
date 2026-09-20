@@ -1,3 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Основное название -->
     <string name="app_name">PersonalLangMaster</string>
+
+    <!-- Навигация -->
+    <string name="nav_home">Главная</string>
+    <string name="nav_lesson">Урок</string>
+    <string name="nav_practice">Практика</string>
+    <string name="nav_progress">Прогресс</string>
+    <string name="nav_settings">Настройки</string>
+
+    <!-- Персоны тренера -->
+    <string name="persona_friendly_buddy_title">Friendly Buddy</string>
+    <string name="persona_friendly_buddy_desc">Расслабленный, поддерживающий друг для живого общения и свободных тем.</string>
+    <string name="persona_strict_teacher_title">Strict Teacher</string>
+    <string name="persona_strict_teacher_desc">Академичный, придирчивый преподаватель с фокусом на точности и правилах.</string>
+    <string name="persona_business_coach_title">Business Coach</string>
+    <string name="persona_business_coach_desc">Деловой английский, бизнес-лексика, переговоры и деловые презентации.</string>
+    <string name="persona_chatty_native_title">Chatty Native</string>
+    <string name="persona_chatty_native_desc">Быстрая живая речь носителя, современные сленг, идиомы и фразовые глаголы.</string>
+    <string name="persona_kids_tutor_title">Kids Tutor</string>
+    <string name="persona_kids_tutor_desc">Простые слова, медленный темп речи, много похвалы и игровых примеров.</string>
+
+    <!-- Уровни строгости -->
+    <string name="strictness_level_0_title">Поток</string>
+    <string name="strictness_level_0_desc">Не поправляет вслух вообще, все ошибки копится в разбор после урока.</string>
+    <string name="strictness_level_1_title">Мягко</string>
+    <string name="strictness_level_1_desc">Незаметный рикаст: повторяет мысль правильно, не акцентируя внимание на ошибке.</string>
+    <string name="strictness_level_2_title">Баланс</string>
+    <string name="strictness_level_2_desc">В конце реплики дает одну главную поправку и продолжает разговор.</string>
+    <string name="strictness_level_3_title">Требовательно</string>
+    <string name="strictness_level_3_desc">Поправляет все заметные ошибки и просит повторить правильный вариант.</string>
+    <string name="strictness_level_4_title">Дрилл</string>
+    <string name="strictness_level_4_desc">Перебивает сразу, добивается точного повтора, включая звуки и интонацию.</string>
+
+    <!-- Ошибки соединения и сети (ErrorKind) -->
+    <string name="error_no_key_title">Нет API-ключа</string>
+    <string name="error_no_key_desc">Введите ваш ключ Google Gemini API в настройках приложения.</string>
+    <string name="error_invalid_key_title">Неверный API-ключ</string>
+    <string name="error_invalid_key_desc">Проверьте правильность введенного API-ключа Google Gemini.</string>
+    <string name="error_quota_title">Превышена квота</string>
+    <string name="error_quota_desc">Квота запросов исчерпана. Подождите или проверьте лимиты вашего аккаунта.</string>
+    <string name="error_network_title">Ошибка сети</string>
+    <string name="error_network_desc">Проверьте подключение к интернету и повторите попытку.</string>
+    <string name="error_protocol_title">Ошибка протокола</string>
+    <string name="error_protocol_desc">Произошла ошибка связи с сервером Gemini Live.</string>
+    <string name="error_audio_device_title">Ошибка микрофона</string>
+    <string name="error_audio_device_desc">Не удалось получить доступ к микрофону. Проверьте разрешения.</string>
+    <string name="error_budget_limit_title">Достигнут лимит расходов</string>
+    <string name="error_budget_limit_desc">Вы достигли дневного лимита расходов, установленного в настройках.</string>
+
+    <!-- Экран урока -->
+    <string name="lesson_title">Урок</string>
+    <string name="lesson_mode_free_talk">Свободный разговор</string>
+    <string name="lesson_mode_scenario">Сценарий</string>
+    <string name="lesson_mode_placement">Тест уровня</string>
+    <string name="lesson_mode_drill">Дрилл</string>
+    <string name="lesson_state_connecting">Подключение...</string>
+    <string name="lesson_state_ready">Готов к разговору</string>
+    <string name="lesson_state_listening">Слушаю вас...</string>
+    <string name="lesson_state_thinking">Думаю...</string>
+    <string name="lesson_state_speaking">Говорит...</string>
+    <string name="lesson_state_reconnecting">Переподключение (%1$d)...</string>
+    <string name="lesson_mic_hold_hint">Держите, чтобы говорить</string>
+    <string name="lesson_mic_tap_hint">Нажмите, чтобы говорить</string>
+    <string name="lesson_mic_speaking_hint">Перебить</string>
+    <string name="lesson_btn_pause">Пауза</string>
+    <string name="lesson_btn_resume">Продолжить</string>
+    <string name="lesson_btn_end">Завершить</string>
+    <string name="lesson_btn_text_input">Текст</string>
+    <string name="lesson_card_listen">Послушать</string>
+    <string name="lesson_card_add_vocab">В словарь</string>
+    <string name="lesson_card_dismiss">Скрыть</string>
+    <string name="lesson_slow_repeat">Повторить медленнее</string>
+    <string name="lesson_cost_estimate">≈ %1$s за %2$d мин</string>
+
+    <!-- Настройки: Секции -->
+    <string name="settings_section_tutor">Преподаватель</string>
+    <string name="settings_section_method">Методика</string>
+    <string name="settings_section_level">Уровень владения</string>
+    <string name="settings_section_audio">Аудио и микрофон</string>
+    <string name="settings_section_model">Модель и ключ API</string>
+    <string name="settings_section_budget">Бюджет и лимиты</string>
+    <string name="settings_section_data">Данные и приватность</string>
+    <string name="settings_section_appearance">Внешний вид</string>
+    <string name="settings_section_notifications">Напоминания</string>
+
+    <!-- Настройки: Тренер -->
+    <string name="settings_tutor_persona_title">Персона тренера</string>
+    <string name="settings_tutor_persona_subtitle">Стиль общения и характер</string>
+    <string name="settings_tutor_voice_title">Голос</string>
+    <string name="settings_tutor_voice_subtitle">Выбор голоса и прослушивание примера</string>
+    <string name="settings_tutor_accent_title">Акцент</string>
+    <string name="settings_tutor_accent_subtitle">Американский, британский или нейтральный</string>
+    <string name="settings_tutor_rate_title">Темп речи</string>
+    <string name="settings_tutor_rate_subtitle">Скорость разговора преподавателя</string>
+    <string name="settings_tutor_verbosity_title">Многословность</string>
+    <string name="settings_tutor_verbosity_subtitle">Длина реплик и ответов</string>
+    <string name="settings_tutor_name_title">Имя и обращение</string>
+    <string name="settings_tutor_name_subtitle">Имя тренера и как обращаться к вам</string>
+    <string name="settings_tutor_custom_prompt_title">Свой системный промпт</string>
+    <string name="settings_tutor_custom_prompt_subtitle">Дополнительные инструкции для AI</string>
+
+    <!-- Настройки: Методика -->
+    <string name="settings_method_strictness_title">Строгость исправлений</string>
+    <string name="settings_method_strictness_subtitle">Насколько активно преподаватель поправляет ошибки</string>
+    <string name="settings_method_targets_title">Что поправлять</string>
+    <string name="settings_method_targets_subtitle">Грамматика, произношение, артикли, предлоги</string>
+    <string name="settings_method_lang_title">Язык поправок</string>
+    <string name="settings_method_lang_subtitle">Язык комментариев и объяснений</string>
+    <string name="settings_method_allow_ru_title">Русский от ученика</string>
+    <string name="settings_method_allow_ru_subtitle">Можно ли переспрашивать по-русски</string>
+    <string name="settings_method_initiative_title">Инициатива тренера</string>
+    <string name="settings_method_initiative_subtitle">Кто ведет диалог</string>
+    <string name="settings_method_lesson_length_title">Длина урока по умолчанию</string>
+    <string name="settings_method_auto_analysis_title">Автоматический разбор</string>
+    <string name="settings_method_auto_analysis_subtitle">Генерировать разбор сразу после урока</string>
+
+    <!-- Настройки: Уровень -->
+    <string name="settings_level_cefr_title">Текущий CEFR</string>
+    <string name="settings_level_lock_title">Зафиксировать уровень вручную</string>
+    <string name="settings_level_lock_subtitle">Отключить автокоррекцию уровня</string>
+    <string name="settings_level_pace_title">Темп усложнения</string>
+    <string name="settings_level_retest_title">Пройти тест заново</string>
+
+    <!-- Настройки: Аудио и микрофон -->
+    <string name="settings_audio_mic_mode_title">Режим микрофона</string>
+    <string name="settings_audio_mic_mode_subtitle">Удержание, нажатие или hands-free</string>
+    <string name="settings_audio_vad_sensitivity_title">Чувствительность VAD</string>
+    <string name="settings_audio_barge_in_title">Перебивание тренера</string>
+    <string name="settings_audio_barge_in_subtitle">Возможность говорить во время ответа AI</string>
+    <string name="settings_audio_noise_suppression_title">Шумоподавление</string>
+    <string name="settings_audio_output_device_title">Вывод звука</string>
+
+    <!-- Настройки: Модель и ключ API -->
+    <string name="settings_model_api_key_title">API-ключ Gemini</string>
+    <string name="settings_model_api_key_subtitle">Зашифрованный ключ Google AI Studio</string>
+    <string name="settings_model_test_key">Проверить ключ</string>
+    <string name="settings_model_live_model_title">Модель Live</string>
+    <string name="settings_model_text_model_title">Модель для текстов</string>
+
+    <!-- Настройки: Бюджет и лимиты -->
+    <string name="settings_budget_daily_title">Дневной лимит</string>
+    <string name="settings_budget_monthly_title">Месячный лимит</string>
+    <string name="settings_budget_behavior_title">Поведение при превышении</string>
+    <string name="settings_budget_parental_pin_title">Родительский PIN</string>
+
+    <!-- Настройки: Данные и приватность -->
+    <string name="settings_data_transcripts_title">Хранить транскрипты</string>
+    <string name="settings_data_audio_recording_title">Записывать аудио</string>
+    <string name="settings_data_export_title">Экспорт данных</string>
+    <string name="settings_data_import_title">Импорт данных</string>
+    <string name="settings_data_clear_title">Удалить все данные</string>
+
+    <!-- Настройки: Внешний вид -->
+    <string name="settings_appearance_theme_title">Тема оформления</string>
+    <string name="settings_appearance_dynamic_color_title">Динамические цвета</string>
+    <string name="settings_appearance_subtitles_title">Субтитры</string>
+
+    <!-- Настройки: Напоминания -->
+    <string name="settings_section_notifications_title">Напоминания</string>
+    <string name="settings_notifications_daily_title">Ежедневное напоминание</string>
+    <string name="settings_notifications_review_title">Напоминание о карточках</string>
+
+    <!-- Онбординг -->
+    <string name="onboarding_title">Добро пожаловать в PersonalLangMaster</string>
+    <string name="onboarding_step_name">Как вас зовут?</string>
+    <string name="onboarding_step_interests">Ваши интересы и цели</string>
+    <string name="onboarding_step_persona">Выберите тренера</string>
+    <string name="onboarding_step_key">API-ключ Gemini</string>
+    <string name="onboarding_api_key_help">Ключ можно бесплатно получить в Google AI Studio</string>
+    <string name="onboarding_permission_mic">Разрешение на микрофон</string>
+    <string name="onboarding_btn_next">Далее</string>
+    <string name="onboarding_btn_start">Начать заниматься</string>
+
+    <!-- Разбор урока -->
+    <string name="review_title">Разбор урока</string>
+    <string name="review_summary">Итоги урока</string>
+    <string name="review_cefr_estimate">Оценка CEFR за урок</string>
+    <string name="review_fluency">Беглость речи</string>
+    <string name="review_accuracy">Точность</string>
+    <string name="review_vocab_range">Словарный запас</string>
+    <string name="review_mistakes_title">Ошибки и поправки</string>
+    <string name="review_mistakes_empty">Отлично! В этом уроке заметных ошибок не было.</string>
+    <string name="review_vocab_title">Новые слова</string>
+    <string name="review_btn_add_all_vocab">Добавить все в словарь</string>
+    <string name="review_btn_generate_exercises">Создать упражнения</string>
+
+    <!-- Экраны модулей -->
+    <string name="vocab_title">Словарь</string>
+    <string name="vocab_due_today">Карточки на сегодня</string>
+    <string name="vocab_empty">На сегодня карточек нет!</string>
+    <string name="vocab_grade_again">Забыл</string>
+    <string name="vocab_grade_hard">Трудно</string>
+    <string name="vocab_grade_good">Хорошо</string>
+    <string name="vocab_grade_easy">Легко</string>
+    <string name="pronunciation_title">Произношение</string>
+    <string name="pronunciation_phonemes_map">Карта звуков</string>
+    <string name="pronunciation_minimal_pairs">Минимальные пары</string>
+    <string name="grammar_title">Грамматика</string>
+    <string name="grammar_recommended">Рекомендованные темы</string>
+    <string name="progress_title">Прогресс</string>
+    <string name="progress_streak_days">%1$d дней подряд</string>
+    <string name="progress_total_time">Время разговора</string>
+    <string name="progress_usage_cost">Затраты за месяц</string>
+
+    <!-- Диалоги -->
+    <string name="dialog_confirm">Подтвердить</string>
+    <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_delete">Удалить</string>
+    <string name="dialog_clear_all_title">Удалить все данные?</string>
+    <string name="dialog_clear_all_msg">Это действие нельзя отменить. Вся история и словарь будут удалены.</string>
+
+    <!-- Plurals -->
+    <plurals name="plurals_words">
+        <item quantity="one">%1$d слово</item>
+        <item quantity="few">%1$d слова</item>
+        <item quantity="many">%1$d слов</item>
+        <item quantity="other">%1$d слова</item>
+    </plurals>
+
+    <plurals name="plurals_minutes">
+        <item quantity="one">%1$d минута</item>
+        <item quantity="few">%1$d минуты</item>
+        <item quantity="many">%1$d минут</item>
+        <item quantity="other">%1$d минуты</item>
+    </plurals>
+
+    <plurals name="plurals_lessons">
+        <item quantity="one">%1$d урок</item>
+        <item quantity="few">%1$d урока</item>
+        <item quantity="many">%1$d уроков</item>
+        <item quantity="other">%1$d урока</item>
+    </plurals>
+
+    <plurals name="plurals_cards">
+        <item quantity="one">%1$d карточка</item>
+        <item quantity="few">%1$d карточки</item>
+        <item quantity="many">%1$d карточек</item>
+        <item quantity="other">%1$d карточки</item>
+    </plurals>
 </resources>
