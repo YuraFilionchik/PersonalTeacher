@@ -31,7 +31,4 @@ private fun PlaceholderScreen(title: String) {
 fun HomeScreen() = PlaceholderScreen(stringResource(R.string.nav_home))
 
 @Composable
-fun PracticeScreen() = PlaceholderScreen(stringResource(R.string.nav_practice))
-
-@Composable
 fun ProgressScreen() = PlaceholderScreen(stringResource(R.string.nav_progress))

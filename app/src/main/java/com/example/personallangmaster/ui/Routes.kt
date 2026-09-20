@@ -32,4 +32,12 @@ sealed interface Route : NavKey {
     /** Разбор конкретного урока. */
     @Serializable
     data class Review(val lessonId: Long) : Route
+
+    /** Весь словарь профиля. */
+    @Serializable
+    data object VocabList : Route
+
+    /** Очередь повторений на сегодня. */
+    @Serializable
+    data object VocabReview : Route
 }

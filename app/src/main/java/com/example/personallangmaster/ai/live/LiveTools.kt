@@ -27,13 +27,23 @@ object LiveTools {
             functionDeclarations = listOf(
                 FunctionDeclaration(
                     name = SAVE_VOCAB,
-                    description = "Save a word or phrase the student should learn. " +
-                        "Call it silently whenever something is worth remembering.",
+                    description = "Save a single word or short phrase (at most four words) the " +
+                        "student should learn, so it can become a flashcard. " +
+                        "Call it silently whenever something is worth remembering. " +
+                        "Do not use this tool for grammar advice or explanations.",
                     parameters = objectSchema(
                         required = listOf("term", "translation_ru"),
                     ) {
-                        stringProperty("term", "The English word or phrase")
-                        stringProperty("translation_ru", "Russian translation")
+                        stringProperty(
+                            "term",
+                            "The English word or short phrase itself, in its dictionary form. " +
+                                "Never a sentence and never an instruction.",
+                        )
+                        stringProperty(
+                            "translation_ru",
+                            "The Russian translation only: one or a few words, no explanation, " +
+                                "no advice, no full sentences.",
+                        )
                         stringProperty("example", "A short example sentence in English")
                         stringProperty("why", "Why this is worth learning for this student")
                     },

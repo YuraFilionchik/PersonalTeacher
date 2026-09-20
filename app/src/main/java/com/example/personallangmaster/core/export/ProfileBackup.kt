@@ -13,8 +13,10 @@ data class ProfileBackup(
     val name: String,
     val targetLang: String,
     val cefrOverall: String,
-    val interests: String?,
-    val goals: String?,
+    // Без значения по умолчанию kotlinx.serialization считает поле обязательным,
+    // даже если его тип допускает null: старый бэкап без этих полей не читался.
+    val interests: String? = null,
+    val goals: String? = null,
     val vocabItems: List<VocabBackupItem> = emptyList(),
     val stats: StatsBackup? = null,
 )

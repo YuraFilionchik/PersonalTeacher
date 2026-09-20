@@ -21,6 +21,9 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.personallangmaster.R
 import com.example.personallangmaster.di.LocalAppContainer
 import com.example.personallangmaster.ui.lesson.LessonScreen
+import com.example.personallangmaster.ui.practice.PracticeScreen
+import com.example.personallangmaster.ui.vocab.VocabListScreen
+import com.example.personallangmaster.ui.vocab.VocabReviewScreen
 import com.example.personallangmaster.ui.review.LessonReviewScreen
 import com.example.personallangmaster.ui.settings.AppearanceSettingsScreen
 import com.example.personallangmaster.ui.settings.AudioSettingsScreen
@@ -104,7 +107,19 @@ fun PersonalLangMasterApp() {
                         }
                     )
                 }
-                entry<Route.Practice> { PracticeScreen() }
+                entry<Route.Practice> {
+                    PracticeScreen(
+                        onOpenVocab = { backStack.add(Route.VocabList) },
+                        onStartReview = { backStack.add(Route.VocabReview) },
+                    )
+                }
+                entry<Route.VocabList> {
+                    VocabListScreen(
+                        onBack = goBack,
+                        onStartReview = { backStack.add(Route.VocabReview) },
+                    )
+                }
+                entry<Route.VocabReview> { VocabReviewScreen(onBack = goBack) }
                 entry<Route.Progress> { ProgressScreen() }
                 entry<Route.Review> { key ->
                     LessonReviewScreen(lessonId = key.lessonId, onBack = goBack)

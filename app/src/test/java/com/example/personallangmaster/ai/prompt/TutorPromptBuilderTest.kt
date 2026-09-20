@@ -178,11 +178,33 @@ class TutorPromptBuilderTest {
             TutorContext(profile, AppSettings(lessonMinutes = 15))
         )
         assertTrue(prompt.contains("about 15 minutes"))
-        assertTrue(prompt.contains("end_lesson"))
+        assertTrue("тренер должен сворачивать разговор сам, без инструмента",
+            prompt.contains("start wrapping up"))
 
         val unlimited = TutorPromptBuilder.build(
             TutorContext(profile, AppSettings(lessonMinutes = 0))
         )
-        assertFalse(unlimited.contains("minutes; wrap up"))
+        assertFalse(unlimited.contains("The lesson is planned"))
+    }
+
+    @Test
+    fun `промпт не зовёт инструменты, которых нет`() {
+        val prompts = com.example.personallangmaster.data.db.LessonMode.entries.map { mode ->
+            TutorPromptBuilder.build(TutorContext(profile, AppSettings(), mode = mode))
+        }
+        val declared = com.example.personallangmaster.ai.live.LiveTools.declarations
+            .flatMap { it.functionDeclarations }
+            .map { it.name }
+
+        prompts.forEach { prompt ->
+            Regex("""\b[a-z]+_[a-z_]+\b""").findAll(prompt)
+                .map { it.value }
+                .filter { it.endsWith("_lesson") || it.startsWith("save_") || it.startsWith("log_") ||
+                    it.startsWith("set_") || it.startsWith("show_") || it.startsWith("suggest_") }
+                .forEach { mentioned ->
+                    assertTrue("промпт упоминает $mentioned, но такого инструмента нет",
+                        declared.contains(mentioned))
+                }
+        }
     }
 }

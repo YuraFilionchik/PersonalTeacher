@@ -158,7 +158,8 @@ object TutorPromptBuilder {
         LessonMode.PLACEMENT ->
             "Placement interview. Start with simple everyday questions and gradually move to " +
                 "abstract and hypothetical ones until the student clearly struggles. Do not correct " +
-                "anything during this interview. Keep it under five minutes, then call end_lesson."
+                "anything during this interview. Keep it under five minutes, then tell the student " +
+                "the interview is over and say what you noticed."
 
         LessonMode.DRILL ->
             "Focused drill. Work on one weak spot at a time with short repetitions. " +

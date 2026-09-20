@@ -3,10 +3,13 @@ package com.example.personallangmaster.di
 import android.content.Context
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.example.personallangmaster.core.crypto.KeyVault
+import com.example.personallangmaster.core.speech.SpeechInput
+import com.example.personallangmaster.core.speech.TtsController
 import com.example.personallangmaster.data.db.AppDatabase
 import com.example.personallangmaster.data.prefs.SettingsRepository
 import com.example.personallangmaster.data.repo.LessonRepository
 import com.example.personallangmaster.data.repo.ProfileRepository
+import com.example.personallangmaster.data.repo.VocabRepository
 import com.example.personallangmaster.data.seed.SeedLoader
 import com.example.personallangmaster.domain.AnalyzeLessonUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -37,6 +40,12 @@ class AppContainer(context: Context) {
             statsDao = database.statsDao(),
         )
     }
+    val vocabRepository: VocabRepository by lazy { VocabRepository(database.vocabDao()) }
+
+    // Системные озвучка и распознавание: повторения должны работать без сети и бесплатно.
+    val ttsController: TtsController by lazy { TtsController(appContext) }
+    val speechInput: SpeechInput by lazy { SpeechInput(appContext) }
+
     val analyzeLessonUseCase: AnalyzeLessonUseCase by lazy {
         AnalyzeLessonUseCase(
             lessonDao = database.lessonDao(),
