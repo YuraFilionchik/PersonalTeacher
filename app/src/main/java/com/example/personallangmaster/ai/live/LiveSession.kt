@@ -1,0 +1,390 @@
+package com.example.personallangmaster.ai.live
+
+import android.util.Base64
+import android.util.Log
+import com.example.personallangmaster.core.audio.AudioPlayer
+import com.example.personallangmaster.core.audio.AudioRecorder
+import com.example.personallangmaster.core.audio.EnergyVad
+import com.example.personallangmaster.core.audio.Pcm
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.JsonObject
+
+/** Всё, что нужно знать сессии перед подключением. */
+data class LiveSessionConfig(
+    val apiKey: String,
+    val model: String,
+    val systemInstruction: String,
+    val voiceName: String,
+    val languageCode: String = "en-US",
+    val temperature: Float = 0.8f,
+    val transcription: Boolean = true,
+    val contextCompression: Boolean = true,
+    val sessionResumption: Boolean = true,
+    /** true — границы реплики задаёт кнопка, false — серверный VAD (hands-free). */
+    val manualActivity: Boolean = true,
+    val bargeInEnabled: Boolean = true,
+    val noiseSuppression: Boolean = true,
+    /** Локальный порог тишины: молчание на сервер не отправляется. */
+    val vadThresholdDb: Double = -38.0,
+    val silenceHangoverMs: Int = 800,
+)
+
+/**
+ * Живая сессия урока: соединение, звук и состояние в одном месте.
+ *
+ * Сюда стекается всё, что делает разговор разговором — открытие микрофона,
+ * перебивание, восстановление после обрыва. UI получает только состояние и события.
+ */
+class LiveSession(
+    private val scope: CoroutineScope,
+    private val recorder: AudioRecorder = AudioRecorder(),
+    private val player: AudioPlayer = AudioPlayer(),
+    private val clientFactory: () -> LiveWebSocketClient = { LiveWebSocketClient() },
+) {
+
+    private val _state = MutableStateFlow<LiveSessionState>(LiveSessionState.Idle)
+    val state: StateFlow<LiveSessionState> = _state.asStateFlow()
+
+    private val _events = MutableSharedFlow<LiveEvent>(extraBufferCapacity = 64)
+    val events: SharedFlow<LiveEvent> = _events.asSharedFlow()
+
+    private val _micLevelDbfs = MutableStateFlow(-100.0)
+    val micLevelDbfs: StateFlow<Double> = _micLevelDbfs.asStateFlow()
+
+    /** Уровень речи тренера — для той же волны на экране. */
+    val tutorLevelDbfs: StateFlow<Double> get() = player.levelDbfs
+
+    private var client: LiveWebSocketClient? = null
+    private var socketJob: Job? = null
+    private var micJob: Job? = null
+    private var config: LiveSessionConfig? = null
+
+    private var resumptionHandle: String? = null
+    private var stopped = false
+    private var talking = false
+    private var reconnectAttempt = 0
+
+    // --- Жизненный цикл ---
+
+    fun start(config: LiveSessionConfig) {
+        if (config.apiKey.isBlank()) {
+            fail(LiveErrorKind.NO_KEY, "Ключ Gemini не задан")
+            return
+        }
+        this.config = config
+        stopped = false
+        reconnectAttempt = 0
+        player.start()
+        connect()
+    }
+
+    fun stop() {
+        stopped = true
+        stopTalking()
+        micJob?.cancel()
+        micJob = null
+        socketJob?.cancel()
+        socketJob = null
+        client?.close()
+        client = null
+        player.stop()
+        _state.value = LiveSessionState.Closed
+    }
+
+    private fun connect() {
+        val current = config ?: return
+        val socket = clientFactory()
+        client = socket
+        _state.value = if (reconnectAttempt == 0) {
+            LiveSessionState.Connecting
+        } else {
+            LiveSessionState.Reconnecting(reconnectAttempt)
+        }
+
+        socketJob?.cancel()
+        socketJob = socket.connect(current.apiKey)
+            .onEach { event -> handleSocketEvent(event, current) }
+            .catch { error -> scheduleReconnect(error.message ?: "обрыв соединения") }
+            .launchIn(scope)
+    }
+
+    private fun handleSocketEvent(event: LiveSocketEvent, config: LiveSessionConfig) {
+        when (event) {
+            LiveSocketEvent.Opened -> sendSetup(config)
+            is LiveSocketEvent.Message -> handleServerMessage(event.message)
+            is LiveSocketEvent.Failure -> {
+                when (event.httpCode) {
+                    401, 403 -> fail(LiveErrorKind.INVALID_KEY, "Ключ не принят сервером")
+                    429 -> fail(LiveErrorKind.QUOTA, "Квота исчерпана")
+                    else -> scheduleReconnect(event.error.message ?: "нет связи")
+                }
+            }
+            is LiveSocketEvent.Closed -> {
+                if (!stopped) scheduleReconnect("соединение закрыто (${event.code})")
+            }
+        }
+    }
+
+    private fun sendSetup(config: LiveSessionConfig) {
+        val setup = Setup(
+            model = "models/${config.model}",
+            generationConfig = GenerationConfig(
+                responseModalities = listOf("AUDIO"),
+                temperature = config.temperature,
+                speechConfig = SpeechConfig(
+                    voiceConfig = VoiceConfig(PrebuiltVoiceConfig(config.voiceName)),
+                    languageCode = config.languageCode,
+                ),
+            ),
+            systemInstruction = Content(parts = listOf(Part(text = config.systemInstruction))),
+            tools = LiveTools.declarations,
+            realtimeInputConfig = if (config.manualActivity) {
+                RealtimeInputConfig(AutomaticActivityDetection(disabled = true))
+            } else {
+                null
+            },
+            sessionResumption = if (config.sessionResumption) {
+                SessionResumption(handle = resumptionHandle)
+            } else {
+                null
+            },
+            contextWindowCompression = if (config.contextCompression) {
+                ContextWindowCompression()
+            } else {
+                null
+            },
+            // Без транскрипции не будет ни субтитров, ни материала для разбора урока.
+            inputAudioTranscription = if (config.transcription) Empty() else null,
+            outputAudioTranscription = if (config.transcription) Empty() else null,
+        )
+
+        client?.send(SetupMessage(setup))
+    }
+
+    private fun handleServerMessage(message: ServerMessage) {
+        message.setupComplete?.let {
+            reconnectAttempt = 0
+            _state.value = LiveSessionState.Ready
+        }
+
+        message.sessionResumptionUpdate?.let { update ->
+            if (update.resumable == true) resumptionHandle = update.newHandle
+        }
+
+        message.usageMetadata?.let { usage ->
+            emit(
+                LiveEvent.Usage(
+                    promptTokens = usage.promptTokenCount ?: 0,
+                    responseTokens = usage.responseTokenCount ?: 0,
+                )
+            )
+        }
+
+        message.goAway?.let { emit(LiveEvent.GoingAway(it.timeLeft)) }
+
+        message.serverContent?.let(::handleServerContent)
+
+        message.toolCall?.functionCalls?.forEach { call -> emit(LiveEvent.Tool(call)) }
+    }
+
+    private fun handleServerContent(content: ServerContent) {
+        if (content.interrupted == true) {
+            player.flush()
+            emit(LiveEvent.Interrupted)
+        }
+
+        content.inputTranscription?.text?.takeIf { it.isNotBlank() }?.let { text ->
+            emit(LiveEvent.UserTranscript(text, isFinal = content.turnComplete == true))
+        }
+
+        content.outputTranscription?.text?.takeIf { it.isNotBlank() }?.let { text ->
+            emit(LiveEvent.TutorTranscript(text, isFinal = false))
+        }
+
+        content.modelTurn?.parts?.forEach { part ->
+            part.inlineData?.let { blob ->
+                if (blob.mimeType.startsWith("audio/")) {
+                    runCatching { Base64.decode(blob.data, Base64.DEFAULT) }
+                        .onSuccess { pcm ->
+                            player.enqueue(pcm)
+                            if (_state.value !is LiveSessionState.Error) {
+                                _state.value = LiveSessionState.Speaking
+                            }
+                        }
+                }
+            }
+            part.text?.takeIf { it.isNotBlank() }?.let { text ->
+                emit(LiveEvent.TutorTranscript(text, isFinal = false))
+            }
+        }
+
+        if (content.turnComplete == true) {
+            emit(LiveEvent.TurnComplete)
+            if (!talking) _state.value = LiveSessionState.Ready
+        }
+    }
+
+    // --- Микрофон ---
+
+    /** Ученик начал говорить: открываем микрофон и, если надо, перебиваем тренера. */
+    fun startTalking() {
+        val current = config ?: return
+        if (talking) return
+        talking = true
+
+        if (current.bargeInEnabled && player.isPlaying.value) {
+            player.flush()
+        }
+
+        if (current.manualActivity) {
+            client?.send(RealtimeInputMessage(RealtimeInput(activityStart = Empty())))
+        }
+        _state.value = LiveSessionState.Listening
+
+        val vad = EnergyVad(
+            sampleRate = AudioRecorder.SAMPLE_RATE,
+            startThresholdDb = current.vadThresholdDb,
+            stopThresholdDb = current.vadThresholdDb - 7.0,
+            silenceHangoverMs = current.silenceHangoverMs,
+        )
+
+        // Небольшой предбуфер: иначе VAD съедает первые слоги, пока набирает уверенность.
+        val preRoll = ArrayDeque<ByteArray>()
+
+        micJob?.cancel()
+        micJob = recorder.chunks(applyEffects = current.noiseSuppression)
+            .onEach { chunk ->
+                _micLevelDbfs.value = Pcm.dbfs(chunk)
+                val wasSpeaking = vad.isSpeaking
+                vad.process(chunk)
+
+                when {
+                    // Тишину не отправляем: самая дешёвая экономия входных токенов.
+                    !vad.isSpeaking -> {
+                        preRoll.addLast(chunk)
+                        while (preRoll.size > PRE_ROLL_CHUNKS) preRoll.removeFirst()
+                    }
+
+                    !wasSpeaking -> {
+                        while (preRoll.isNotEmpty()) sendAudio(preRoll.removeFirst())
+                        sendAudio(chunk)
+                    }
+
+                    else -> sendAudio(chunk)
+                }
+            }
+            .catch { error ->
+                Log.w(TAG, "Микрофон остановлен: ${error.message}")
+                fail(LiveErrorKind.AUDIO_DEVICE, "Не удалось открыть микрофон")
+            }
+            .launchIn(scope)
+    }
+
+    /** Ученик закончил реплику. */
+    fun stopTalking() {
+        if (!talking) return
+        talking = false
+        micJob?.cancel()
+        micJob = null
+        _micLevelDbfs.value = -100.0
+
+        config?.let { current ->
+            if (current.manualActivity) {
+                client?.send(RealtimeInputMessage(RealtimeInput(activityEnd = Empty())))
+            }
+        }
+
+        if (_state.value is LiveSessionState.Listening) {
+            _state.value = LiveSessionState.Thinking
+        }
+    }
+
+    private fun sendAudio(pcm: ByteArray) {
+        val encoded = Base64.encodeToString(pcm, Base64.NO_WRAP)
+        client?.send(
+            RealtimeInputMessage(
+                RealtimeInput(
+                    audio = Blob(
+                        mimeType = "audio/pcm;rate=${AudioRecorder.SAMPLE_RATE}",
+                        data = encoded,
+                    )
+                )
+            )
+        )
+    }
+
+    // --- Текст и инструменты ---
+
+    /** Реплика текстом: тот же диалог, просто без микрофона. */
+    fun sendText(text: String) {
+        if (text.isBlank()) return
+        client?.send(
+            ClientContentMessage(
+                ClientContent(
+                    turns = listOf(Content(parts = listOf(Part(text = text)), role = "user")),
+                    turnComplete = true,
+                )
+            )
+        )
+        _state.value = LiveSessionState.Thinking
+    }
+
+    /** Ответ на вызов функции. Должен уходить сразу, иначе рвётся темп речи. */
+    fun respondToTool(call: FunctionCall, response: JsonObject = LiveTools.ok()) {
+        client?.send(
+            ToolResponseMessage(
+                ToolResponse(
+                    functionResponses = listOf(
+                        FunctionResponse(id = call.id, name = call.name, response = response)
+                    )
+                )
+            )
+        )
+    }
+
+    // --- Восстановление ---
+
+    private fun scheduleReconnect(reason: String) {
+        if (stopped) return
+        if (reconnectAttempt >= MAX_RECONNECT_ATTEMPTS) {
+            fail(LiveErrorKind.NETWORK, "Не удалось восстановить соединение: $reason")
+            return
+        }
+        reconnectAttempt++
+        _state.value = LiveSessionState.Reconnecting(reconnectAttempt)
+        scope.launch {
+            delay(RECONNECT_BASE_MS * (1L shl (reconnectAttempt - 1)))
+            if (!stopped) connect()
+        }
+    }
+
+    private fun fail(kind: LiveErrorKind, message: String) {
+        _state.value = LiveSessionState.Error(kind, message)
+        emit(LiveEvent.Failed(kind, message))
+    }
+
+    private fun emit(event: LiveEvent) {
+        if (!_events.tryEmit(event)) {
+            scope.launch { _events.emit(event) }
+        }
+    }
+
+    private companion object {
+        const val TAG = "LiveSession"
+        const val MAX_RECONNECT_ATTEMPTS = 5
+        const val RECONNECT_BASE_MS = 1_000L
+        const val PRE_ROLL_CHUNKS = 3
+    }
+}

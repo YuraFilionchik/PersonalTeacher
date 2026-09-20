@@ -20,6 +20,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.personallangmaster.R
 import com.example.personallangmaster.di.LocalAppContainer
+import com.example.personallangmaster.ui.lesson.LessonScreen
 import com.example.personallangmaster.ui.settings.AppearanceSettingsScreen
 import com.example.personallangmaster.ui.settings.AudioSettingsScreen
 import com.example.personallangmaster.ui.settings.BudgetSettingsScreen
@@ -92,7 +93,15 @@ fun PersonalLangMasterApp() {
             onBack = goBack,
             entryProvider = entryProvider {
                 entry<Route.Home> { HomeScreen() }
-                entry<Route.Lesson> { LessonScreen() }
+                entry<Route.Lesson> {
+                    LessonScreen(
+                        onOpenSettings = {
+                            backStack.clear()
+                            backStack.add(Route.Settings)
+                            backStack.add(SettingsRoute.Model)
+                        }
+                    )
+                }
                 entry<Route.Practice> { PracticeScreen() }
                 entry<Route.Progress> { ProgressScreen() }
                 entry<Route.Settings> {

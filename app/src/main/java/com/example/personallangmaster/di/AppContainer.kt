@@ -5,6 +5,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import com.example.personallangmaster.core.crypto.KeyVault
 import com.example.personallangmaster.data.db.AppDatabase
 import com.example.personallangmaster.data.prefs.SettingsRepository
+import com.example.personallangmaster.data.repo.LessonRepository
 import com.example.personallangmaster.data.repo.ProfileRepository
 import com.example.personallangmaster.data.seed.SeedLoader
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +28,14 @@ class AppContainer(context: Context) {
     val keyVault: KeyVault by lazy { KeyVault() }
     val settingsRepository: SettingsRepository by lazy { SettingsRepository(appContext, keyVault) }
     val profileRepository: ProfileRepository by lazy { ProfileRepository(database.profileDao()) }
+    val lessonRepository: LessonRepository by lazy {
+        LessonRepository(
+            lessonDao = database.lessonDao(),
+            vocabDao = database.vocabDao(),
+            contentDao = database.contentDao(),
+            statsDao = database.statsDao(),
+        )
+    }
     private val seedLoader: SeedLoader by lazy { SeedLoader(appContext, database.contentDao()) }
 
     /** Разовая инициализация на старте приложения: подгрузка учебного контента. */
