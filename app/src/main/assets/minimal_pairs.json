@@ -1,0 +1,542 @@
+[
+  {
+    "id": "mp_ship_sheep",
+    "word1": "ship",
+    "word2": "sheep",
+    "phoneme1": "/ɪ/",
+    "phoneme2": "/iː/",
+    "translation1": "корабль",
+    "translation2": "овца"
+  },
+  {
+    "id": "mp_hit_heat",
+    "word1": "hit",
+    "word2": "heat",
+    "phoneme1": "/ɪ/",
+    "phoneme2": "/iː/",
+    "translation1": "бить",
+    "translation2": "жара"
+  },
+  {
+    "id": "mp_bit_beat",
+    "word1": "bit",
+    "word2": "beat",
+    "phoneme1": "/ɪ/",
+    "phoneme2": "/iː/",
+    "translation1": "кусочек",
+    "translation2": "бить/побеждать"
+  },
+  {
+    "id": "mp_it_eat",
+    "word1": "it",
+    "word2": "eat",
+    "phoneme1": "/ɪ/",
+    "phoneme2": "/iː/",
+    "translation1": "это",
+    "translation2": "есть"
+  },
+  {
+    "id": "mp_sit_seat",
+    "word1": "sit",
+    "word2": "seat",
+    "phoneme1": "/ɪ/",
+    "phoneme2": "/iː/",
+    "translation1": "сидеть",
+    "translation2": "сиденье"
+  },
+  {
+    "id": "mp_bed_bad",
+    "word1": "bed",
+    "word2": "bad",
+    "phoneme1": "/e/",
+    "phoneme2": "/æ/",
+    "translation1": "кровать",
+    "translation2": "плохой"
+  },
+  {
+    "id": "mp_pen_pan",
+    "word1": "pen",
+    "word2": "pan",
+    "phoneme1": "/e/",
+    "phoneme2": "/æ/",
+    "translation1": "ручка",
+    "translation2": "сковорода"
+  },
+  {
+    "id": "mp_men_man",
+    "word1": "men",
+    "word2": "man",
+    "phoneme1": "/e/",
+    "phoneme2": "/æ/",
+    "translation1": "мужчины",
+    "translation2": "мужчина"
+  },
+  {
+    "id": "mp_head_had",
+    "word1": "head",
+    "word2": "had",
+    "phoneme1": "/e/",
+    "phoneme2": "/æ/",
+    "translation1": "голова",
+    "translation2": "имел"
+  },
+  {
+    "id": "mp_said_sad",
+    "word1": "said",
+    "word2": "sad",
+    "phoneme1": "/e/",
+    "phoneme2": "/æ/",
+    "translation1": "сказал",
+    "translation2": "грустный"
+  },
+  {
+    "id": "mp_cup_cap",
+    "word1": "cup",
+    "word2": "cap",
+    "phoneme1": "/ʌ/",
+    "phoneme2": "/æ/",
+    "translation1": "чашка",
+    "translation2": "кепка"
+  },
+  {
+    "id": "mp_much_match",
+    "word1": "much",
+    "word2": "match",
+    "phoneme1": "/ʌ/",
+    "phoneme2": "/æ/",
+    "translation1": "много",
+    "translation2": "матч/спичка"
+  },
+  {
+    "id": "mp_uncle_ankle",
+    "word1": "uncle",
+    "word2": "ankle",
+    "phoneme1": "/ʌ/",
+    "phoneme2": "/æ/",
+    "translation1": "дядя",
+    "translation2": "лодыжка"
+  },
+  {
+    "id": "mp_bug_bag",
+    "word1": "bug",
+    "word2": "bag",
+    "phoneme1": "/ʌ/",
+    "phoneme2": "/æ/",
+    "translation1": "жук",
+    "translation2": "сумка"
+  },
+  {
+    "id": "mp_hut_hat",
+    "word1": "hut",
+    "word2": "hat",
+    "phoneme1": "/ʌ/",
+    "phoneme2": "/æ/",
+    "translation1": "хижина",
+    "translation2": "шляпа"
+  },
+  {
+    "id": "mp_work_walk",
+    "word1": "work",
+    "word2": "walk",
+    "phoneme1": "/ɜː/",
+    "phoneme2": "/ɔː/",
+    "translation1": "работать",
+    "translation2": "гулять"
+  },
+  {
+    "id": "mp_bird_board",
+    "word1": "bird",
+    "word2": "board",
+    "phoneme1": "/ɜː/",
+    "phoneme2": "/ɔː/",
+    "translation1": "птица",
+    "translation2": "доска"
+  },
+  {
+    "id": "mp_hurt_heart",
+    "word1": "hurt",
+    "word2": "heart",
+    "phoneme1": "/ɜː/",
+    "phoneme2": "/ɑː/",
+    "translation1": "повредить",
+    "translation2": "сердце"
+  },
+  {
+    "id": "mp_cut_cart",
+    "word1": "cut",
+    "word2": "cart",
+    "phoneme1": "/ʌ/",
+    "phoneme2": "/ɑː/",
+    "translation1": "резать",
+    "translation2": "тележка"
+  },
+  {
+    "id": "mp_duck_dark",
+    "word1": "duck",
+    "word2": "dark",
+    "phoneme1": "/ʌ/",
+    "phoneme2": "/ɑː/",
+    "translation1": "утка",
+    "translation2": "темный"
+  },
+  {
+    "id": "mp_pull_pool",
+    "word1": "pull",
+    "word2": "pool",
+    "phoneme1": "/ʊ/",
+    "phoneme2": "/uː/",
+    "translation1": "тянуть",
+    "translation2": "бассейн"
+  },
+  {
+    "id": "mp_full_fool",
+    "word1": "full",
+    "word2": "fool",
+    "phoneme1": "/ʊ/",
+    "phoneme2": "/uː/",
+    "translation1": "полный",
+    "translation2": "дурак"
+  },
+  {
+    "id": "mp_look_luke",
+    "word1": "look",
+    "word2": "Luke",
+    "phoneme1": "/ʊ/",
+    "phoneme2": "/uː/",
+    "translation1": "смотреть",
+    "translation2": "Люк (имя)"
+  },
+  {
+    "id": "mp_would_wood",
+    "word1": "would",
+    "word2": "wood",
+    "phoneme1": "/wʊd/",
+    "phoneme2": "/wʊd/",
+    "translation1": "бы (модальный)",
+    "translation2": "дерево (омофоны)"
+  },
+  {
+    "id": "mp_not_note",
+    "word1": "not",
+    "word2": "note",
+    "phoneme1": "/ɒ/",
+    "phoneme2": "/əʊ/",
+    "translation1": "не",
+    "translation2": "заметка"
+  },
+  {
+    "id": "mp_want_won",
+    "word1": "want",
+    "word2": "won't",
+    "phoneme1": "/ɒ/",
+    "phoneme2": "/əʊ/",
+    "translation1": "хотеть",
+    "translation2": "не буду"
+  },
+  {
+    "id": "mp_cost_coast",
+    "word1": "cost",
+    "word2": "coast",
+    "phoneme1": "/ɒ/",
+    "phoneme2": "/əʊ/",
+    "translation1": "стоить",
+    "translation2": "побережье"
+  },
+  {
+    "id": "mp_cot_caught",
+    "word1": "cot",
+    "word2": "caught",
+    "phoneme1": "/ɒ/",
+    "phoneme2": "/ɔː/",
+    "translation1": "детская кроватка",
+    "translation2": "поймал"
+  },
+  {
+    "id": "mp_spot_sport",
+    "word1": "spot",
+    "word2": "sport",
+    "phoneme1": "/ɒ/",
+    "phoneme2": "/ɔː/",
+    "translation1": "пятно",
+    "translation2": "спорт"
+  },
+  {
+    "id": "mp_think_sink",
+    "word1": "think",
+    "word2": "sink",
+    "phoneme1": "/θ/",
+    "phoneme2": "/s/",
+    "translation1": "думать",
+    "translation2": "тонуть/раковина"
+  },
+  {
+    "id": "mp_thing_sing",
+    "word1": "thing",
+    "word2": "sing",
+    "phoneme1": "/θ/",
+    "phoneme2": "/s/",
+    "translation1": "вещь",
+    "translation2": "петь"
+  },
+  {
+    "id": "mp_mouse_mouth",
+    "word1": "mouse",
+    "word2": "mouth",
+    "phoneme1": "/s/",
+    "phoneme2": "/θ/",
+    "translation1": "мышь",
+    "translation2": "рот"
+  },
+  {
+    "id": "mp_pass_path",
+    "word1": "pass",
+    "word2": "path",
+    "phoneme1": "/s/",
+    "phoneme2": "/θ/",
+    "translation1": "передавать",
+    "translation2": "тропа"
+  },
+  {
+    "id": "mp_they_day",
+    "word1": "they",
+    "word2": "day",
+    "phoneme1": "/ð/",
+    "phoneme2": "/d/",
+    "translation1": "они",
+    "translation2": "день"
+  },
+  {
+    "id": "mp_there_dare",
+    "word1": "there",
+    "word2": "dare",
+    "phoneme1": "/ð/",
+    "phoneme2": "/d/",
+    "translation1": "там",
+    "translation2": "сметь"
+  },
+  {
+    "id": "mp_breathe_breed",
+    "word1": "breathe",
+    "word2": "breed",
+    "phoneme1": "/ð/",
+    "phoneme2": "/d/",
+    "translation1": "дышать",
+    "translation2": "разводить"
+  },
+  {
+    "id": "mp_vine_wine",
+    "word1": "vine",
+    "word2": "wine",
+    "phoneme1": "/v/",
+    "phoneme2": "/w/",
+    "translation1": "лоза",
+    "translation2": "вино"
+  },
+  {
+    "id": "mp_vet_wet",
+    "word1": "vet",
+    "word2": "wet",
+    "phoneme1": "/v/",
+    "phoneme2": "/w/",
+    "translation1": "ветеринар",
+    "translation2": "мокрый"
+  },
+  {
+    "id": "mp_vest_west",
+    "word1": "vest",
+    "word2": "west",
+    "phoneme1": "/v/",
+    "phoneme2": "/w/",
+    "translation1": "жилет",
+    "translation2": "запад"
+  },
+  {
+    "id": "mp_berry_very",
+    "word1": "berry",
+    "word2": "very",
+    "phoneme1": "/b/",
+    "phoneme2": "/v/",
+    "translation1": "ягода",
+    "translation2": "очень"
+  },
+  {
+    "id": "mp_boat_vote",
+    "word1": "boat",
+    "word2": "vote",
+    "phoneme1": "/b/",
+    "phoneme2": "/v/",
+    "translation1": "лодка",
+    "translation2": "голосовать"
+  },
+  {
+    "id": "mp_ban_van",
+    "word1": "ban",
+    "word2": "van",
+    "phoneme1": "/b/",
+    "phoneme2": "/v/",
+    "translation1": "запрет",
+    "translation2": "фургон"
+  },
+  {
+    "id": "mp_fan_van",
+    "word1": "fan",
+    "word2": "van",
+    "phoneme1": "/f/",
+    "phoneme2": "/v/",
+    "translation1": "вентилятор/фанат",
+    "translation2": "фургон"
+  },
+  {
+    "id": "mp_safe_save",
+    "word1": "safe",
+    "word2": "save",
+    "phoneme1": "/f/",
+    "phoneme2": "/v/",
+    "translation1": "безопасный",
+    "translation2": "сохранять"
+  },
+  {
+    "id": "mp_light_right",
+    "word1": "light",
+    "word2": "right",
+    "phoneme1": "/l/",
+    "phoneme2": "/r/",
+    "translation1": "свет/легкий",
+    "translation2": "право/правильный"
+  },
+  {
+    "id": "mp_long_wrong",
+    "word1": "long",
+    "word2": "wrong",
+    "phoneme1": "/l/",
+    "phoneme2": "/r/",
+    "translation1": "длинный",
+    "translation2": "неправильный"
+  },
+  {
+    "id": "mp_alive_arrive",
+    "word1": "alive",
+    "word2": "arrive",
+    "phoneme1": "/l/",
+    "phoneme2": "/r/",
+    "translation1": "живой",
+    "translation2": "прибывать"
+  },
+  {
+    "id": "mp_fly_fry",
+    "word1": "fly",
+    "word2": "fry",
+    "phoneme1": "/l/",
+    "phoneme2": "/r/",
+    "translation1": "летать",
+    "translation2": "жарить"
+  },
+  {
+    "id": "mp_glass_grass",
+    "word1": "glass",
+    "word2": "grass",
+    "phoneme1": "/l/",
+    "phoneme2": "/r/",
+    "translation1": "стекло/стакан",
+    "translation2": "трава"
+  },
+  {
+    "id": "mp_watch_wash",
+    "word1": "watch",
+    "word2": "wash",
+    "phoneme1": "/tʃ/",
+    "phoneme2": "/ʃ/",
+    "translation1": "смотреть/часы",
+    "translation2": "мыть"
+  },
+  {
+    "id": "mp_catch_cash",
+    "word1": "catch",
+    "word2": "cash",
+    "phoneme1": "/tʃ/",
+    "phoneme2": "/ʃ/",
+    "translation1": "ловить",
+    "translation2": "наличные"
+  },
+  {
+    "id": "mp_match_mash",
+    "word1": "match",
+    "word2": "mash",
+    "phoneme1": "/tʃ/",
+    "phoneme2": "/ʃ/",
+    "translation1": "матч/спичка",
+    "translation2": "пюре/мять"
+  },
+  {
+    "id": "mp_choose_shoes",
+    "word1": "choose",
+    "word2": "shoes",
+    "phoneme1": "/tʃ/",
+    "phoneme2": "/ʃ/",
+    "translation1": "выбирать",
+    "translation2": "обувь"
+  },
+  {
+    "id": "mp_jeep_cheap",
+    "word1": "jeep",
+    "word2": "cheap",
+    "phoneme1": "/dʒ/",
+    "phoneme2": "/tʃ/",
+    "translation1": "джип",
+    "translation2": "дешевый"
+  },
+  {
+    "id": "mp_joke_choke",
+    "word1": "joke",
+    "word2": "choke",
+    "phoneme1": "/dʒ/",
+    "phoneme2": "/tʃ/",
+    "translation1": "шутка",
+    "translation2": "душить/давиться"
+  },
+  {
+    "id": "mp_large_larch",
+    "word1": "large",
+    "word2": "larch",
+    "phoneme1": "/dʒ/",
+    "phoneme2": "/tʃ/",
+    "translation1": "большой",
+    "translation2": "лиственница"
+  },
+  {
+    "id": "mp_pig_big",
+    "word1": "pig",
+    "word2": "big",
+    "phoneme1": "/p/",
+    "phoneme2": "/b/",
+    "translation1": "свинья",
+    "translation2": "большой"
+  },
+  {
+    "id": "mp_pear_bear",
+    "word1": "pear",
+    "word2": "bear",
+    "phoneme1": "/p/",
+    "phoneme2": "/b/",
+    "translation1": "груша",
+    "translation2": "медведь"
+  },
+  {
+    "id": "mp_time_dime",
+    "word1": "time",
+    "word2": "dime",
+    "phoneme1": "/t/",
+    "phoneme2": "/d/",
+    "translation1": "время",
+    "translation2": "монета (10 центов)"
+  },
+  {
+    "id": "mp_cold_gold",
+    "word1": "cold",
+    "word2": "gold",
+    "phoneme1": "/k/",
+    "phoneme2": "/ɡ/",
+    "translation1": "холодный",
+    "translation2": "золото"
+  }
+]

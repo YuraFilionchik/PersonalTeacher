@@ -1,0 +1,544 @@
+[
+  {
+    "id": "scenario_cafe_1",
+    "category": "EVERYDAY",
+    "level": "A1",
+    "title_ru": "В кофейне",
+    "title_en": "At a coffee shop",
+    "description_ru": "Заказать кофе и выпечку в шумном кафе",
+    "duration_mins": 3,
+    "role_tutor": "Бариста в популярной кофейне, дружелюбный, но спешит",
+    "role_user": "Посетитель, хочет заказать кофе с собой",
+    "goal": "Сделать заказ, уточнить детали (размер, тип молока) и узнать цену",
+    "success_criteria": [
+      "Заказан конкретный напиток",
+      "Указан размер или тип молока",
+      "Вопрос о стоимости задан и понят ответ"
+    ],
+    "opening_line": "Hi there! What can I get started for you today?",
+    "vocab_hints": ["to go", "eat in", "skim milk", "oat milk", "receipt"]
+  },
+  {
+    "id": "scenario_airport_1",
+    "category": "TRAVEL",
+    "level": "A2",
+    "title_ru": "Паспортный контроль",
+    "title_en": "Passport Control",
+    "description_ru": "Пройти собеседование с офицером пограничной службы",
+    "duration_mins": 5,
+    "role_tutor": "Офицер пограничной службы, строгий, задает стандартные вопросы",
+    "role_user": "Турист, прилетевший в отпуск",
+    "goal": "Ответить на все вопросы о цели визита, сроках и месте проживания",
+    "success_criteria": [
+      "Названа цель визита (туризм/бизнес)",
+      "Названа продолжительность пребывания",
+      "Указано место проживания (отель/друзья)"
+    ],
+    "opening_line": "Next in line, please. Passport and landing card.",
+    "vocab_hints": ["purpose of visit", "duration of stay", "accommodation", "return ticket"]
+  },
+  {
+    "id": "scenario_hotel_1",
+    "category": "TRAVEL",
+    "level": "A2",
+    "title_ru": "Заселение в отель",
+    "title_en": "Hotel Check-in",
+    "description_ru": "Заселиться в забронированный номер",
+    "duration_mins": 4,
+    "role_tutor": "Администратор отеля, вежливый и услужливый",
+    "role_user": "Гость с бронированием",
+    "goal": "Подтвердить бронирование, дать паспорт/карту, узнать время завтрака",
+    "success_criteria": [
+      "Сказано о наличии брони на свое имя",
+      "Задан вопрос про время/место завтрака"
+    ],
+    "opening_line": "Good afternoon! Welcome to the Grand Hotel. How can I help you?",
+    "vocab_hints": ["reservation", "under the name of", "ID", "deposit", "breakfast included"]
+  },
+  {
+    "id": "scenario_restaurant_1",
+    "category": "EVERYDAY",
+    "level": "B1",
+    "title_ru": "Жалоба в ресторане",
+    "title_en": "Restaurant Complaint",
+    "description_ru": "Указать официанту на ошибку в заказе или проблему с едой",
+    "duration_mins": 5,
+    "role_tutor": "Официант, извиняется и пытается решить проблему",
+    "role_user": "Недовольный, но вежливый посетитель",
+    "goal": "Объяснить суть проблемы и попросить заменить блюдо или убрать из счета",
+    "success_criteria": [
+      "Проблема описана четко (холодное/не то блюдо)",
+      "Предложено решение (заменить/вернуть деньги)"
+    ],
+    "opening_line": "Is everything okay with your meal?",
+    "vocab_hints": ["overcooked", "undercooked", "this isn't what I ordered", "could you replace this", "take this off the bill"]
+  },
+  {
+    "id": "scenario_work_1",
+    "category": "BUSINESS",
+    "level": "B1",
+    "title_ru": "Small talk с коллегой",
+    "title_en": "Small Talk by the Water Cooler",
+    "description_ru": "Светская беседа с коллегой перед началом рабочего дня",
+    "duration_mins": 3,
+    "role_tutor": "Коллега из соседнего отдела, общительный",
+    "role_user": "Сотрудник компании",
+    "goal": "Поддержать разговор о выходных, погоде или недавних новостях компании",
+    "success_criteria": [
+      "Заданы встречные вопросы собеседнику",
+      "Беседа поддержана минимум 4 репликами"
+    ],
+    "opening_line": "Morning! How was your weekend? Do anything fun?",
+    "vocab_hints": ["catch up", "relaxing", "busy week ahead", "did you hear about"]
+  },
+  {
+    "id": "scenario_interview_1",
+    "category": "BUSINESS",
+    "level": "B2",
+    "title_ru": "Собеседование: Рассказ о себе",
+    "title_en": "Job Interview: Tell me about yourself",
+    "description_ru": "Пройти первую часть собеседования на английском",
+    "duration_mins": 5,
+    "role_tutor": "HR-менеджер, профессиональный, задает уточняющие вопросы",
+    "role_user": "Кандидат на позицию (IT, маркетинг, дизайн и т.д.)",
+    "goal": "Кратко рассказать об опыте, сильных сторонах и почему интересна эта позиция",
+    "success_criteria": [
+      "Упомянут релевантный опыт работы",
+      "Указана мотивация (почему эта компания/роль)"
+    ],
+    "opening_line": "Thanks for coming in today. To start off, could you tell me a little bit about yourself and your background?",
+    "vocab_hints": ["background", "experience in", "responsible for", "looking for a new challenge", "strengths"]
+  },
+  {
+    "id": "scenario_pharmacy_1",
+    "category": "HEALTH",
+    "level": "A2",
+    "title_ru": "В аптеке",
+    "title_en": "At the Pharmacy",
+    "description_ru": "Описать симптомы и купить лекарство без рецепта",
+    "duration_mins": 3,
+    "role_tutor": "Фармацевт, задает вопросы о симптомах и аллергиях",
+    "role_user": "Покупатель с легким недомоганием",
+    "goal": "Описать симптомы (головная боль, простуда), спросить рекомендацию",
+    "success_criteria": [
+      "Описаны минимум 2 симптома",
+      "Отвечен вопрос про аллергию на лекарства"
+    ],
+    "opening_line": "Hello! Do you need help finding anything?",
+    "vocab_hints": ["headache", "sore throat", "painkillers", "allergic to", "prescription"]
+  },
+  {
+    "id": "scenario_store_1",
+    "category": "EVERYDAY",
+    "level": "A1",
+    "title_ru": "В магазине одежды",
+    "title_en": "Clothes Shopping",
+    "description_ru": "Попросить другой размер и узнать о примерочной",
+    "duration_mins": 3,
+    "role_tutor": "Консультант в магазине, предлагает помощь",
+    "role_user": "Покупатель, ищущий нужный размер",
+    "goal": "Попросить вещь на размер больше/меньше и найти примерочную",
+    "success_criteria": [
+      "Запрошен другой размер",
+      "Задан вопрос, где можно примерить"
+    ],
+    "opening_line": "Hi! Are you just looking, or can I help you find a specific size?",
+    "vocab_hints": ["fitting room", "a size larger", "too tight", "on sale", "try it on"]
+  },
+  {
+    "id": "scenario_lost_1",
+    "category": "TRAVEL",
+    "level": "A2",
+    "title_ru": "Спросить дорогу",
+    "title_en": "Asking for Directions",
+    "description_ru": "Узнать, как дойти до нужного места в чужом городе",
+    "duration_mins": 3,
+    "role_tutor": "Местный житель, готов помочь, объясняет маршрут",
+    "role_user": "Потерявшийся турист",
+    "goal": "Узнать дорогу до станции метро или музея и уточнить, далеко ли это",
+    "success_criteria": [
+      "Спросить дорогу",
+      "Уточнить расстояние или нужно ли ехать на автобусе"
+    ],
+    "opening_line": "Excuse me, are you lost? Do you need help?",
+    "vocab_hints": ["how do I get to", "is it far", "turn left/right", "go straight ahead", "blocks"]
+  },
+  {
+    "id": "scenario_friend_1",
+    "category": "SOCIAL",
+    "level": "B1",
+    "title_ru": "Спор о фильме",
+    "title_en": "Debating a Movie",
+    "description_ru": "Обсудить с другом фильм, который вам понравился, а ему нет",
+    "duration_mins": 5,
+    "role_tutor": "Друг, которому фильм показался скучным и затянутым",
+    "role_user": "Человек, в восторге от фильма",
+    "goal": "Привести аргументы, почему фильм хорош (актеры, сюжет, музыка)",
+    "success_criteria": [
+      "Приведено минимум 2 аргумента в защиту фильма",
+      "Использованы фразы для выражения мнения"
+    ],
+    "opening_line": "I don't know why you liked that movie so much. I honestly almost fell asleep in the middle of it.",
+    "vocab_hints": ["masterpiece", "plot twists", "I disagree", "acting was brilliant", "slow-paced"]
+  },
+  {
+    "id": "scenario_taxi_1",
+    "category": "TRAVEL",
+    "level": "A1",
+    "title_ru": "Поездка в такси",
+    "title_en": "Taking a Taxi",
+    "description_ru": "Объяснить водителю, куда ехать, и попросить остановиться",
+    "duration_mins": 2,
+    "role_tutor": "Водитель такси, разговорчивый",
+    "role_user": "Пассажир",
+    "goal": "Назвать пункт назначения и попросить высадить у конкретного здания",
+    "success_criteria": [
+      "Назван адрес",
+      "Сделана просьба остановиться (pull over / drop me off)"
+    ],
+    "opening_line": "Hi! Where are we heading today?",
+    "vocab_hints": ["drop me off", "pull over", "keep the change", "in a hurry"]
+  },
+  {
+    "id": "scenario_rent_1",
+    "category": "EVERYDAY",
+    "level": "B1",
+    "title_ru": "Аренда квартиры",
+    "title_en": "Renting an Apartment",
+    "description_ru": "Разговор с лендлордом о деталях аренды",
+    "duration_mins": 5,
+    "role_tutor": "Арендодатель (landlord), показывает квартиру",
+    "role_user": "Потенциальный арендатор",
+    "goal": "Узнать про коммунальные услуги, депозит и правила насчет животных",
+    "success_criteria": [
+      "Задан вопрос про коммунальные услуги (utilities)",
+      "Уточнены правила проживания с животными"
+    ],
+    "opening_line": "So, this is the living room. Gets a lot of natural light. What do you think?",
+    "vocab_hints": ["utilities included", "security deposit", "pet policy", "lease agreement", "neighborhood"]
+  },
+  {
+    "id": "scenario_doctor_1",
+    "category": "HEALTH",
+    "level": "B2",
+    "title_ru": "На приеме у врача",
+    "title_en": "Doctor's Appointment",
+    "description_ru": "Детально описать проблему со здоровьем",
+    "duration_mins": 5,
+    "role_tutor": "Врач, спрашивает о симптомах, продолжительности и боли",
+    "role_user": "Пациент с жалобами на боли в спине или желудке",
+    "goal": "Описать локализацию боли, характер и когда она началась",
+    "success_criteria": [
+      "Описан характер боли (sharp, dull, aching)",
+      "Указано время начала симптомов"
+    ],
+    "opening_line": "Good morning. What seems to be the problem today?",
+    "vocab_hints": ["sharp pain", "dull ache", "it started two days ago", "dizzy", "make an appointment"]
+  },
+  {
+    "id": "scenario_bank_1",
+    "category": "BUSINESS",
+    "level": "B1",
+    "title_ru": "В банке",
+    "title_en": "At the Bank",
+    "description_ru": "Открыть счет или заблокировать утерянную карту",
+    "duration_mins": 4,
+    "role_tutor": "Сотрудник банка, просит документы",
+    "role_user": "Клиент банка",
+    "goal": "Объяснить проблему (утеряна карта) и узнать, как получить новую",
+    "success_criteria": [
+      "Четко названа причина визита",
+      "Уточнены сроки выпуска новой карты"
+    ],
+    "opening_line": "Hello, how can I help you today?",
+    "vocab_hints": ["open an account", "report a lost card", "cancel my card", "ID", "issue a new one"]
+  },
+  {
+    "id": "scenario_call_1",
+    "category": "BUSINESS",
+    "level": "B1",
+    "title_ru": "Рабочий созвон (Zoom)",
+    "title_en": "Zoom Meeting",
+    "description_ru": "Присоединиться к созвону и отчитаться о статусе задачи",
+    "duration_mins": 4,
+    "role_tutor": "Менеджер проекта, ведет встречу, спрашивает статус",
+    "role_user": "Разработчик/дизайнер/маркетолог",
+    "goal": "Сказать, что есть задержка, и назвать новую дату готовности",
+    "success_criteria": [
+      "Извиниться за задержку",
+      "Назвать причину и новый срок"
+    ],
+    "opening_line": "Alright, let's get started. [Name], could you give us an update on your part of the project?",
+    "vocab_hints": ["behind schedule", "running late", "wrap it up by", "share my screen", "you're on mute"]
+  },
+  {
+    "id": "scenario_party_1",
+    "category": "SOCIAL",
+    "level": "A2",
+    "title_ru": "Знакомство на вечеринке",
+    "title_en": "Meeting at a Party",
+    "description_ru": "Познакомиться с кем-то новым через общего друга",
+    "duration_mins": 4,
+    "role_tutor": "Гость на вечеринке, открытый к общению",
+    "role_user": "Гость",
+    "goal": "Узнать, откуда собеседник знает хозяина вечеринки, и рассказать о себе",
+    "success_criteria": [
+      "Спросить, как собеседник знаком с хозяином",
+      "Рассказать кратко о своей профессии/увлечениях"
+    ],
+    "opening_line": "Hi! I don't think we've met. I'm Sarah, Mike's friend from college.",
+    "vocab_hints": ["how do you know", "what do you do for a living", "in my free time", "great party"]
+  },
+  {
+    "id": "scenario_flight_1",
+    "category": "TRAVEL",
+    "level": "B1",
+    "title_ru": "Проблема с рейсом",
+    "title_en": "Canceled Flight",
+    "description_ru": "Разобраться на стойке регистрации с отмененным рейсом",
+    "duration_mins": 5,
+    "role_tutor": "Сотрудник авиакомпании, вежливый, но уставший",
+    "role_user": "Пассажир, чей рейс отменили",
+    "goal": "Узнать причину отмены и потребовать пересадку на ближайший рейс или гостиницу",
+    "success_criteria": [
+      "Узнать альтернативные варианты вылета",
+      "Спросить про компенсацию или гостиницу"
+    ],
+    "opening_line": "I'm very sorry, sir/madam, but your flight to London has been canceled due to bad weather.",
+    "vocab_hints": ["rebook", "next available flight", "compensation", "accommodation", "unacceptable"]
+  },
+  {
+    "id": "scenario_techsupport_1",
+    "category": "EVERYDAY",
+    "level": "B2",
+    "title_ru": "Звонок в техподдержку",
+    "title_en": "Tech Support",
+    "description_ru": "Объяснить провайдеру, что не работает интернет",
+    "duration_mins": 5,
+    "role_tutor": "Оператор техподдержки, просит перезагрузить роутер",
+    "role_user": "Клиент без интернета",
+    "goal": "Объяснить, что базовые шаги (перезагрузка) не помогли, и вызвать мастера",
+    "success_criteria": [
+      "Объяснить суть поломки (нет сигнала/лампочка красная)",
+      "Потребовать прислать техника"
+    ],
+    "opening_line": "Thank you for calling Tech Support. Have you tried turning your router off and on again?",
+    "vocab_hints": ["unplugged", "reboot", "blinking red light", "send a technician", "outage"]
+  },
+  {
+    "id": "scenario_police_1",
+    "category": "TRAVEL",
+    "level": "B1",
+    "title_ru": "Кража кошелька",
+    "title_en": "Reporting a Theft",
+    "description_ru": "Сообщить полиции о краже кошелька в тур. поездке",
+    "duration_mins": 5,
+    "role_tutor": "Полицейский, записывает детали происшествия",
+    "role_user": "Потерпевший турист",
+    "goal": "Описать, где это произошло, как выглядел кошелек и что внутри",
+    "success_criteria": [
+      "Указано место и примерное время",
+      "Перечислены украденные вещи (ID, credit cards, cash)"
+    ],
+    "opening_line": "Take a seat. So, tell me exactly what happened.",
+    "vocab_hints": ["pickpocketed", "stolen", "leather wallet", "ID card", "cancel my cards"]
+  },
+  {
+    "id": "scenario_gym_1",
+    "category": "EVERYDAY",
+    "level": "A2",
+    "title_ru": "Запись в фитнес-клуб",
+    "title_en": "Joining a Gym",
+    "description_ru": "Узнать условия абонемента в спортзал",
+    "duration_mins": 4,
+    "role_tutor": "Менеджер по продажам фитнес-клуба",
+    "role_user": "Потенциальный клиент",
+    "goal": "Узнать цены на месяц/год, входит ли бассейн и тренер",
+    "success_criteria": [
+      "Заданы вопросы про цены",
+      "Уточнен доступ к дополнительным зонам (бассейн, сауна)"
+    ],
+    "opening_line": "Welcome to FitLife! Are you looking to sign up for a membership today?",
+    "vocab_hints": ["membership", "monthly fee", "personal trainer", "pool included", "cancel anytime"]
+  },
+  {
+    "id": "scenario_neighbor_1",
+    "category": "SOCIAL",
+    "level": "B1",
+    "title_ru": "Шумный сосед",
+    "title_en": "Noisy Neighbor",
+    "description_ru": "Вежливо попросить соседа сделать музыку тише",
+    "duration_mins": 4,
+    "role_tutor": "Сосед, немного удивлен, слушает громко музыку",
+    "role_user": "Сосед, который пытается уснуть/работать",
+    "goal": "Объяснить ситуацию и попросить убавить громкость, не доводя до конфликта",
+    "success_criteria": [
+      "Проблема изложена вежливо, но твердо",
+      "Достигнут компромисс"
+    ],
+    "opening_line": "(Opens door) Oh, hey! Is everything alright?",
+    "vocab_hints": ["turn it down", "keep the noise down", "early start tomorrow", "walls are thin", "appreciate it"]
+  },
+  {
+    "id": "scenario_hairdresser_1",
+    "category": "EVERYDAY",
+    "level": "A2",
+    "title_ru": "В парикмахерской",
+    "title_en": "At the Hairdresser",
+    "description_ru": "Объяснить, какую стрижку вы хотите",
+    "duration_mins": 3,
+    "role_tutor": "Парикмахер",
+    "role_user": "Клиент",
+    "goal": "Сказать 'только подравнять кончики' или 'сделать короче по бокам'",
+    "success_criteria": [
+      "Объяснено желаемое действие (cut/trim)",
+      "Указаны детали (how short)"
+    ],
+    "opening_line": "Hi there! Take a seat. What are we doing with your hair today?",
+    "vocab_hints": ["just a trim", "split ends", "shorter on the sides", "leave the length on top", "bangs"]
+  },
+  {
+    "id": "scenario_vet_1",
+    "category": "EVERYDAY",
+    "level": "B1",
+    "title_ru": "У ветеринара",
+    "title_en": "At the Vet",
+    "description_ru": "Привести питомца на осмотр с жалобой",
+    "duration_mins": 4,
+    "role_tutor": "Ветеринар, осматривает животное",
+    "role_user": "Владелец собаки/кошки",
+    "goal": "Описать, что питомец не ест и вялый",
+    "success_criteria": [
+      "Описаны изменения в поведении питомца",
+      "Заданы вопросы про лечение"
+    ],
+    "opening_line": "Hello! So, what seems to be bothering your little friend today?",
+    "vocab_hints": ["lethargic", "lost appetite", "vomiting", "vaccinations", "examine"]
+  },
+  {
+    "id": "scenario_negotiation_1",
+    "category": "BUSINESS",
+    "level": "B2",
+    "title_ru": "Переговоры о зарплате",
+    "title_en": "Salary Negotiation",
+    "description_ru": "Попросить прибавку к зарплате у начальника",
+    "duration_mins": 5,
+    "role_tutor": "Начальник, ценит сотрудника, но ссылается на бюджет",
+    "role_user": "Сотрудник, взявший на себя больше обязанностей",
+    "goal": "Аргументировать просьбу своими достижениями и увеличенной нагрузкой",
+    "success_criteria": [
+      "Названы конкретные достижения/задачи",
+      "Названа желаемая сумма или процент"
+    ],
+    "opening_line": "Hi. You wanted to discuss your compensation package? Let's hear what you have in mind.",
+    "vocab_hints": ["take on more responsibilities", "contributions", "market rate", "raise", "tight budget"]
+  },
+  {
+    "id": "scenario_customs_1",
+    "category": "TRAVEL",
+    "level": "B1",
+    "title_ru": "Таможня (декларация)",
+    "title_en": "Customs Declaration",
+    "description_ru": "Пройти досмотр багажа",
+    "duration_mins": 3,
+    "role_tutor": "Офицер таможни, строгий, просит открыть сумку",
+    "role_user": "Пассажир",
+    "goal": "Ответить, везете ли вы запрещенные продукты, алкоголь или наличные свыше лимита",
+    "success_criteria": [
+      "Ответ на вопрос про декларируемые товары",
+      "Успешное завершение досмотра"
+    ],
+    "opening_line": "Do you have anything to declare? Any fresh food, alcohol, or large amounts of cash?",
+    "vocab_hints": ["declare", "personal belongings", "allowance", "souvenirs", "open your bag"]
+  },
+  {
+    "id": "scenario_rent_car_1",
+    "category": "TRAVEL",
+    "level": "B1",
+    "title_ru": "Аренда автомобиля",
+    "title_en": "Renting a Car",
+    "description_ru": "Арендовать машину в аэропорту",
+    "duration_mins": 4,
+    "role_tutor": "Сотрудник проката, пытается продать доп. страховку",
+    "role_user": "Турист",
+    "goal": "Отказаться от дорогой страховки и уточнить правила возврата (полный бак)",
+    "success_criteria": [
+      "Отказ от апсейла (доп страховки)",
+      "Уточнение правил возврата"
+    ],
+    "opening_line": "Welcome. I see your reservation for a compact car. Would you like to upgrade to full coverage insurance today?",
+    "vocab_hints": ["comprehensive insurance", "decline", "full tank", "mileage limit", "driver's license"]
+  },
+  {
+    "id": "scenario_colleague_help_1",
+    "category": "BUSINESS",
+    "level": "B1",
+    "title_ru": "Просьба о помощи",
+    "title_en": "Asking for Help at Work",
+    "description_ru": "Попросить коллегу подменить вас или помочь с отчетом",
+    "duration_mins": 3,
+    "role_tutor": "Коллега, очень занят своими делами",
+    "role_user": "Сотрудник, который не успевает",
+    "goal": "Убедить коллегу помочь, пообещав вернуть услугу позже",
+    "success_criteria": [
+      "Суть просьбы ясна",
+      "Предложен компромисс или взаимная услуга"
+    ],
+    "opening_line": "Hey! I'm completely swamped right now. What's up?",
+    "vocab_hints": ["swamped", "cover for me", "owe you one", "give me a hand", "deadline"]
+  },
+  {
+    "id": "scenario_feedback_1",
+    "category": "BUSINESS",
+    "level": "B2",
+    "title_ru": "Критика идеи",
+    "title_en": "Giving Constructive Feedback",
+    "description_ru": "Сказать коллеге, что его идея не сработает",
+    "duration_mins": 4,
+    "role_tutor": "Коллега, энтузиаст, предлагает дорогую рекламную кампанию",
+    "role_user": "Сотрудник, считающий идею слишком дорогой",
+    "goal": "Вежливо, но твердо отклонить идею, предложив альтернативу",
+    "success_criteria": [
+      "Использованы вежливые формулировки для несогласия",
+      "Предложена альтернатива"
+    ],
+    "opening_line": "So, I think we should spend our entire marketing budget on a Super Bowl ad. It'll be huge!",
+    "vocab_hints": ["point of view", "I see where you're coming from", "alternative", "cost-effective", "backfire"]
+  },
+  {
+    "id": "scenario_emergency_1",
+    "category": "HEALTH",
+    "level": "A2",
+    "title_ru": "Вызов скорой",
+    "title_en": "Calling 911",
+    "description_ru": "Срочный звонок в экстренные службы",
+    "duration_mins": 3,
+    "role_tutor": "Оператор службы спасения, задает быстрые вопросы",
+    "role_user": "Свидетель происшествия (авария или человеку стало плохо)",
+    "goal": "Назвать адрес и кратко описать, что случилось",
+    "success_criteria": [
+      "Четко названо место",
+      "Описано состояние пострадавшего"
+    ],
+    "opening_line": "911, what's your emergency?",
+    "vocab_hints": ["unconscious", "breathing", "car accident", "send an ambulance", "address"]
+  },
+  {
+    "id": "scenario_hobby_1",
+    "category": "SOCIAL",
+    "level": "A2",
+    "title_ru": "Обсуждение хобби",
+    "title_en": "Talking About Hobbies",
+    "description_ru": "Рассказать новому знакомому о своих увлечениях",
+    "duration_mins": 3,
+    "role_tutor": "Любопытный знакомый, задает вопросы",
+    "role_user": "Вы",
+    "goal": "Рассказать, чем занимаетесь в свободное время, и спросить об увлечениях собеседника",
+    "success_criteria": [
+      "Описано минимум одно хобби",
+      "Задан встречный вопрос"
+    ],
+    "opening_line": "I'm trying to find a new hobby. What do you usually do in your free time?",
+    "vocab_hints": ["into photography", "reading", "working out", "how about you", "pass time"]
+  }
+]

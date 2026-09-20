@@ -1,0 +1,402 @@
+[
+  {
+    "id": "present_simple",
+    "code": "TENSE_PRESENT_SIMPLE",
+    "title_ru": "Present Simple (Настоящее простое)",
+    "title_en": "Present Simple",
+    "cefr": "A1",
+    "explanation_ru": "Используется для фактов, привычек и регулярных действий. Добавляем -s/-es для he/she/it.",
+    "explanation_en": "Used for facts, habits, and routines. Add -s/-es for 3rd person singular.",
+    "isSeed": true
+  },
+  {
+    "id": "present_continuous",
+    "code": "TENSE_PRESENT_CONTINUOUS",
+    "title_ru": "Present Continuous (Настоящее длительное)",
+    "title_en": "Present Continuous",
+    "cefr": "A1",
+    "explanation_ru": "Действие происходит прямо сейчас или вокруг момента речи. Формируется: am/is/are + глагол с -ing.",
+    "explanation_en": "Used for actions happening right now or around now. am/is/are + verb-ing.",
+    "isSeed": true
+  },
+  {
+    "id": "past_simple",
+    "code": "TENSE_PAST_SIMPLE",
+    "title_ru": "Past Simple (Прошедшее простое)",
+    "title_en": "Past Simple",
+    "cefr": "A2",
+    "explanation_ru": "Завершенное действие в прошлом. Добавляем -ed к правильным глаголам, неправильные нужно выучить (V2). Вопрос: Did + V1.",
+    "explanation_en": "Completed actions in the past. Regular verbs take -ed, irregular verbs use V2. Questions use 'Did + base verb'.",
+    "isSeed": true
+  },
+  {
+    "id": "past_continuous",
+    "code": "TENSE_PAST_CONTINUOUS",
+    "title_ru": "Past Continuous (Прошедшее длительное)",
+    "title_en": "Past Continuous",
+    "cefr": "A2",
+    "explanation_ru": "Действие, которое длилось в определенный момент в прошлом (часто прерывается коротким Past Simple). was/were + V-ing.",
+    "explanation_en": "Actions in progress at a specific time in the past. was/were + verb-ing.",
+    "isSeed": true
+  },
+  {
+    "id": "present_perfect",
+    "code": "TENSE_PRESENT_PERFECT",
+    "title_ru": "Present Perfect (Настоящее завершенное)",
+    "title_en": "Present Perfect",
+    "cefr": "B1",
+    "explanation_ru": "Действие в прошлом с результатом в настоящем, или жизненный опыт (без точного времени). have/has + V3.",
+    "explanation_en": "Past actions with a result in the present, or life experiences (unspecified time). have/has + past participle.",
+    "isSeed": true
+  },
+  {
+    "id": "present_perfect_continuous",
+    "code": "TENSE_PRESENT_PERFECT_CONTINUOUS",
+    "title_ru": "Present Perfect Continuous",
+    "title_en": "Present Perfect Continuous",
+    "cefr": "B2",
+    "explanation_ru": "Действие началось в прошлом и продолжается до сих пор (акцент на длительность). have/has been + V-ing.",
+    "explanation_en": "Action started in the past and continues up to now (focus on duration). have/has been + verb-ing.",
+    "isSeed": true
+  },
+  {
+    "id": "past_perfect",
+    "code": "TENSE_PAST_PERFECT",
+    "title_ru": "Past Perfect (Предпрошедшее)",
+    "title_en": "Past Perfect",
+    "cefr": "B1",
+    "explanation_ru": "Действие завершилось до другого действия в прошлом. had + V3.",
+    "explanation_en": "An action completed before another action in the past. had + past participle.",
+    "isSeed": true
+  },
+  {
+    "id": "future_simple",
+    "code": "TENSE_FUTURE_SIMPLE",
+    "title_ru": "Future Simple (will)",
+    "title_en": "Future Simple (will)",
+    "cefr": "A2",
+    "explanation_ru": "Спонтанные решения, предсказания, обещания. will + V1.",
+    "explanation_en": "Spontaneous decisions, predictions without evidence, promises. will + base verb.",
+    "isSeed": true
+  },
+  {
+    "id": "future_going_to",
+    "code": "TENSE_GOING_TO",
+    "title_ru": "Конструкция be going to",
+    "title_en": "be going to",
+    "cefr": "A2",
+    "explanation_ru": "Запланированные действия (планы) или предсказания на основе очевидных фактов (Look at the clouds, it's going to rain).",
+    "explanation_en": "Plans/intentions or predictions based on present evidence.",
+    "isSeed": true
+  },
+  {
+    "id": "articles_a_an",
+    "code": "ARTICLE_A_AN",
+    "title_ru": "Артикли a/an",
+    "title_en": "Indefinite Articles (a/an)",
+    "cefr": "A1",
+    "explanation_ru": "Используем перед исчисляемыми существительными в единственном числе, когда говорим о предмете впервые. 'an' перед гласным звуком.",
+    "explanation_en": "Used with singular countable nouns mentioned for the first time. 'an' before a vowel sound.",
+    "isSeed": true
+  },
+  {
+    "id": "article_the",
+    "code": "ARTICLE_THE",
+    "title_ru": "Артикль the",
+    "title_en": "Definite Article (the)",
+    "cefr": "A1",
+    "explanation_ru": "Используем, когда обе стороны понимают, о каком конкретно предмете идет речь, или предмет уникален (the sun).",
+    "explanation_en": "Used when referring to a specific item known to both speaker and listener, or unique things.",
+    "isSeed": true
+  },
+  {
+    "id": "zero_article",
+    "code": "ARTICLE_ZERO",
+    "title_ru": "Нулевой артикль",
+    "title_en": "Zero Article",
+    "cefr": "A2",
+    "explanation_ru": "Артикль не нужен со множественным числом или неисчисляемыми существительными, если мы говорим о них 'в целом' (I like cats).",
+    "explanation_en": "No article for plural or uncountable nouns when talking about things in general.",
+    "isSeed": true
+  },
+  {
+    "id": "plurals",
+    "code": "NOUN_PLURALS",
+    "title_ru": "Множественное число",
+    "title_en": "Plural Nouns",
+    "cefr": "A1",
+    "explanation_ru": "Обычно добавляем -s. Исключения (man-men, child-children) и правила (y->ies, f->ves).",
+    "explanation_en": "Usually add -s. Learn irregular plurals (man-men, child-children).",
+    "isSeed": true
+  },
+  {
+    "id": "uncountable_nouns",
+    "code": "NOUN_UNCOUNTABLE",
+    "title_ru": "Неисчисляемые существительные",
+    "title_en": "Uncountable Nouns",
+    "cefr": "A2",
+    "explanation_ru": "Слова вроде water, money, advice, information. У них нет формы с -s и нельзя использовать 'a/an'.",
+    "explanation_en": "Substances, concepts, etc. (water, money, advice). No plural form, no 'a/an'.",
+    "isSeed": true
+  },
+  {
+    "id": "some_any",
+    "code": "QUANTIFIERS_SOME_ANY",
+    "title_ru": "Some и Any",
+    "title_en": "Some and Any",
+    "cefr": "A1",
+    "explanation_ru": "Some — в утверждениях и просьбах. Any — в вопросах и отрицаниях.",
+    "explanation_en": "Some is for positive sentences/requests. Any is for questions and negative sentences.",
+    "isSeed": true
+  },
+  {
+    "id": "much_many_a_lot",
+    "code": "QUANTIFIERS_MUCH_MANY",
+    "title_ru": "Much, Many, A lot of",
+    "title_en": "Much, Many, A lot of",
+    "cefr": "A2",
+    "explanation_ru": "Many — исчисляемые (вопросы/отрицания). Much — неисчисляемые (вопросы/отрицания). A lot of — универсально для утверждений.",
+    "explanation_en": "Many for countable, much for uncountable (mostly questions/negatives). A lot of for positive sentences.",
+    "isSeed": true
+  },
+  {
+    "id": "comparative",
+    "code": "ADJ_COMPARATIVE",
+    "title_ru": "Сравнительная степень прилагательных",
+    "title_en": "Comparative Adjectives",
+    "cefr": "A2",
+    "explanation_ru": "Для коротких +er (taller). Для длинных: more + adj (more beautiful). Сравниваем через 'than'.",
+    "explanation_en": "Short adjectives take -er. Long ones take 'more'. Use 'than' to compare.",
+    "isSeed": true
+  },
+  {
+    "id": "superlative",
+    "code": "ADJ_SUPERLATIVE",
+    "title_ru": "Превосходная степень",
+    "title_en": "Superlative Adjectives",
+    "cefr": "A2",
+    "explanation_ru": "Короткие: the ...est (the tallest). Длинные: the most (the most beautiful). Исключения: good-better-best.",
+    "explanation_en": "Short: the ...est. Long: the most... Irregular: good-better-best.",
+    "isSeed": true
+  },
+  {
+    "id": "modals_can_could",
+    "code": "MODAL_CAN_COULD",
+    "title_ru": "Can и Could (Способность и просьба)",
+    "title_en": "Can and Could",
+    "cefr": "A1",
+    "explanation_ru": "Can — физическая возможность и умение сейчас. Could — в прошлом или вежливая просьба.",
+    "explanation_en": "Can for present ability. Could for past ability or polite requests.",
+    "isSeed": true
+  },
+  {
+    "id": "modals_must_have_to",
+    "code": "MODAL_MUST_HAVE_TO",
+    "title_ru": "Must и Have to (Обязательство)",
+    "title_en": "Must vs Have to",
+    "cefr": "B1",
+    "explanation_ru": "Must — внутреннее, личное обязательство. Have to — внешние правила. Mustn't — запрет. Don't have to — нет необходимости (можно не делать).",
+    "explanation_en": "Must is personal obligation. Have to is external rules. Mustn't is prohibition, don't have to is lack of obligation.",
+    "isSeed": true
+  },
+  {
+    "id": "modals_should",
+    "code": "MODAL_SHOULD",
+    "title_ru": "Should (Совет)",
+    "title_en": "Should",
+    "cefr": "A2",
+    "explanation_ru": "Используется для советов и рекомендаций ('тебе следует').",
+    "explanation_en": "Used for giving advice or recommendations.",
+    "isSeed": true
+  },
+  {
+    "id": "modals_deduction",
+    "code": "MODAL_DEDUCTION",
+    "title_ru": "Модальные глаголы дедукции (must/might/cant)",
+    "title_en": "Modals of Deduction",
+    "cefr": "B2",
+    "explanation_ru": "Must be — должно быть точно. Might/may be — возможно. Can't be — не может быть.",
+    "explanation_en": "Must be (strong certainty), might/may be (possibility), can't be (impossibility).",
+    "isSeed": true
+  },
+  {
+    "id": "prepositions_time",
+    "code": "PREP_TIME",
+    "title_ru": "Предлоги времени (in, on, at)",
+    "title_en": "Prepositions of Time",
+    "cefr": "A1",
+    "explanation_ru": "AT: время (at 5 pm). ON: дни (on Monday). IN: месяцы, годы, сезоны (in May, in 2020).",
+    "explanation_en": "AT for times. ON for days. IN for months, years, seasons.",
+    "isSeed": true
+  },
+  {
+    "id": "prepositions_place",
+    "code": "PREP_PLACE",
+    "title_ru": "Предлоги места (in, on, at)",
+    "title_en": "Prepositions of Place",
+    "cefr": "A1",
+    "explanation_ru": "AT: точка/событие (at the door, at a party). ON: поверхность (on the table). IN: внутри объема (in a box, in London).",
+    "explanation_en": "AT for points. ON for surfaces. IN for enclosed spaces.",
+    "isSeed": true
+  },
+  {
+    "id": "conditional_zero",
+    "code": "COND_ZERO",
+    "title_ru": "Zero Conditional",
+    "title_en": "Zero Conditional",
+    "cefr": "A2",
+    "explanation_ru": "Факты и законы природы. If + Present Simple, Present Simple (If you heat ice, it melts).",
+    "explanation_en": "General truths and scientific facts. If + present simple, present simple.",
+    "isSeed": true
+  },
+  {
+    "id": "conditional_first",
+    "code": "COND_FIRST",
+    "title_ru": "First Conditional (Первый тип)",
+    "title_en": "First Conditional",
+    "cefr": "B1",
+    "explanation_ru": "Реальное будущее. If + Present Simple, will + V1 (If it rains, we will stay home). После if НИКОГДА нет will.",
+    "explanation_en": "Real or probable future situations. If + present simple, will + base verb.",
+    "isSeed": true
+  },
+  {
+    "id": "conditional_second",
+    "code": "COND_SECOND",
+    "title_ru": "Second Conditional (Второй тип)",
+    "title_en": "Second Conditional",
+    "cefr": "B1",
+    "explanation_ru": "Нереальное настоящее/будущее (мечты). If + Past Simple, would + V1 (If I won the lottery, I would buy a house).",
+    "explanation_en": "Unreal or hypothetical present/future situations. If + past simple, would + base verb.",
+    "isSeed": true
+  },
+  {
+    "id": "conditional_third",
+    "code": "COND_THIRD",
+    "title_ru": "Third Conditional (Третий тип)",
+    "title_en": "Third Conditional",
+    "cefr": "B2",
+    "explanation_ru": "Нереальное прошлое (сожаления). If + Past Perfect, would have + V3.",
+    "explanation_en": "Unreal past situations (regrets/criticism). If + past perfect, would have + past participle.",
+    "isSeed": true
+  },
+  {
+    "id": "passive_voice",
+    "code": "VOICE_PASSIVE",
+    "title_ru": "Пассивный залог (Passive Voice)",
+    "title_en": "Passive Voice",
+    "cefr": "B1",
+    "explanation_ru": "Важно ЧТО сделано, а не КЕМ. Формула: глагол 'to be' в нужном времени + V3 (The house was built in 1990).",
+    "explanation_en": "Focus on the action/object, not the doer. Form: 'to be' + past participle.",
+    "isSeed": true
+  },
+  {
+    "id": "gerund_vs_infinitive",
+    "code": "GERUND_INFINITIVE",
+    "title_ru": "Герундий vs Инфинитив",
+    "title_en": "Gerund vs Infinitive",
+    "cefr": "B2",
+    "explanation_ru": "Одни глаголы требуют -ing (enjoy doing), другие to (want to do). Некоторые меняют смысл (stop smoking vs stop to smoke).",
+    "explanation_en": "Verbs followed by -ing vs to-infinitive. Some verbs change meaning (stop, remember, try).",
+    "isSeed": true
+  },
+  {
+    "id": "relative_clauses",
+    "code": "RELATIVE_CLAUSES",
+    "title_ru": "Относительные придаточные (who/which/that)",
+    "title_en": "Relative Clauses",
+    "cefr": "B1",
+    "explanation_ru": "Who — для людей. Which — для вещей. That — для обоих (в определяющих). Whose — чей.",
+    "explanation_en": "Who (people), which (things), that (both in defining clauses).",
+    "isSeed": true
+  },
+  {
+    "id": "reported_speech",
+    "code": "REPORTED_SPEECH",
+    "title_ru": "Косвенная речь (Reported Speech)",
+    "title_en": "Reported Speech",
+    "cefr": "B2",
+    "explanation_ru": "Сдвиг времен на шаг назад: Present -> Past, will -> would. Замена местоимений (I -> he).",
+    "explanation_en": "Backshift of tenses (Present -> Past). Pronouns and time words change.",
+    "isSeed": true
+  },
+  {
+    "id": "used_to",
+    "code": "USED_TO",
+    "title_ru": "Used to (Привычки в прошлом)",
+    "title_en": "Used to",
+    "cefr": "B1",
+    "explanation_ru": "Действия, которые были регулярны в прошлом, но сейчас не происходят. I used to smoke (раньше курил, сейчас нет).",
+    "explanation_en": "Past habits or states that are no longer true now.",
+    "isSeed": true
+  },
+  {
+    "id": "question_tags",
+    "code": "QUESTION_TAGS",
+    "title_ru": "Разделительные вопросы (Question Tags)",
+    "title_en": "Question Tags",
+    "cefr": "B1",
+    "explanation_ru": "Утверждение -> отрицательный хвостик (You are a doctor, aren't you?). Отрицание -> утвердительный.",
+    "explanation_en": "Positive sentence -> negative tag. Negative sentence -> positive tag.",
+    "isSeed": true
+  },
+  {
+    "id": "pronouns_object",
+    "code": "PRONOUNS_OBJECT",
+    "title_ru": "Объектные местоимения (me, him, them)",
+    "title_en": "Object Pronouns",
+    "cefr": "A1",
+    "explanation_ru": "Используются как объект действия (после глагола/предлога): call HIM, look at US.",
+    "explanation_en": "Used as the object of a verb or preposition: me, you, him, her, it, us, them.",
+    "isSeed": true
+  },
+  {
+    "id": "possessive_pronouns",
+    "code": "PRONOUNS_POSSESSIVE",
+    "title_ru": "Притяжательные местоимения (mine, yours)",
+    "title_en": "Possessive Pronouns",
+    "cefr": "A2",
+    "explanation_ru": "Заменяют 'my book' -> 'mine'. Стоят самостоятельно: This book is mine.",
+    "explanation_en": "Replace noun phrases (my car -> mine) and stand alone.",
+    "isSeed": true
+  },
+  {
+    "id": "adverbs_frequency",
+    "code": "ADVERB_FREQUENCY",
+    "title_ru": "Наречия частоты (always, often)",
+    "title_en": "Adverbs of Frequency",
+    "cefr": "A1",
+    "explanation_ru": "Ставятся перед обычным глаголом (I often read), но ПОСЛЕ 'to be' (I am always late).",
+    "explanation_en": "Go before main verbs, but after the verb 'to be'.",
+    "isSeed": true
+  },
+  {
+    "id": "so_neither",
+    "code": "SO_NEITHER",
+    "title_ru": "Краткие ответы (So do I / Neither do I)",
+    "title_en": "So / Neither do I",
+    "cefr": "B1",
+    "explanation_ru": "Согласие: So + вспом.глагол + I (Я тоже). Neither + вспом.глагол + I (Я тоже нет).",
+    "explanation_en": "Agreeing: So (positive), Neither (negative) + auxiliary verb + subject.",
+    "isSeed": true
+  },
+  {
+    "id": "wishes",
+    "code": "WISH_CLAUSES",
+    "title_ru": "Конструкция I wish (Сожаления)",
+    "title_en": "I wish / If only",
+    "cefr": "B2",
+    "explanation_ru": "Настоящее: I wish I had (Past Simple). Прошлое: I wish I had done (Past Perfect). Жалоба: I wish you wouldn't do that.",
+    "explanation_en": "Wish + past (present regret), wish + past perfect (past regret), wish + would (annoyance).",
+    "isSeed": true
+  },
+  {
+    "id": "causative",
+    "code": "CAUSATIVE_HAVE",
+    "title_ru": "Causative (have something done)",
+    "title_en": "Causative form",
+    "cefr": "B2",
+    "explanation_ru": "Кто-то сделал это для вас. I had my hair cut (Мне постригли волосы).",
+    "explanation_en": "Arranging for someone else to do something for you. Have + object + past participle.",
+    "isSeed": true
+  }
+]
