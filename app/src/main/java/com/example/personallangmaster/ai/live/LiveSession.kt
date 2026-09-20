@@ -37,6 +37,13 @@ data class LiveSessionConfig(
     val sessionResumption: Boolean = true,
     /** true — границы реплики задаёт кнопка, false — серверный VAD (hands-free). */
     val manualActivity: Boolean = true,
+    /**
+     * Закрывать реплику самостоятельно, когда ученик замолчал.
+     *
+     * Нужен для режима одиночного нажатия: нажал, сказал, отпустил телефон —
+     * второй раз тянуться к кнопке, чтобы «отправить», неестественно в разговоре.
+     */
+    val autoEndOnSilence: Boolean = false,
     val bargeInEnabled: Boolean = true,
     val noiseSuppression: Boolean = true,
     /** Локальный порог тишины: молчание на сервер не отправляется. */
@@ -302,6 +309,8 @@ class LiveSession(
 
         // Небольшой предбуфер: иначе VAD съедает первые слоги, пока набирает уверенность.
         val preRoll = ArrayDeque<ByteArray>()
+        // Пока ученик не сказал ни слова, тишина не считается концом реплики.
+        var spokeAtLeastOnce = false
 
         micJob?.cancel()
         micJob = recorder.chunks(applyEffects = current.noiseSuppression)
@@ -318,11 +327,17 @@ class LiveSession(
                     }
 
                     !wasSpeaking -> {
+                        spokeAtLeastOnce = true
                         while (preRoll.isNotEmpty()) sendAudio(preRoll.removeFirst())
                         sendAudio(chunk)
                     }
 
                     else -> sendAudio(chunk)
+                }
+
+                // Ученик договорил — закрываем реплику сами, не дожидаясь кнопки.
+                if (current.autoEndOnSilence && spokeAtLeastOnce && wasSpeaking && !vad.isSpeaking) {
+                    stopTalking()
                 }
             }
             .catch { error ->

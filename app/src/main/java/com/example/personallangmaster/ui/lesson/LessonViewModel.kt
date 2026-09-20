@@ -250,6 +250,7 @@ class LessonViewModel(
                     contextCompression = settings.contextCompression,
                     sessionResumption = settings.sessionResumption,
                     manualActivity = settings.micMode != MicMode.HANDS_FREE,
+                    autoEndOnSilence = settings.micMode == MicMode.TAP,
                     bargeInEnabled = settings.bargeInEnabled,
                     noiseSuppression = settings.noiseSuppression,
                     vadThresholdDb = settings.vadThresholdDb,

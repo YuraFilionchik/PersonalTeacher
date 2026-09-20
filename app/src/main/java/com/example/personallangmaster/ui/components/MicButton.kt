@@ -49,6 +49,9 @@ fun MicButton(
     gesture: MicGesture = MicGesture.HOLD,
     modifier: Modifier = Modifier
 ) {
+    // Актуальное состояние для обработчика жестов, который живёт дольше состояния.
+    val currentState = rememberUpdatedState(state)
+
     // Анимация кольца в зависимости от громкости (от -100 до 0 dBFS)
     // -60 dBFS - порог тишины, 0 dBFS - максимум.
     val targetRingScale = when (state) {
@@ -131,19 +134,30 @@ fun MicButton(
                     .size(96.dp)
                     .clip(CircleShape)
                     .background(buttonColor)
-                    .pointerInput(state, gesture) {
-                        if (state == MicButtonState.DISABLED) return@pointerInput
+                    // Ключ — только жест: если добавить сюда state, нажатие начнёт
+                    // реплику, состояние сменится на LISTENING, обработчик
+                    // перезапустится и отпускание кнопки потеряется — удержание
+                    // превращалось в «нажми дважды».
+                    .pointerInput(gesture) {
                         when (gesture) {
                             // onTap здесь не вызываем: короткое нажатие — это та же реплика,
                             // уже законченная отпусканием, а не команда начать новую.
                             MicGesture.HOLD -> detectTapGestures(
                                 onPress = {
+                                    if (currentState.value == MicButtonState.DISABLED) {
+                                        return@detectTapGestures
+                                    }
                                     onPress()
                                     tryAwaitRelease()
                                     onRelease()
                                 }
                             )
-                            MicGesture.TAP -> detectTapGestures(onTap = { onTap() })
+
+                            MicGesture.TAP -> detectTapGestures(
+                                onTap = {
+                                    if (currentState.value != MicButtonState.DISABLED) onTap()
+                                }
+                            )
                         }
                     }
             ) {

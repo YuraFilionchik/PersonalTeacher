@@ -58,6 +58,7 @@ fun AudioSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                 "Чем выше порог, тем меньше приложение реагирует на фоновый шум — но тихую речь " +
                     "тоже может не услышать."
             )
+            SettingsNote(silenceHangoverHint(settings.micMode))
             SettingsSliderRow(
                 title = "Пауза до конца реплики",
                 valueLabel = "${settings.silenceHangoverMs} мс",
