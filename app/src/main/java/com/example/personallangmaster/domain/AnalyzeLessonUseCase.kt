@@ -23,6 +23,7 @@ import com.example.personallangmaster.data.db.entity.VocabItemEntity
 import com.example.personallangmaster.data.prefs.ExplanationLanguage
 import com.example.personallangmaster.data.prefs.ProgressionPace
 import com.example.personallangmaster.data.prefs.SettingsRepository
+import com.example.personallangmaster.data.repo.ContentRepository
 import com.example.personallangmaster.data.repo.ProfileRepository
 import java.time.LocalDate
 
@@ -162,7 +163,7 @@ class AnalyzeLessonUseCase(
                 contentDao.upsertPhonemeScore(
                     PhonemeScoreEntity(
                         profileId = profileId,
-                        phoneme = note.phoneme,
+                        phoneme = ContentRepository.normalizePhoneme(note.phoneme),
                         score = PROBLEM_PHONEME_SCORE,
                         attempts = 1,
                         lastPracticedAt = now,

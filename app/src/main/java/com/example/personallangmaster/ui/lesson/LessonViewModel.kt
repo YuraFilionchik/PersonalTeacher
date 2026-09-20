@@ -60,6 +60,8 @@ data class LessonUiState(
     val sessionState: LiveSessionState = LiveSessionState.Idle,
     val mode: LessonMode = LessonMode.FREE_TALK,
     val micMode: MicMode = MicMode.HOLD,
+    /** Сценарий, выбранный до начала урока: показывается на панели запуска. */
+    val scenario: com.example.personallangmaster.data.db.entity.ScenarioEntity? = null,
     val subtitles: List<SubtitleItem> = emptyList(),
     val corrections: List<CorrectionItem> = emptyList(),
     val hints: List<HintCard> = emptyList(),
@@ -329,13 +331,28 @@ class LessonViewModel(
         }
     }
 
+    /** Загружает сценарий, выбранный в каталоге, чтобы показать его перед стартом. */
+    fun prepareScenario(scenarioId: String?) {
+        if (scenarioId == null) {
+            _state.update { it.copy(scenario = null) }
+            return
+        }
+        viewModelScope.launch {
+            _state.update { it.copy(scenario = lessonRepository.scenario(scenarioId)) }
+        }
+    }
+
     /** Сброс экрана к панели запуска: история прошлого урока уже сохранена в базе. */
     fun resetForNewLesson() {
         transcript.clear()
         pendingTutorText = StringBuilder()
         tokensIn = 0
         tokensOut = 0
-        _state.value = LessonUiState(chatMode = _state.value.chatMode)
+        _state.value = LessonUiState(
+            chatMode = _state.value.chatMode,
+            micMode = _state.value.micMode,
+            scenario = _state.value.scenario,
+        )
     }
 
     override fun onCleared() {

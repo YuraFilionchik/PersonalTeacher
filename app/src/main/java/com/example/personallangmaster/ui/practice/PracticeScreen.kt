@@ -16,6 +16,7 @@ import androidx.compose.material.icons.rounded.MenuBook
 import androidx.compose.material.icons.rounded.RecordVoiceOver
 import androidx.compose.material.icons.rounded.Rule
 import androidx.compose.material.icons.rounded.Style
+import androidx.compose.material.icons.rounded.TheaterComedy
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +49,9 @@ import com.example.personallangmaster.ui.vocab.VocabListViewModel
 fun PracticeScreen(
     onOpenVocab: () -> Unit,
     onStartReview: () -> Unit,
+    onOpenScenarios: () -> Unit,
+    onOpenPronunciation: () -> Unit,
+    onOpenGrammar: () -> Unit,
 ) {
     val container = LocalAppContainer.current
     val viewModel: VocabListViewModel = viewModel(
@@ -90,17 +94,24 @@ fun PracticeScreen(
             )
 
             ModuleCard(
+                title = "Ролевые сценарии",
+                subtitle = "Кафе, собеседование, спор — разговор с целью",
+                icon = Icons.Rounded.TheaterComedy,
+                onClick = onOpenScenarios,
+            )
+
+            ModuleCard(
                 title = stringResource(R.string.pronunciation_title),
-                subtitle = "Минимальные пары и карта звуков — следующий этап",
+                subtitle = "Минимальные пары, слабые звуки и карта фонем",
                 icon = Icons.Rounded.RecordVoiceOver,
-                enabled = false,
+                onClick = onOpenPronunciation,
             )
 
             ModuleCard(
                 title = stringResource(R.string.grammar_title),
-                subtitle = "Темы и упражнения по вашим ошибкам — следующий этап",
+                subtitle = "Темы и упражнения на материале ваших ошибок",
                 icon = Icons.Rounded.Rule,
-                enabled = false,
+                onClick = onOpenGrammar,
             )
 
             Spacer(Modifier.height(24.dp))

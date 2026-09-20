@@ -7,11 +7,14 @@ import com.example.personallangmaster.core.speech.SpeechInput
 import com.example.personallangmaster.core.speech.TtsController
 import com.example.personallangmaster.data.db.AppDatabase
 import com.example.personallangmaster.data.prefs.SettingsRepository
+import com.example.personallangmaster.data.repo.ContentRepository
 import com.example.personallangmaster.data.repo.LessonRepository
 import com.example.personallangmaster.data.repo.ProfileRepository
 import com.example.personallangmaster.data.repo.VocabRepository
 import com.example.personallangmaster.data.seed.SeedLoader
 import com.example.personallangmaster.domain.AnalyzeLessonUseCase
+import com.example.personallangmaster.domain.GenerateExercisesUseCase
+import com.example.personallangmaster.domain.GenerateScenarioUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -41,6 +44,9 @@ class AppContainer(context: Context) {
         )
     }
     val vocabRepository: VocabRepository by lazy { VocabRepository(database.vocabDao()) }
+    val contentRepository: ContentRepository by lazy {
+        ContentRepository(contentDao = database.contentDao(), lessonDao = database.lessonDao())
+    }
 
     // Системные озвучка и распознавание: повторения должны работать без сети и бесплатно.
     val ttsController: TtsController by lazy { TtsController(appContext) }
@@ -54,6 +60,20 @@ class AppContainer(context: Context) {
             statsDao = database.statsDao(),
             settingsRepository = settingsRepository,
             profileRepository = profileRepository,
+        )
+    }
+    val generateScenarioUseCase: GenerateScenarioUseCase by lazy {
+        GenerateScenarioUseCase(
+            settingsRepository = settingsRepository,
+            profileRepository = profileRepository,
+            contentRepository = contentRepository,
+        )
+    }
+    val generateExercisesUseCase: GenerateExercisesUseCase by lazy {
+        GenerateExercisesUseCase(
+            settingsRepository = settingsRepository,
+            profileRepository = profileRepository,
+            contentRepository = contentRepository,
         )
     }
     private val seedLoader: SeedLoader by lazy { SeedLoader(appContext, database.contentDao()) }

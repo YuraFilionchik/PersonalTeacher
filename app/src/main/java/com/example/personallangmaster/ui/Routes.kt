@@ -40,4 +40,20 @@ sealed interface Route : NavKey {
     /** Очередь повторений на сегодня. */
     @Serializable
     data object VocabReview : Route
+
+    /** Каталог ролевых сценариев. */
+    @Serializable
+    data object Scenarios : Route
+
+    /** Урок по конкретному сценарию. */
+    @Serializable
+    data class ScenarioLesson(val scenarioId: String) : Route
+
+    /** Тренажёр произношения и карта звуков. */
+    @Serializable
+    data object Pronunciation : Route
+
+    /** Грамматика: темы и упражнения. */
+    @Serializable
+    data object Grammar : Route
 }

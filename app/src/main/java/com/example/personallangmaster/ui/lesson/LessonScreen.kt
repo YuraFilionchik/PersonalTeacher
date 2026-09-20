@@ -68,6 +68,7 @@ import com.example.personallangmaster.ui.components.Speaker as UiSpeaker
  */
 @Composable
 fun LessonScreen(
+    scenarioId: String? = null,
     onOpenSettings: () -> Unit = {},
     onOpenReview: (Long) -> Unit = {},
 ) {
@@ -84,7 +85,15 @@ fun LessonScreen(
 
     val micLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { granted -> if (granted) viewModel.startLesson() }
+    ) { granted ->
+        if (granted) {
+            val scenario = viewModel.state.value.scenario
+            viewModel.startLesson(
+                mode = if (scenario != null) LessonMode.SCENARIO else LessonMode.FREE_TALK,
+                scenarioId = scenario?.id,
+            )
+        }
+    }
 
     // Пока урок идёт, процесс держит передний сервис: иначе запись оборвётся
     // при погасшем экране.
@@ -99,6 +108,8 @@ fun LessonScreen(
     LaunchedEffect(Unit) {
         LessonForegroundService.stopRequestFlow.collect { viewModel.endLesson() }
     }
+
+    LaunchedEffect(scenarioId) { viewModel.prepareScenario(scenarioId) }
 
     Scaffold { innerPadding ->
         Column(
@@ -121,7 +132,7 @@ fun LessonScreen(
                             ) == PackageManager.PERMISSION_GRANTED
 
                             if (granted) {
-                                viewModel.startLesson(mode)
+                                viewModel.startLesson(mode, state.scenario?.id)
                             } else {
                                 micLauncher.launch(Manifest.permission.RECORD_AUDIO)
                             }
@@ -139,7 +150,7 @@ fun LessonScreen(
                     state = state,
                     onRestart = {
                         viewModel.resetForNewLesson()
-                        viewModel.startLesson(state.mode)
+                        viewModel.startLesson(state.mode, state.scenario?.id)
                     },
                     onOpenReview = { viewModel.lastLessonId?.let(onOpenReview) },
                     onClearHistory = viewModel::resetForNewLesson,
@@ -394,6 +405,35 @@ private fun StartPanel(
                 Button(onClick = onOpenSettings) { Text("Открыть настройки") }
                 Spacer(Modifier.height(8.dp))
             }
+        } else if (state.scenario != null) {
+            val scenario = state.scenario
+            Text(
+                text = scenario.titleRu,
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+            )
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = scenario.descriptionRu,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(16.dp))
+            // Цель проговариваем заранее: без неё ролевая игра превращается
+            // в обычную беседу и не даёт ощущения выполненной задачи.
+            Text(
+                text = "Ваша задача: ${scenario.goal}",
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            if (scenario.vocabHints.isNotEmpty()) {
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = "Пригодятся: ${scenario.vocabHints.joinToString(", ")}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(Modifier.height(24.dp))
         } else {
             Text(
                 text = "Готовы поговорить?",
@@ -410,12 +450,21 @@ private fun StartPanel(
             Spacer(Modifier.height(24.dp))
         }
 
-        Button(onClick = { onStart(LessonMode.FREE_TALK) }) {
-            Text(if (error != null) "Попробовать снова" else "Начать урок")
+        val primaryMode = if (state.scenario != null) LessonMode.SCENARIO else LessonMode.FREE_TALK
+        Button(onClick = { onStart(primaryMode) }) {
+            Text(
+                when {
+                    error != null -> "Попробовать снова"
+                    state.scenario != null -> "Начать сценарий"
+                    else -> "Начать урок"
+                }
+            )
         }
         Spacer(Modifier.height(8.dp))
-        OutlinedButton(onClick = { onStart(LessonMode.PLACEMENT) }) {
-            Text("Пройти тест уровня")
+        if (state.scenario == null) {
+            OutlinedButton(onClick = { onStart(LessonMode.PLACEMENT) }) {
+                Text("Пройти тест уровня")
+            }
         }
     }
 }

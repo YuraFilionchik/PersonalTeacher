@@ -22,6 +22,9 @@ import com.example.personallangmaster.R
 import com.example.personallangmaster.di.LocalAppContainer
 import com.example.personallangmaster.ui.lesson.LessonScreen
 import com.example.personallangmaster.ui.practice.PracticeScreen
+import com.example.personallangmaster.ui.grammar.GrammarScreen
+import com.example.personallangmaster.ui.pronunciation.PronunciationScreen
+import com.example.personallangmaster.ui.scenarios.ScenarioListScreen
 import com.example.personallangmaster.ui.vocab.VocabListScreen
 import com.example.personallangmaster.ui.vocab.VocabReviewScreen
 import com.example.personallangmaster.ui.review.LessonReviewScreen
@@ -111,6 +114,9 @@ fun PersonalLangMasterApp() {
                     PracticeScreen(
                         onOpenVocab = { backStack.add(Route.VocabList) },
                         onStartReview = { backStack.add(Route.VocabReview) },
+                        onOpenScenarios = { backStack.add(Route.Scenarios) },
+                        onOpenPronunciation = { backStack.add(Route.Pronunciation) },
+                        onOpenGrammar = { backStack.add(Route.Grammar) },
                     )
                 }
                 entry<Route.VocabList> {
@@ -120,6 +126,25 @@ fun PersonalLangMasterApp() {
                     )
                 }
                 entry<Route.VocabReview> { VocabReviewScreen(onBack = goBack) }
+                entry<Route.Pronunciation> { PronunciationScreen(onBack = goBack) }
+                entry<Route.Grammar> { GrammarScreen(onBack = goBack) }
+                entry<Route.Scenarios> {
+                    ScenarioListScreen(
+                        onBack = goBack,
+                        onStartScenario = { id -> backStack.add(Route.ScenarioLesson(id)) },
+                    )
+                }
+                entry<Route.ScenarioLesson> { key ->
+                    LessonScreen(
+                        scenarioId = key.scenarioId,
+                        onOpenReview = { lessonId -> backStack.add(Route.Review(lessonId)) },
+                        onOpenSettings = {
+                            backStack.clear()
+                            backStack.add(Route.Settings)
+                            backStack.add(SettingsRoute.Model)
+                        },
+                    )
+                }
                 entry<Route.Progress> { ProgressScreen() }
                 entry<Route.Review> { key ->
                     LessonReviewScreen(lessonId = key.lessonId, onBack = goBack)
