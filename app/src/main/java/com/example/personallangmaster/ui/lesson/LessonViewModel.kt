@@ -59,6 +59,7 @@ data class HintCard(
 data class LessonUiState(
     val sessionState: LiveSessionState = LiveSessionState.Idle,
     val mode: LessonMode = LessonMode.FREE_TALK,
+    val micMode: MicMode = MicMode.HOLD,
     val subtitles: List<SubtitleItem> = emptyList(),
     val corrections: List<CorrectionItem> = emptyList(),
     val hints: List<HintCard> = emptyList(),
@@ -205,6 +206,7 @@ class LessonViewModel(
             _state.update {
                 LessonUiState(
                     mode = mode,
+                    micMode = settings.micMode,
                     sessionState = LiveSessionState.Connecting,
                     chatMode = it.chatMode,
                 )

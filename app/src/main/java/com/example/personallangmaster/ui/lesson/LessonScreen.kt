@@ -49,10 +49,12 @@ import com.example.personallangmaster.ai.live.LiveErrorKind
 import com.example.personallangmaster.ai.live.LiveSessionState
 import com.example.personallangmaster.core.cost.CostCalculator
 import com.example.personallangmaster.data.db.LessonMode
+import com.example.personallangmaster.data.prefs.MicMode
 import com.example.personallangmaster.di.LocalAppContainer
 import com.example.personallangmaster.ui.components.CorrectionCard
 import com.example.personallangmaster.ui.components.MicButton
 import com.example.personallangmaster.ui.components.MicButtonState
+import com.example.personallangmaster.ui.components.MicGesture
 import com.example.personallangmaster.ui.components.SubtitleLine
 import com.example.personallangmaster.ui.components.WaveformVisualizer
 import com.example.personallangmaster.data.db.Speaker as DbSpeaker
@@ -315,6 +317,7 @@ private fun LessonControls(state: LessonUiState, viewModel: LessonViewModel) {
                 } else {
                     state.micLevelDbfs
                 },
+                gesture = micGesture(state.micMode),
                 onPress = viewModel::onMicPress,
                 onRelease = viewModel::onMicRelease,
                 onTap = viewModel::onMicTap,
@@ -423,6 +426,12 @@ private fun micState(state: LessonUiState): MicButtonState = when (state.session
     is LiveSessionState.Thinking -> MicButtonState.THINKING
     is LiveSessionState.Speaking -> MicButtonState.SPEAKING
     else -> MicButtonState.DISABLED
+}
+
+/** Удержание — только в режиме «удерживать»; остальные режимы работают одиночным тапом. */
+private fun micGesture(mode: MicMode): MicGesture = when (mode) {
+    MicMode.HOLD -> MicGesture.HOLD
+    MicMode.TAP, MicMode.HANDS_FREE -> MicGesture.TAP
 }
 
 private fun statusText(state: LiveSessionState): String = when (state) {

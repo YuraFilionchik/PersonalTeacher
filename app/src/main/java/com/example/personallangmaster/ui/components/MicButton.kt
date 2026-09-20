@@ -26,6 +26,15 @@ import com.example.personallangmaster.ui.theme.PersonalLangMasterTheme
 
 enum class MicButtonState { READY, LISTENING, THINKING, SPEAKING, DISABLED }
 
+/** Как кнопка понимает жест — от этого зависит, когда реплика считается законченной. */
+enum class MicGesture {
+    /** Реплика идёт, пока кнопка зажата: отпустил — отправил. */
+    HOLD,
+
+    /** Один тап открывает микрофон, второй закрывает. */
+    TAP,
+}
+
 /**
  * Основная кнопка управления уроком. 
  * Размер: 96dp. Вокруг кнопки рисуется кольцо, реагирующее на громкость (levelDbfs).
@@ -37,6 +46,7 @@ fun MicButton(
     onPress: () -> Unit,
     onRelease: () -> Unit,
     onTap: () -> Unit,
+    gesture: MicGesture = MicGesture.HOLD,
     modifier: Modifier = Modifier
 ) {
     // Анимация кольца в зависимости от громкости (от -100 до 0 dBFS)
@@ -121,16 +131,19 @@ fun MicButton(
                     .size(96.dp)
                     .clip(CircleShape)
                     .background(buttonColor)
-                    .pointerInput(state) {
-                        if (state != MicButtonState.DISABLED) {
-                            detectTapGestures(
-                                onTap = { onTap() },
+                    .pointerInput(state, gesture) {
+                        if (state == MicButtonState.DISABLED) return@pointerInput
+                        when (gesture) {
+                            // onTap здесь не вызываем: короткое нажатие — это та же реплика,
+                            // уже законченная отпусканием, а не команда начать новую.
+                            MicGesture.HOLD -> detectTapGestures(
                                 onPress = {
                                     onPress()
                                     tryAwaitRelease()
                                     onRelease()
                                 }
                             )
+                            MicGesture.TAP -> detectTapGestures(onTap = { onTap() })
                         }
                     }
             ) {
@@ -182,7 +195,22 @@ private fun MicButtonPreviewReady() {
         }
     }
 }
-
+@Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun MicButtonPreviewTap() {
+    PersonalLangMasterTheme {
+        Surface {
+            MicButton(
+                state = MicButtonState.READY,
+                levelDbfs = -100.0,
+                onPress = {}, onRelease = {}, onTap = {},
+                gesture = MicGesture.TAP,
+                modifier = Modifier.padding(32.dp)
+            )
+        }
+    }
+}
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
