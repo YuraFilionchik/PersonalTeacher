@@ -4,9 +4,17 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
+import com.example.personallangmaster.data.db.UsageKind
 import com.example.personallangmaster.data.db.entity.DailyStatEntity
 import com.example.personallangmaster.data.db.entity.UsageLogEntity
 import kotlinx.coroutines.flow.Flow
+
+/** Строка разбивки расходов по типу токенов. */
+data class UsageByKind(
+    val kind: UsageKind,
+    val tokens: Long,
+    val costUsd: Double,
+)
 
 @Dao
 interface StatsDao {
@@ -26,6 +34,13 @@ interface StatsDao {
 
     @Query("SELECT COALESCE(SUM(tokens), 0) FROM usage_log WHERE profileId = :profileId AND at >= :since")
     suspend fun tokensSince(profileId: Long, since: Long): Long
+
+    /** Расход по типам токенов — разбивка на экране расходов. */
+    @Query(
+        "SELECT kind AS kind, SUM(tokens) AS tokens, SUM(costUsd) AS costUsd " +
+            "FROM usage_log WHERE profileId = :profileId AND at >= :since GROUP BY kind"
+    )
+    fun observeUsageByKind(profileId: Long, since: Long): Flow<List<UsageByKind>>
 
     @Query("DELETE FROM usage_log WHERE at < :before")
     suspend fun deleteUsageOlderThan(before: Long)

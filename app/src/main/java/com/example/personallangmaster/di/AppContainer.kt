@@ -10,11 +10,14 @@ import com.example.personallangmaster.data.prefs.SettingsRepository
 import com.example.personallangmaster.data.repo.ContentRepository
 import com.example.personallangmaster.data.repo.LessonRepository
 import com.example.personallangmaster.data.repo.ProfileRepository
+import com.example.personallangmaster.data.repo.StatsRepository
 import com.example.personallangmaster.data.repo.VocabRepository
 import com.example.personallangmaster.data.seed.SeedLoader
 import com.example.personallangmaster.domain.AnalyzeLessonUseCase
 import com.example.personallangmaster.domain.GenerateExercisesUseCase
 import com.example.personallangmaster.domain.GenerateScenarioUseCase
+import com.example.personallangmaster.work.Notifications
+import com.example.personallangmaster.work.WorkScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -44,6 +47,9 @@ class AppContainer(context: Context) {
         )
     }
     val vocabRepository: VocabRepository by lazy { VocabRepository(database.vocabDao()) }
+    val statsRepository: StatsRepository by lazy {
+        StatsRepository(statsDao = database.statsDao(), profileDao = database.profileDao())
+    }
     val contentRepository: ContentRepository by lazy {
         ContentRepository(contentDao = database.contentDao(), lessonDao = database.lessonDao())
     }
@@ -78,9 +84,18 @@ class AppContainer(context: Context) {
     }
     private val seedLoader: SeedLoader by lazy { SeedLoader(appContext, database.contentDao()) }
 
-    /** Разовая инициализация на старте приложения: подгрузка учебного контента. */
+    /** Разовая инициализация на старте: контент, канал уведомлений и расписание задач. */
     fun warmUp() {
-        scope.launch { seedLoader.seedIfNeeded() }
+        scope.launch {
+            seedLoader.seedIfNeeded()
+            Notifications.ensureChannel(appContext)
+            WorkScheduler.sync(appContext, settingsRepository.current())
+        }
+    }
+
+    /** Пересобрать расписание после изменения настроек напоминаний. */
+    fun rescheduleReminders() {
+        scope.launch { WorkScheduler.sync(appContext, settingsRepository.current()) }
     }
 }
 

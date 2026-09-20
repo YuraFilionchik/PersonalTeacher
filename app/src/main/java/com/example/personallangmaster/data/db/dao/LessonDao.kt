@@ -71,6 +71,10 @@ interface LessonDao {
     @Query("DELETE FROM turn WHERE lessonId IN (SELECT id FROM lesson WHERE startedAt < :before)")
     suspend fun deleteTurnsOlderThan(before: Long)
 
+    /** Уроки, от которых остались аудиозаписи старше срока хранения. */
+    @Query("SELECT * FROM lesson WHERE audioPath IS NOT NULL AND startedAt < :before")
+    suspend fun lessonsWithAudioBefore(before: Long): List<LessonEntity>
+
     @Insert
     suspend fun insertMistakes(mistakes: List<MistakeEntity>): List<Long>
 

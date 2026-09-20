@@ -58,4 +58,7 @@ interface ProfileDao {
 
     @Query("SELECT * FROM streak WHERE profileId = :profileId")
     fun observeStreak(profileId: Long): Flow<StreakEntity?>
+
+    @Query("SELECT * FROM streak WHERE profileId = :profileId")
+    suspend fun observeStreakOnce(profileId: Long): StreakEntity?
 }

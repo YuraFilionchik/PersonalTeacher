@@ -78,6 +78,7 @@ fun LessonScreen(
             container.settingsRepository,
             container.profileRepository,
             container.lessonRepository,
+            container.statsRepository,
         )
     )
     val state by viewModel.state.collectAsStateWithLifecycle()

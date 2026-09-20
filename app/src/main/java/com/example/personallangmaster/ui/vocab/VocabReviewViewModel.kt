@@ -56,6 +56,7 @@ data class VocabReviewUiState(
 class VocabReviewViewModel(
     private val vocabRepository: VocabRepository,
     private val profileRepository: ProfileRepository,
+    private val statsRepository: com.example.personallangmaster.data.repo.StatsRepository,
     private val tts: TtsController,
     private val speechInput: SpeechInput,
 ) : ViewModel() {
@@ -191,6 +192,14 @@ class VocabReviewViewModel(
             )
         }
 
+        // Сессия закончилась — записываем повторения в сводку дня одной строкой.
+        if (_state.value.finished) {
+            val reviewed = _state.value.reviewed
+            profileId?.let { profile ->
+                viewModelScope.launch { statsRepository.recordReviews(profile, reviewed) }
+            }
+        }
+
         if (!_state.value.finished && _state.value.mode == ReviewMode.LISTEN) speakTerm()
     }
 
@@ -215,12 +224,14 @@ class VocabReviewViewModel(
         fun factory(
             vocabRepository: VocabRepository,
             profileRepository: ProfileRepository,
+            statsRepository: com.example.personallangmaster.data.repo.StatsRepository,
             tts: TtsController,
             speechInput: SpeechInput,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                VocabReviewViewModel(vocabRepository, profileRepository, tts, speechInput) as T
+            override fun <T : ViewModel> create(modelClass: Class<T>): T = VocabReviewViewModel(
+                vocabRepository, profileRepository, statsRepository, tts, speechInput,
+            ) as T
         }
     }
 }

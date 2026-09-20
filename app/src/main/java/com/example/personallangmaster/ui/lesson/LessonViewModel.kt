@@ -18,6 +18,8 @@ import com.example.personallangmaster.core.cost.CostCalculator
 import com.example.personallangmaster.core.cost.PricingTable
 import com.example.personallangmaster.data.db.LessonMode
 import com.example.personallangmaster.data.db.Speaker
+import com.example.personallangmaster.domain.BudgetAction
+import com.example.personallangmaster.domain.BudgetPolicy
 import com.example.personallangmaster.data.prefs.AppSettings
 import com.example.personallangmaster.data.prefs.MicMode
 import com.example.personallangmaster.data.prefs.SettingsRepository
@@ -96,6 +98,7 @@ class LessonViewModel(
     private val settingsRepository: SettingsRepository,
     private val profileRepository: ProfileRepository,
     private val lessonRepository: LessonRepository,
+    private val statsRepository: com.example.personallangmaster.data.repo.StatsRepository,
 ) : ViewModel() {
 
     private val session = LiveSession(viewModelScope)
@@ -160,17 +163,31 @@ class LessonViewModel(
                 lessonRepository.spentTodayUsd(it, startOfToday())
             } ?: 0.0
 
-            if (settings.dailyLimitUsd > 0 && spentToday >= settings.dailyLimitUsd) {
+            val spentMonth = profile?.id?.let {
+                lessonRepository.spentTodayUsd(it, startOfMonth())
+            } ?: 0.0
+
+            val decision = BudgetPolicy.beforeLesson(
+                spentTodayUsd = spentToday,
+                spentMonthUsd = spentMonth,
+                dailyLimitUsd = settings.dailyLimitUsd,
+                monthlyLimitUsd = settings.monthlyLimitUsd,
+                behavior = settings.limitBehavior,
+            )
+
+            if (decision.action == BudgetAction.BLOCK) {
                 _state.update {
                     it.copy(
                         sessionState = LiveSessionState.Error(
                             LiveErrorKind.BUDGET_LIMIT,
-                            "Дневной лимит исчерпан: потрачено " +
-                                CostCalculator.formatUsd(spentToday),
+                            decision.reason.orEmpty(),
                         )
                     )
                 }
                 return@launch
+            }
+            if (decision.action == BudgetAction.WARN) {
+                _state.update { it.copy(budgetWarning = decision.reason) }
             }
 
             val scenario = scenarioId?.let { lessonRepository.scenario(it) }
@@ -327,6 +344,15 @@ class LessonViewModel(
                     responseCostUsd = CostCalculator.costUsd(tokensOut, pricing.audioOutputPerMTok),
                 )
             }
+            if (profile != null && elapsed > 0) {
+                statsRepository.recordLesson(
+                    profileId = profile,
+                    minutes = elapsed / 60.0,
+                    costUsd = _state.value.costUsd,
+                    goalMinutes = profileRepository.current()?.dailyGoalMinutes ?: 0,
+                )
+            }
+
             _state.update { it.copy(finished = true) }
         }
     }
@@ -488,18 +514,23 @@ class LessonViewModel(
         }
     }
 
+    /**
+     * Реакция на приближение к лимиту.
+     *
+     * Урок обрывается только если пользователь сам выбрал такое поведение;
+     * правило целиком живёт в [BudgetPolicy] и покрыто тестами.
+     */
     private fun checkBudget(cost: Double) {
-        val limit = settings.dailyLimitUsd
-        if (limit <= 0) return
-        when {
-            cost >= limit -> {
-                _state.update { it.copy(budgetWarning = "Лимит на сегодня исчерпан") }
-                endLesson()
-            }
-            cost >= limit * BUDGET_WARN_SHARE -> _state.update {
-                it.copy(budgetWarning = "Израсходовано ${CostCalculator.formatUsd(cost)} из лимита")
-            }
-        }
+        val decision = BudgetPolicy.duringLesson(
+            sessionCostUsd = cost,
+            dailyLimitUsd = settings.dailyLimitUsd,
+            behavior = settings.limitBehavior,
+        )
+
+        if (decision.action == BudgetAction.ALLOW) return
+
+        _state.update { it.copy(budgetWarning = decision.reason) }
+        if (decision.action == BudgetAction.BLOCK) endLesson()
     }
 
     private fun startTimer() {
@@ -520,6 +551,14 @@ class LessonViewModel(
 
     private fun elapsedMillis(): Long = System.currentTimeMillis() - startedAtMillis
 
+    private fun startOfMonth(): Long = Calendar.getInstance().apply {
+        set(Calendar.DAY_OF_MONTH, 1)
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+
     private fun startOfToday(): Long = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, 0)
         set(Calendar.MINUTE, 0)
@@ -533,17 +572,18 @@ class LessonViewModel(
         private const val MAX_SUBTITLES = 50
         private const val MAX_VISIBLE_CORRECTIONS = 2
         private const val MAX_VISIBLE_HINTS = 2
-        private const val BUDGET_WARN_SHARE = 0.8
         private const val LESSON_GRACE_SECONDS = 60
 
         fun factory(
             settingsRepository: SettingsRepository,
             profileRepository: ProfileRepository,
             lessonRepository: LessonRepository,
+            statsRepository: com.example.personallangmaster.data.repo.StatsRepository,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                LessonViewModel(settingsRepository, profileRepository, lessonRepository) as T
+            override fun <T : ViewModel> create(modelClass: Class<T>): T = LessonViewModel(
+                settingsRepository, profileRepository, lessonRepository, statsRepository,
+            ) as T
         }
     }
 }

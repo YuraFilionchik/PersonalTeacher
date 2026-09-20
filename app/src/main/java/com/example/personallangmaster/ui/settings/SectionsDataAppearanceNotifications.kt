@@ -1,5 +1,10 @@
 package com.example.personallangmaster.ui.settings
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -188,6 +193,13 @@ fun AppearanceSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
 @Composable
 fun NotificationSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
+    val container = com.example.personallangmaster.di.LocalAppContainer.current
+
+    // Разрешение спрашиваем здесь, а не на онбординге: просьба понятна только
+    // в тот момент, когда человек сам включает напоминания.
+    val notificationLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { container.rescheduleReminders() }
 
     SettingsScaffold(stringResource(R.string.settings_section_notifications), onBack) {
         SettingsGroup("Ежедневное напоминание") {
@@ -195,7 +207,14 @@ fun NotificationSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit)
                 title = stringResource(R.string.settings_notifications_daily_title),
                 subtitle = "Напомнить, если цель дня ещё не выполнена",
                 checked = settings.reminderEnabled,
-                onCheckedChange = { enabled -> viewModel.update { setReminder(enabled) } },
+                onCheckedChange = { enabled ->
+                    viewModel.update { setReminder(enabled) }
+                    if (enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        container.rescheduleReminders()
+                    }
+                },
             )
             if (settings.reminderEnabled) {
                 SettingsSliderRow(
@@ -250,13 +269,16 @@ fun NotificationSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit)
                 title = stringResource(R.string.settings_notifications_review_title),
                 subtitle = "Когда накопились карточки словаря",
                 checked = settings.reviewReminderEnabled,
-                onCheckedChange = { value -> viewModel.update { setReviewReminder(value) } },
+                onCheckedChange = { value ->
+                    viewModel.update { setReviewReminder(value) }
+                    container.rescheduleReminders()
+                },
             )
         }
 
         SettingsNote(
-            "Уведомления начнут приходить, когда будет готов модуль напоминаний — " +
-                "настройки здесь уже сохраняются."
+            "Напоминание не приходит, если цель дня уже выполнена, а карточки напоминают " +
+                "о себе, только когда их накопилось хотя бы десять."
         )
     }
 }

@@ -23,6 +23,8 @@ import com.example.personallangmaster.di.LocalAppContainer
 import com.example.personallangmaster.ui.lesson.LessonScreen
 import com.example.personallangmaster.ui.practice.PracticeScreen
 import com.example.personallangmaster.ui.grammar.GrammarScreen
+import com.example.personallangmaster.ui.home.HomeScreen
+import com.example.personallangmaster.ui.progress.ProgressScreen
 import com.example.personallangmaster.ui.pronunciation.PronunciationScreen
 import com.example.personallangmaster.ui.scenarios.ScenarioListScreen
 import com.example.personallangmaster.ui.vocab.VocabListScreen
@@ -99,7 +101,17 @@ fun PersonalLangMasterApp() {
             modifier = Modifier.fillMaxSize(),
             onBack = goBack,
             entryProvider = entryProvider {
-                entry<Route.Home> { HomeScreen() }
+                entry<Route.Home> {
+                    HomeScreen(
+                        onStartLesson = {
+                            backStack.clear()
+                            backStack.add(Route.Lesson)
+                        },
+                        onReviewVocab = { backStack.add(Route.VocabReview) },
+                        onOpenGrammar = { backStack.add(Route.Grammar) },
+                        onOpenReview = { lessonId -> backStack.add(Route.Review(lessonId)) },
+                    )
+                }
                 entry<Route.Lesson> {
                     LessonScreen(
                         onOpenReview = { lessonId -> backStack.add(Route.Review(lessonId)) },
@@ -145,7 +157,11 @@ fun PersonalLangMasterApp() {
                         },
                     )
                 }
-                entry<Route.Progress> { ProgressScreen() }
+                entry<Route.Progress> {
+                    ProgressScreen(
+                        onOpenReview = { lessonId -> backStack.add(Route.Review(lessonId)) },
+                    )
+                }
                 entry<Route.Review> { key ->
                     LessonReviewScreen(lessonId = key.lessonId, onBack = goBack)
                 }

@@ -77,6 +77,21 @@ class LessonRepository(
         )
     }
 
+    /**
+     * Удаляет аудиозаписи уроков старше срока хранения.
+     *
+     * Файл и ссылка на него чистятся вместе: иначе в истории остаются уроки
+     * с кнопкой «переслушать», которая ничего не находит.
+     */
+    suspend fun deleteAudioOlderThan(days: Int) {
+        if (days <= 0) return
+        val threshold = System.currentTimeMillis() - days * 24L * 60 * 60 * 1000
+        lessonDao.lessonsWithAudioBefore(threshold).forEach { lesson ->
+            lesson.audioPath?.let { path -> runCatching { java.io.File(path).delete() } }
+            lessonDao.update(lesson.copy(audioPath = null))
+        }
+    }
+
     suspend fun markFailed(lessonId: Long) {
         lessonDao.getById(lessonId)?.let { lesson ->
             lessonDao.update(lesson.copy(status = LessonStatus.FAILED, endedAt = System.currentTimeMillis()))

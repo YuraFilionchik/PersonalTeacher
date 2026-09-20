@@ -63,6 +63,7 @@ fun VocabReviewScreen(onBack: () -> Unit) {
         factory = VocabReviewViewModel.factory(
             container.vocabRepository,
             container.profileRepository,
+            container.statsRepository,
             container.ttsController,
             container.speechInput,
         )
