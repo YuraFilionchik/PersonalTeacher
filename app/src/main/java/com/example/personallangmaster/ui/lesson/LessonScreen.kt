@@ -466,6 +466,14 @@ private fun StartPanel(
             OutlinedButton(onClick = { onStart(LessonMode.PLACEMENT) }) {
                 Text("Пройти тест уровня")
             }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                text = "Тест — это пятиминутная беседа без поправок: тренер постепенно " +
+                    "усложняет вопросы, а в конце по разбору ставится уровень.",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            )
         }
     }
 }

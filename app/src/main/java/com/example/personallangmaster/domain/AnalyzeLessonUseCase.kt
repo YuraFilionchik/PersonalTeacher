@@ -6,6 +6,7 @@ import com.example.personallangmaster.ai.text.LessonAnalysisSchema
 import com.example.personallangmaster.ai.text.TextResult
 import com.example.personallangmaster.core.cost.CostCalculator
 import com.example.personallangmaster.data.db.Cefr
+import com.example.personallangmaster.data.db.LessonMode
 import com.example.personallangmaster.data.db.LessonStatus
 import com.example.personallangmaster.data.db.MistakeType
 import com.example.personallangmaster.data.db.Speaker
@@ -55,8 +56,15 @@ class AnalyzeLessonUseCase(
             ?: return AnalysisResult.Failure("Урок не найден")
 
         val turns = lessonDao.getTurns(lessonId)
-        if (turns.count { it.speaker == Speaker.USER } < MIN_USER_TURNS) {
-            return AnalysisResult.Failure("Слишком короткий разговор для разбора")
+        val userTurns = turns.count { it.speaker == Speaker.USER }
+        if (userTurns < MIN_USER_TURNS) {
+            return AnalysisResult.Failure(
+                if (turns.isEmpty()) {
+                    "Разговор не сохранился: проверьте, включена ли транскрипция в настройках"
+                } else {
+                    "В разговоре всего $userTurns ваших реплик — для разбора нужно хотя бы $MIN_USER_TURNS"
+                }
+            )
         }
 
         val settings = settingsRepository.current()
@@ -91,9 +99,20 @@ class AnalyzeLessonUseCase(
                 persist(lessonId, lesson.profileId, analysis)
                 logUsage(lesson.profileId, lessonId, result, settings)
 
-                val newLevel = profile
-                    ?.takeIf { !it.levelLocked }
-                    ?.let { updateLevelIfNeeded(it.id, it.cefrOverall, settings.progressionPace) }
+                val newLevel = when {
+                    profile == null || profile.levelLocked -> null
+
+                    // Тест уровня для того и нужен: его оценка ставится сразу,
+                    // а не копится вместе с обычными уроками.
+                    lesson.mode == LessonMode.PLACEMENT ->
+                        applyPlacement(profile, analysis.cefr_estimate)
+
+                    else -> updateLevelIfNeeded(
+                        profile.id,
+                        profile.cefrOverall,
+                        settings.progressionPace,
+                    )
+                }
 
                 AnalysisResult.Success(analysis, newLevel)
             }
@@ -205,6 +224,26 @@ class AnalyzeLessonUseCase(
         ).filter { it.tokens > 0 }
 
         if (entries.isNotEmpty()) statsDao.insertUsage(entries)
+    }
+
+    /** Результат теста уровня применяется целиком и сразу. */
+    private suspend fun applyPlacement(
+        profile: com.example.personallangmaster.data.db.entity.ProfileEntity,
+        estimate: String?,
+    ): Cefr? {
+        val level = Cefr.fromOrNull(estimate) ?: return null
+        profileRepository.update(
+            profile.copy(
+                cefrOverall = level,
+                cefrSpeaking = level,
+                cefrListening = level,
+                cefrGrammar = level,
+                cefrVocab = level,
+                cefrUpdatedAt = System.currentTimeMillis(),
+                createdFromPlacement = true,
+            )
+        )
+        return level
     }
 
     /** Пересчёт уровня по последним оценкам. Логика решения — в [LevelProgression]. */

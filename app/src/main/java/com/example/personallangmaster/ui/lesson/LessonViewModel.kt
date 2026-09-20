@@ -121,6 +121,14 @@ class LessonViewModel(
     private val transcript = mutableListOf<Triple<Speaker, String, Long>>()
     private var pendingTutorText = StringBuilder()
 
+    /**
+     * Расшифровка речи ученика приходит кусками, а `turnComplete` — только
+     * вместе с ответом тренера. Поэтому реплику копим здесь и закрываем сами:
+     * иначе она навсегда остаётся «частичной» и не попадает ни в транскрипт,
+     * ни в разбор урока.
+     */
+    private var pendingUserText = StringBuilder()
+
     init {
         session.state
             .onEach { live -> _state.update { it.copy(sessionState = live) } }
@@ -311,6 +319,9 @@ class LessonViewModel(
 
     fun endLesson() {
         timerJob?.cancel()
+        // Последняя реплика часто остаётся незакрытой: урок обрывают в середине хода.
+        finalizeUserTurn()
+        finalizeTutorTurn()
         session.stop()
 
         val profile = profileId
@@ -372,6 +383,7 @@ class LessonViewModel(
     fun resetForNewLesson() {
         transcript.clear()
         pendingTutorText = StringBuilder()
+        pendingUserText = StringBuilder()
         tokensIn = 0
         tokensOut = 0
         _state.value = LessonUiState(
@@ -391,20 +403,22 @@ class LessonViewModel(
 
     private fun handleEvent(event: LiveEvent) {
         when (event) {
-            is LiveEvent.UserTranscript -> addSubtitle(Speaker.USER, event.text, !event.isFinal)
+            is LiveEvent.UserTranscript -> {
+                pendingUserText.append(event.text)
+                addSubtitle(Speaker.USER, pendingUserText.toString(), isPartial = !event.isFinal)
+                if (event.isFinal) finalizeUserTurn()
+            }
 
             is LiveEvent.TutorTranscript -> {
+                // Заговорил тренер — значит, реплика ученика закончилась.
+                finalizeUserTurn()
                 pendingTutorText.append(event.text)
                 addSubtitle(Speaker.TUTOR, pendingTutorText.toString(), isPartial = true)
             }
 
             LiveEvent.TurnComplete -> {
-                if (pendingTutorText.isNotEmpty()) {
-                    val text = pendingTutorText.toString()
-                    pendingTutorText = StringBuilder()
-                    addSubtitle(Speaker.TUTOR, text, isPartial = false)
-                    transcript += Triple(Speaker.TUTOR, text, elapsedMillis())
-                }
+                finalizeUserTurn()
+                finalizeTutorTurn()
             }
 
             LiveEvent.Interrupted -> {
@@ -496,6 +510,22 @@ class LessonViewModel(
         }
     }
 
+    /** Закрывает реплику ученика: она уходит в субтитры и в транскрипт. */
+    private fun finalizeUserTurn() {
+        if (pendingUserText.isBlank()) return
+        val text = pendingUserText.toString().trim()
+        pendingUserText = StringBuilder()
+        addSubtitle(Speaker.USER, text, isPartial = false)
+    }
+
+    private fun finalizeTutorTurn() {
+        if (pendingTutorText.isEmpty()) return
+        val text = pendingTutorText.toString().trim()
+        pendingTutorText = StringBuilder()
+        addSubtitle(Speaker.TUTOR, text, isPartial = false)
+        transcript += Triple(Speaker.TUTOR, text, elapsedMillis())
+    }
+
     private fun addSubtitle(speaker: Speaker, text: String, isPartial: Boolean) {
         if (text.isBlank()) return
         _state.update { current ->
@@ -541,7 +571,13 @@ class LessonViewModel(
                 val seconds = ((System.currentTimeMillis() - startedAtMillis) / 1000).toInt()
                 _state.update { it.copy(elapsedSeconds = seconds) }
 
-                val limit = settings.lessonMinutes
+                // Тест уровня не зависит от длины обычного урока: пять минут
+                // хватает, чтобы оценить речь, а дальше это уже просто разговор.
+                val limit = if (_state.value.mode == LessonMode.PLACEMENT) {
+                    PLACEMENT_MINUTES
+                } else {
+                    settings.lessonMinutes
+                }
                 if (limit > 0 && seconds >= limit * 60 + LESSON_GRACE_SECONDS) {
                     endLesson()
                 }
@@ -573,6 +609,7 @@ class LessonViewModel(
         private const val MAX_VISIBLE_CORRECTIONS = 2
         private const val MAX_VISIBLE_HINTS = 2
         private const val LESSON_GRACE_SECONDS = 60
+        private const val PLACEMENT_MINUTES = 5
 
         fun factory(
             settingsRepository: SettingsRepository,
