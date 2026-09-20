@@ -9,6 +9,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.personallangmaster.R
 
 /** Временная заглушка экрана: заменяется реальным содержимым на своём этапе плана. */
 @Composable
@@ -26,16 +28,13 @@ private fun PlaceholderScreen(title: String) {
 }
 
 @Composable
-fun HomeScreen() = PlaceholderScreen("Главная")
+fun HomeScreen() = PlaceholderScreen(stringResource(R.string.nav_home))
 
 @Composable
-fun LessonScreen() = PlaceholderScreen("Урок")
+fun LessonScreen() = PlaceholderScreen(stringResource(R.string.nav_lesson))
 
 @Composable
-fun PracticeScreen() = PlaceholderScreen("Практика")
+fun PracticeScreen() = PlaceholderScreen(stringResource(R.string.nav_practice))
 
 @Composable
-fun ProgressScreen() = PlaceholderScreen("Прогресс")
-
-@Composable
-fun SettingsScreen() = PlaceholderScreen("Настройки")
+fun ProgressScreen() = PlaceholderScreen(stringResource(R.string.nav_progress))

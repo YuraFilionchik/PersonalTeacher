@@ -13,45 +13,75 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.personallangmaster.R
+import com.example.personallangmaster.di.LocalAppContainer
+import com.example.personallangmaster.ui.settings.AppearanceSettingsScreen
+import com.example.personallangmaster.ui.settings.AudioSettingsScreen
+import com.example.personallangmaster.ui.settings.BudgetSettingsScreen
+import com.example.personallangmaster.ui.settings.DataSettingsScreen
+import com.example.personallangmaster.ui.settings.LevelSettingsScreen
+import com.example.personallangmaster.ui.settings.MethodSettingsScreen
+import com.example.personallangmaster.ui.settings.ModelSettingsScreen
+import com.example.personallangmaster.ui.settings.NotificationSettingsScreen
+import com.example.personallangmaster.ui.settings.PromptPreviewScreen
+import com.example.personallangmaster.ui.settings.SettingsRoute
+import com.example.personallangmaster.ui.settings.SettingsScreen
+import com.example.personallangmaster.ui.settings.SettingsViewModel
+import com.example.personallangmaster.ui.settings.TutorSettingsScreen
 
 private data class TopLevelDestination(
     val route: Route,
     val icon: ImageVector,
-    val label: String,
+    val labelRes: Int,
 )
 
 private val topLevelDestinations = listOf(
-    TopLevelDestination(Route.Home, Icons.Rounded.Home, "Главная"),
-    TopLevelDestination(Route.Lesson, Icons.Rounded.RecordVoiceOver, "Урок"),
-    TopLevelDestination(Route.Practice, Icons.Rounded.School, "Практика"),
-    TopLevelDestination(Route.Progress, Icons.Rounded.TrendingUp, "Прогресс"),
-    TopLevelDestination(Route.Settings, Icons.Rounded.Settings, "Настройки"),
+    TopLevelDestination(Route.Home, Icons.Rounded.Home, R.string.nav_home),
+    TopLevelDestination(Route.Lesson, Icons.Rounded.RecordVoiceOver, R.string.nav_lesson),
+    TopLevelDestination(Route.Practice, Icons.Rounded.School, R.string.nav_practice),
+    TopLevelDestination(Route.Progress, Icons.Rounded.TrendingUp, R.string.nav_progress),
+    TopLevelDestination(Route.Settings, Icons.Rounded.Settings, R.string.nav_settings),
 )
 
 /**
- * Корневой каркас приложения: адаптивная навигация (нижняя панель на телефоне,
- * боковой rail на планшете) поверх [NavDisplay].
+ * Корневой каркас: адаптивная навигация (нижняя панель на телефоне, боковой rail
+ * на планшете) поверх [NavDisplay]. Подэкраны настроек кладутся на тот же стек.
  */
 @Composable
 fun PersonalLangMasterApp() {
+    val container = LocalAppContainer.current
     val backStack = rememberNavBackStack(Route.Home)
-    val currentRoute = backStack.lastOrNull()
+
+    // Раздел подсвечивается по корню стека: внутри настроек вкладка остаётся выбранной.
+    val rootRoute = backStack.firstOrNull()
+
+    val goBack: () -> Unit = { if (backStack.size > 1) backStack.removeAt(backStack.lastIndex) }
+
+    val settingsViewModel: SettingsViewModel = viewModel(
+        factory = SettingsViewModel.factory(
+            container.settingsRepository,
+            container.profileRepository,
+            container.database,
+        )
+    )
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
             topLevelDestinations.forEach { destination ->
                 item(
-                    selected = currentRoute == destination.route,
+                    selected = rootRoute == destination.route,
                     onClick = {
                         // Разделы верхнего уровня не копятся в стеке: заменяем корень.
                         backStack.clear()
                         backStack.add(destination.route)
                     },
-                    icon = { Icon(destination.icon, contentDescription = destination.label) },
-                    label = { Text(destination.label) },
+                    icon = { Icon(destination.icon, contentDescription = stringResource(destination.labelRes)) },
+                    label = { Text(stringResource(destination.labelRes)) },
                 )
             }
         },
@@ -59,13 +89,35 @@ fun PersonalLangMasterApp() {
         NavDisplay(
             backStack = backStack,
             modifier = Modifier.fillMaxSize(),
-            onBack = { backStack.removeAt(backStack.lastIndex) },
+            onBack = goBack,
             entryProvider = entryProvider {
                 entry<Route.Home> { HomeScreen() }
                 entry<Route.Lesson> { LessonScreen() }
                 entry<Route.Practice> { PracticeScreen() }
                 entry<Route.Progress> { ProgressScreen() }
-                entry<Route.Settings> { SettingsScreen() }
+                entry<Route.Settings> {
+                    SettingsScreen(
+                        viewModel = settingsViewModel,
+                        onOpenSection = { section -> backStack.add(section) },
+                    )
+                }
+
+                entry<SettingsRoute.Tutor> { TutorSettingsScreen(settingsViewModel, goBack) }
+                entry<SettingsRoute.Method> { MethodSettingsScreen(settingsViewModel, goBack) }
+                entry<SettingsRoute.Level> { LevelSettingsScreen(settingsViewModel, goBack) }
+                entry<SettingsRoute.Audio> { AudioSettingsScreen(settingsViewModel, goBack) }
+                entry<SettingsRoute.Model> { ModelSettingsScreen(settingsViewModel, goBack) }
+                entry<SettingsRoute.Budget> { BudgetSettingsScreen(settingsViewModel, goBack) }
+                entry<SettingsRoute.Data> { DataSettingsScreen(settingsViewModel, goBack) }
+                entry<SettingsRoute.Appearance> {
+                    AppearanceSettingsScreen(settingsViewModel, goBack)
+                }
+                entry<SettingsRoute.Notifications> {
+                    NotificationSettingsScreen(settingsViewModel, goBack)
+                }
+                entry<SettingsRoute.PromptPreview> {
+                    PromptPreviewScreen(settingsViewModel, goBack)
+                }
             },
         )
     }
