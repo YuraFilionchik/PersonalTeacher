@@ -59,6 +59,12 @@ data class LiveSessionConfig(
  * Сюда стекается всё, что делает разговор разговором — открытие микрофона,
  * перебивание, восстановление после обрыва. UI получает только состояние и события.
  */
+/** Куда отдавать звук урока, если включена запись. */
+interface LessonAudioSink {
+    fun onUserPcm(pcm16k: ByteArray)
+    fun onTutorPcm(pcm24k: ByteArray)
+}
+
 class LiveSession(
     private val scope: CoroutineScope,
     private val recorder: AudioRecorder = AudioRecorder(),
@@ -82,6 +88,9 @@ class LiveSession(
     private var socketJob: Job? = null
     private var micJob: Job? = null
     private var config: LiveSessionConfig? = null
+
+    /** Приёмник звука для записи урока. Пока не задан — ничего не пишется. */
+    var audioSink: LessonAudioSink? = null
 
     private var resumptionHandle: String? = null
     private var lastFailureReason: String? = null
@@ -265,6 +274,7 @@ class LiveSession(
                 if (blob.mimeType.startsWith("audio/")) {
                     runCatching { Base64.decode(blob.data, Base64.DEFAULT) }
                         .onSuccess { pcm ->
+                            audioSink?.onTutorPcm(pcm)
                             player.enqueue(pcm)
                             if (_state.value !is LiveSessionState.Error) {
                                 _state.value = LiveSessionState.Speaking
@@ -367,6 +377,8 @@ class LiveSession(
     }
 
     private fun sendAudio(pcm: ByteArray) {
+        // В запись попадает ровно то, что ушло на сервер: тишина не нужна и там, и там.
+        audioSink?.onUserPcm(pcm)
         val encoded = Base64.encodeToString(pcm, Base64.NO_WRAP)
         client?.send(
             RealtimeInputMessage(

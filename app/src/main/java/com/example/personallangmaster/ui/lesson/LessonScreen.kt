@@ -79,6 +79,8 @@ fun LessonScreen(
             container.profileRepository,
             container.lessonRepository,
             container.statsRepository,
+            container.audioFileStore,
+            container.ttsController,
         )
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -275,7 +277,7 @@ private fun LessonControls(state: LessonUiState, viewModel: LessonViewModel) {
                     original = correction.original,
                     corrected = correction.corrected,
                     explanation = correction.explanation,
-                    onListen = { },
+                    onListen = { viewModel.speakCorrection(correction.corrected) },
                     onAddToVocab = { viewModel.addCorrectionToVocab(correction) },
                     onDismiss = { viewModel.dismissCorrection(correction.id) },
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),

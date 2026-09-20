@@ -3,6 +3,8 @@ package com.example.personallangmaster.di
 import android.content.Context
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.example.personallangmaster.core.crypto.KeyVault
+import com.example.personallangmaster.core.audio.AudioFileStore
+import com.example.personallangmaster.core.audio.LessonPlayer
 import com.example.personallangmaster.core.speech.SpeechInput
 import com.example.personallangmaster.core.speech.TtsController
 import com.example.personallangmaster.data.db.AppDatabase
@@ -56,6 +58,8 @@ class AppContainer(context: Context) {
 
     // Системные озвучка и распознавание: повторения должны работать без сети и бесплатно.
     val ttsController: TtsController by lazy { TtsController(appContext) }
+    val audioFileStore: AudioFileStore by lazy { AudioFileStore(appContext) }
+    val lessonPlayer: LessonPlayer by lazy { LessonPlayer() }
     val speechInput: SpeechInput by lazy { SpeechInput(appContext) }
 
     val analyzeLessonUseCase: AnalyzeLessonUseCase by lazy {

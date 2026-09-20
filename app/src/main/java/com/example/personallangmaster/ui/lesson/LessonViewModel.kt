@@ -8,6 +8,7 @@ import com.example.personallangmaster.ai.live.LiveErrorKind
 import com.example.personallangmaster.ai.live.LiveEvent
 import com.example.personallangmaster.ai.live.LiveSession
 import com.example.personallangmaster.ai.live.LiveSessionConfig
+import com.example.personallangmaster.ai.live.LessonAudioSink
 import com.example.personallangmaster.ai.live.LiveSessionState
 import com.example.personallangmaster.ai.live.LiveTools
 import com.example.personallangmaster.ai.live.LiveTools.int
@@ -21,6 +22,7 @@ import com.example.personallangmaster.data.db.Speaker
 import com.example.personallangmaster.domain.BudgetAction
 import com.example.personallangmaster.domain.BudgetPolicy
 import com.example.personallangmaster.data.prefs.AppSettings
+import com.example.personallangmaster.data.prefs.AudioRecording
 import com.example.personallangmaster.data.prefs.MicMode
 import com.example.personallangmaster.data.prefs.SettingsRepository
 import com.example.personallangmaster.data.repo.LessonRepository
@@ -99,6 +101,8 @@ class LessonViewModel(
     private val profileRepository: ProfileRepository,
     private val lessonRepository: LessonRepository,
     private val statsRepository: com.example.personallangmaster.data.repo.StatsRepository,
+    private val audioFileStore: com.example.personallangmaster.core.audio.AudioFileStore,
+    private val tts: com.example.personallangmaster.core.speech.TtsController,
 ) : ViewModel() {
 
     private val session = LiveSession(viewModelScope)
@@ -118,7 +122,7 @@ class LessonViewModel(
 
     private var tokensIn = 0L
     private var tokensOut = 0L
-    private val transcript = mutableListOf<Triple<Speaker, String, Long>>()
+    private val transcript = mutableListOf<LessonRepository.TurnRecord>()
     private var pendingTutorText = StringBuilder()
 
     /**
@@ -128,6 +132,9 @@ class LessonViewModel(
      * ни в разбор урока.
      */
     private var pendingUserText = StringBuilder()
+
+    /** Где в записи началась текущая реплика. */
+    private var turnAudioStartMs = 0L
 
     init {
         session.state
@@ -229,6 +236,24 @@ class LessonViewModel(
             tokensIn = 0
             tokensOut = 0
             startedAtMillis = System.currentTimeMillis()
+            turnAudioStartMs = 0
+
+            val recordingLessonId = lessonId
+            if (settings.audioRecording != AudioRecording.NONE && recordingLessonId != null) {
+                audioFileStore.start(recordingLessonId)
+                session.audioSink = object : LessonAudioSink {
+                    override fun onUserPcm(pcm16k: ByteArray) = audioFileStore.writeUser(pcm16k)
+
+                    override fun onTutorPcm(pcm24k: ByteArray) {
+                        // Режим «только свою речь»: тренера в файл не пишем.
+                        if (settings.audioRecording == AudioRecording.FULL) {
+                            audioFileStore.writeTutor(pcm24k)
+                        }
+                    }
+                }
+            } else {
+                session.audioSink = null
+            }
 
             _state.update {
                 LessonUiState(
@@ -294,6 +319,9 @@ class LessonViewModel(
 
     // --- Карточки ---
 
+    /** Проговаривает правильный вариант системным голосом — бесплатно и сразу. */
+    fun speakCorrection(text: String) = tts.speak(text)
+
     fun dismissCorrection(id: Long) = _state.update { current ->
         current.copy(corrections = current.corrections.filterNot { it.id == id })
     }
@@ -330,6 +358,9 @@ class LessonViewModel(
         val elapsed = _state.value.elapsedSeconds
         lastLessonId = lesson
 
+        val audioPath = audioFileStore.finish()
+        session.audioSink = null
+
         viewModelScope.launch {
             if (lesson != null) {
                 if (settings.transcriptRetentionAllowed) {
@@ -343,6 +374,7 @@ class LessonViewModel(
                     tokensIn = tokensIn,
                     tokensOut = tokensOut,
                     costUsd = _state.value.costUsd,
+                    audioPath = audioPath,
                 )
             }
             if (profile != null && lesson != null && (tokensIn > 0 || tokensOut > 0)) {
@@ -396,6 +428,8 @@ class LessonViewModel(
 
     override fun onCleared() {
         timerJob?.cancel()
+        tts.stop()
+        audioFileStore.finish()
         session.stop()
         super.onCleared()
     }
@@ -524,7 +558,6 @@ class LessonViewModel(
         val text = pendingTutorText.toString().trim()
         pendingTutorText = StringBuilder()
         addSubtitle(Speaker.TUTOR, text, isPartial = false)
-        transcript += Triple(Speaker.TUTOR, text, elapsedMillis())
     }
 
     private fun addSubtitle(speaker: Speaker, text: String, isPartial: Boolean) {
@@ -540,8 +573,16 @@ class LessonViewModel(
             current.copy(subtitles = items.takeLast(MAX_SUBTITLES))
         }
 
-        if (!isPartial && speaker == Speaker.USER) {
-            transcript += Triple(speaker, text, elapsedMillis())
+        if (!isPartial) {
+            transcript += LessonRepository.TurnRecord(
+                speaker = speaker,
+                text = text,
+                startMs = elapsedMillis(),
+                // Смещение в записи запоминаем в момент закрытия реплики: по нему
+                // разбор урока потом находит нужное место в аудио.
+                audioOffsetMs = turnAudioStartMs.takeIf { audioFileStore.isRecording },
+            )
+            turnAudioStartMs = audioFileStore.positionMs
         }
     }
 
@@ -617,10 +658,13 @@ class LessonViewModel(
             profileRepository: ProfileRepository,
             lessonRepository: LessonRepository,
             statsRepository: com.example.personallangmaster.data.repo.StatsRepository,
+            audioFileStore: com.example.personallangmaster.core.audio.AudioFileStore,
+            tts: com.example.personallangmaster.core.speech.TtsController,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T = LessonViewModel(
                 settingsRepository, profileRepository, lessonRepository, statsRepository,
+                audioFileStore, tts,
             ) as T
         }
     }

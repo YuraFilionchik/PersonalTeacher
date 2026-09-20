@@ -12,6 +12,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -21,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -34,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.personallangmaster.data.db.MistakeType
-import com.example.personallangmaster.data.db.entity.MistakeEntity
 import com.example.personallangmaster.di.LocalAppContainer
 
 /**
@@ -51,6 +54,8 @@ fun LessonReviewScreen(lessonId: Long, onBack: () -> Unit) {
         factory = LessonReviewViewModel.factory(
             container.database.lessonDao(),
             container.analyzeLessonUseCase,
+            container.lessonPlayer,
+            container.ttsController,
         )
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -133,6 +138,26 @@ fun LessonReviewScreen(lessonId: Long, onBack: () -> Unit) {
                     }
                 }
 
+                if (state.hasRecording) {
+                    SectionTitle("Запись урока")
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        if (state.playing) {
+                            OutlinedButton(onClick = viewModel::pausePlayback) {
+                                Icon(Icons.Rounded.Pause, contentDescription = null)
+                                Text("  Пауза")
+                            }
+                        } else {
+                            OutlinedButton(onClick = viewModel::playLesson) {
+                                Icon(Icons.Rounded.PlayArrow, contentDescription = null)
+                                Text("  Послушать урок")
+                            }
+                        }
+                    }
+                }
+
                 SectionTitle("Оценки за урок")
                 ScoreBar("Беглость", lesson.fluencyScore)
                 ScoreBar("Точность", lesson.accuracyScore)
@@ -158,7 +183,14 @@ fun LessonReviewScreen(lessonId: Long, onBack: () -> Unit) {
 
             if (state.mistakes.isNotEmpty()) {
                 SectionTitle("Ошибки (${state.mistakes.size})")
-                state.mistakes.forEach { mistake -> MistakeRow(mistake) }
+                state.mistakes.forEach { row ->
+                    MistakeCard(
+                        row = row,
+                        canPlay = state.hasRecording && row.audioOffsetMs != null,
+                        onPlayMine = { viewModel.playMistake(row) },
+                        onSpeakCorrect = { viewModel.speakCorrection(row.mistake.corrected) },
+                    )
+                }
             }
 
             if (state.nextFocus.isNotEmpty()) {
@@ -225,7 +257,13 @@ private fun ScoreBar(title: String, value: Int?) {
 }
 
 @Composable
-private fun MistakeRow(mistake: MistakeEntity) {
+private fun MistakeCard(
+    row: MistakeRow,
+    canPlay: Boolean,
+    onPlayMine: () -> Unit,
+    onSpeakCorrect: () -> Unit,
+) {
+    val mistake = row.mistake
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -252,6 +290,22 @@ private fun MistakeRow(mistake: MistakeEntity) {
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
+            }
+
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Как это прозвучало у вас — только если урок записывался
+                // и фраза нашлась в транскрипте.
+                if (canPlay) {
+                    TextButton(onClick = onPlayMine) {
+                        Icon(Icons.Rounded.PlayArrow, contentDescription = null)
+                        Text(" Как я сказал")
+                    }
+                }
+                TextButton(onClick = onSpeakCorrect) {
+                    Icon(Icons.Rounded.VolumeUp, contentDescription = null)
+                    Text(" Как правильно")
+                }
             }
         }
     }

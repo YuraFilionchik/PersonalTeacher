@@ -60,12 +60,14 @@ class LessonRepository(
         tokensIn: Long,
         tokensOut: Long,
         costUsd: Double,
+        audioPath: String? = null,
         now: Long = System.currentTimeMillis(),
     ) {
         val lesson = lessonDao.getById(lessonId) ?: return
         lessonDao.update(
             lesson.copy(
                 endedAt = now,
+                audioPath = audioPath ?: lesson.audioPath,
                 durationSec = durationSec,
                 userSpeakSec = userSpeakSec,
                 aiSpeakSec = aiSpeakSec,
@@ -98,17 +100,26 @@ class LessonRepository(
         }
     }
 
+    /** Одна реплика урока вместе с её местом в аудиозаписи. */
+    data class TurnRecord(
+        val speaker: Speaker,
+        val text: String,
+        val startMs: Long,
+        val audioOffsetMs: Long?,
+    )
+
     /** Транскрипт сохраняется пачкой в конце урока: по реплике в базу ходить незачем. */
-    suspend fun saveTurns(lessonId: Long, turns: List<Triple<Speaker, String, Long>>) {
+    suspend fun saveTurns(lessonId: Long, turns: List<TurnRecord>) {
         if (turns.isEmpty()) return
         lessonDao.insertTurns(
-            turns.mapIndexed { index, (speaker, text, startMs) ->
+            turns.mapIndexed { index, turn ->
                 TurnEntity(
                     lessonId = lessonId,
                     index = index,
-                    speaker = speaker,
-                    text = text,
-                    startMs = startMs,
+                    speaker = turn.speaker,
+                    text = turn.text,
+                    startMs = turn.startMs,
+                    audioOffsetMs = turn.audioOffsetMs,
                 )
             }
         )
