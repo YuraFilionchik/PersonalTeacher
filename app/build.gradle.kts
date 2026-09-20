@@ -39,6 +39,11 @@ android {
     }
 }
 
+// Схемы Room держим в репозитории: они нужны для миграций и ревью изменений БД.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.accompanist.permissions)
