@@ -8,6 +8,7 @@ import com.example.personallangmaster.data.prefs.SettingsRepository
 import com.example.personallangmaster.data.repo.LessonRepository
 import com.example.personallangmaster.data.repo.ProfileRepository
 import com.example.personallangmaster.data.seed.SeedLoader
+import com.example.personallangmaster.domain.AnalyzeLessonUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -34,6 +35,16 @@ class AppContainer(context: Context) {
             vocabDao = database.vocabDao(),
             contentDao = database.contentDao(),
             statsDao = database.statsDao(),
+        )
+    }
+    val analyzeLessonUseCase: AnalyzeLessonUseCase by lazy {
+        AnalyzeLessonUseCase(
+            lessonDao = database.lessonDao(),
+            vocabDao = database.vocabDao(),
+            contentDao = database.contentDao(),
+            statsDao = database.statsDao(),
+            settingsRepository = settingsRepository,
+            profileRepository = profileRepository,
         )
     }
     private val seedLoader: SeedLoader by lazy { SeedLoader(appContext, database.contentDao()) }

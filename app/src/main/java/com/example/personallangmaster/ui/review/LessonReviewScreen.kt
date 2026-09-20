@@ -1,0 +1,269 @@
+package com.example.personallangmaster.ui.review
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.personallangmaster.data.db.MistakeType
+import com.example.personallangmaster.data.db.entity.MistakeEntity
+import com.example.personallangmaster.di.LocalAppContainer
+
+/**
+ * Разбор урока: что получилось, что поправить и что пошло в словарь.
+ *
+ * Ошибки ученика показываем цветом tertiary, а не error: это учебная поправка,
+ * а не сбой приложения, и красный здесь только демотивирует.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LessonReviewScreen(lessonId: Long, onBack: () -> Unit) {
+    val container = LocalAppContainer.current
+    val viewModel: LessonReviewViewModel = viewModel(
+        factory = LessonReviewViewModel.factory(
+            container.database.lessonDao(),
+            container.analyzeLessonUseCase,
+        )
+    )
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(lessonId) { viewModel.load(lessonId) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Разбор урока") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = "Назад")
+                    }
+                },
+            )
+        },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState()),
+        ) {
+            if (state.loading) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    CircularProgressIndicator()
+                    Spacer(Modifier.height(16.dp))
+                    Text(
+                        "Разбираем разговор…",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                return@Column
+            }
+
+            state.lesson?.let { lesson ->
+                lesson.summaryRu?.let { summary ->
+                    Text(
+                        text = summary,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(16.dp),
+                    )
+                }
+
+                if (state.praise.isNotBlank()) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        ),
+                    ) {
+                        Text(state.praise, modifier = Modifier.padding(12.dp))
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
+
+                state.levelChangedTo?.let { level ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        ),
+                    ) {
+                        Text(
+                            "Уровень обновлён: ${level.name}",
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(12.dp),
+                        )
+                    }
+                }
+
+                SectionTitle("Оценки за урок")
+                ScoreBar("Беглость", lesson.fluencyScore)
+                ScoreBar("Точность", lesson.accuracyScore)
+                ScoreBar("Словарный запас", lesson.vocabularyScore)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text("Уровень разговора", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        lesson.cefrEstimate?.name ?: "—",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+
+            if (state.vocabAdded > 0) {
+                SectionTitle("В словарь добавлено слов: ${state.vocabAdded}")
+            }
+
+            if (state.mistakes.isNotEmpty()) {
+                SectionTitle("Ошибки (${state.mistakes.size})")
+                state.mistakes.forEach { mistake -> MistakeRow(mistake) }
+            }
+
+            if (state.nextFocus.isNotEmpty()) {
+                SectionTitle("На что обратить внимание в следующий раз")
+                state.nextFocus.forEach { focus ->
+                    Text(
+                        text = "• $focus",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp),
+                    )
+                }
+            }
+
+            state.error?.let { error ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Text("Разбор не получился: $error")
+                        Spacer(Modifier.height(8.dp))
+                        OutlinedButton(onClick = { viewModel.retry(lessonId) }) {
+                            Text("Попробовать снова")
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(32.dp))
+        }
+    }
+}
+
+@Composable
+private fun SectionTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 8.dp),
+    )
+}
+
+@Composable
+private fun ScoreBar(title: String, value: Int?) {
+    if (value == null) return
+    Column(Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Text(title, style = MaterialTheme.typography.bodyMedium)
+            Text("$value", style = MaterialTheme.typography.bodyMedium)
+        }
+        LinearProgressIndicator(
+            progress = { value / 100f },
+            modifier = Modifier.fillMaxWidth(),
+        )
+    }
+}
+
+@Composable
+private fun MistakeRow(mistake: MistakeEntity) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+    ) {
+        Column(Modifier.padding(12.dp)) {
+            Text(
+                text = typeTitle(mistake.type),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.tertiary,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(mistake.original, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = "→ ${mistake.corrected}",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.tertiary,
+                fontWeight = FontWeight.Medium,
+            )
+            mistake.explanationRu?.let { explanation ->
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    explanation,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+private fun typeTitle(type: MistakeType): String = when (type) {
+    MistakeType.GRAMMAR -> "Грамматика"
+    MistakeType.VOCAB -> "Слово не то"
+    MistakeType.PRONUNCIATION -> "Произношение"
+    MistakeType.WORD_ORDER -> "Порядок слов"
+    MistakeType.ARTICLE -> "Артикль"
+    MistakeType.TENSE -> "Время"
+    MistakeType.PREPOSITION -> "Предлог"
+    MistakeType.STYLE -> "Стиль"
+}

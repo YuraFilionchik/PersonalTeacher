@@ -32,6 +32,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -63,7 +64,10 @@ import com.example.personallangmaster.ui.components.Speaker as UiSpeaker
  * так решение «поговорить десять минут» остаётся осознанным.
  */
 @Composable
-fun LessonScreen(onOpenSettings: () -> Unit = {}) {
+fun LessonScreen(
+    onOpenSettings: () -> Unit = {},
+    onOpenReview: (Long) -> Unit = {},
+) {
     val container = LocalAppContainer.current
     val viewModel: LessonViewModel = viewModel(
         factory = LessonViewModel.factory(
@@ -124,8 +128,19 @@ fun LessonScreen(onOpenSettings: () -> Unit = {}) {
                 }
             }
 
-            if (state.isActive) {
-                LessonControls(state, viewModel)
+            when {
+                state.isActive -> LessonControls(state, viewModel)
+                // После завершения урока экран не должен превращаться в тупик:
+                // история остаётся на месте, а внизу появляются понятные действия.
+                state.subtitles.isNotEmpty() -> FinishedBar(
+                    state = state,
+                    onRestart = {
+                        viewModel.resetForNewLesson()
+                        viewModel.startLesson(state.mode)
+                    },
+                    onOpenReview = { viewModel.lastLessonId?.let(onOpenReview) },
+                    onClearHistory = viewModel::resetForNewLesson,
+                )
             }
         }
     }
@@ -307,6 +322,38 @@ private fun LessonControls(state: LessonUiState, viewModel: LessonViewModel) {
                 Icon(Icons.Rounded.Stop, contentDescription = "Завершить урок")
             }
         }
+    }
+}
+
+@Composable
+private fun FinishedBar(
+    state: LessonUiState,
+    onRestart: () -> Unit,
+    onOpenReview: () -> Unit,
+    onClearHistory: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = "Урок завершён · %02d:%02d · %s".format(
+                state.elapsedSeconds / 60,
+                state.elapsedSeconds % 60,
+                CostCalculator.formatUsd(state.costUsd),
+            ),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Spacer(Modifier.height(12.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = onRestart) { Text("Начать заново") }
+            OutlinedButton(onClick = onOpenReview) { Text("Разбор урока") }
+        }
+        Spacer(Modifier.height(4.dp))
+        TextButton(onClick = onClearHistory) { Text("Очистить экран") }
     }
 }
 

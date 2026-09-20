@@ -101,6 +101,10 @@ class LessonViewModel(
     val state: StateFlow<LessonUiState> = _state.asStateFlow()
 
     private var lessonId: Long? = null
+
+    /** Идентификатор последнего урока — по нему открывается разбор. */
+    var lastLessonId: Long? = null
+        private set
     private var profileId: Long? = null
     private var settings: AppSettings = AppSettings()
     private var startedAtMillis = 0L
@@ -221,6 +225,7 @@ class LessonViewModel(
                     noiseSuppression = settings.noiseSuppression,
                     vadThresholdDb = settings.vadThresholdDb,
                     silenceHangoverMs = settings.silenceHangoverMs,
+                    tutorVolume = settings.tutorVolume,
                 )
             )
 
@@ -290,6 +295,7 @@ class LessonViewModel(
         val profile = profileId
         val lesson = lessonId
         val elapsed = _state.value.elapsedSeconds
+        lastLessonId = lesson
 
         viewModelScope.launch {
             if (lesson != null) {
@@ -319,6 +325,15 @@ class LessonViewModel(
             }
             _state.update { it.copy(finished = true) }
         }
+    }
+
+    /** Сброс экрана к панели запуска: история прошлого урока уже сохранена в базе. */
+    fun resetForNewLesson() {
+        transcript.clear()
+        pendingTutorText = StringBuilder()
+        tokensIn = 0
+        tokensOut = 0
+        _state.value = LessonUiState(chatMode = _state.value.chatMode)
     }
 
     override fun onCleared() {

@@ -28,6 +28,16 @@ class AudioPlayer(
     private val sampleRate: Int = SAMPLE_RATE,
 ) {
 
+    /**
+     * Куда выводить речь тренера.
+     *
+     * MEDIA звучит заметно громче: он идёт по медиа-потоку, громкость которого
+     * пользователь и крутит кнопками. VOICE_COMMUNICATION нужен только в hands-free,
+     * где микрофон открыт постоянно и аппаратное эхоподавление обязано слышать,
+     * что именно проигрывается, — иначе тренер перебивает сам себя.
+     */
+    enum class Output { MEDIA, VOICE_COMMUNICATION }
+
     private var track: AudioTrack? = null
     private var scope: CoroutineScope? = null
     private var pump: Job? = null
@@ -41,7 +51,7 @@ class AudioPlayer(
     private val _levelDbfs = MutableStateFlow(SILENCE_DB)
     val levelDbfs: StateFlow<Double> = _levelDbfs.asStateFlow()
 
-    fun start(volume: Float = 1.0f) {
+    fun start(volume: Float = 1.0f, output: Output = Output.MEDIA) {
         if (track != null) return
 
         val minBuffer = AudioTrack.getMinBufferSize(
@@ -57,8 +67,12 @@ class AudioPlayer(
         val audioTrack = AudioTrack.Builder()
             .setAudioAttributes(
                 AudioAttributes.Builder()
-                    // Речь собеседника: система сама выберет динамик или гарнитуру.
-                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                    .setUsage(
+                        when (output) {
+                            Output.MEDIA -> AudioAttributes.USAGE_MEDIA
+                            Output.VOICE_COMMUNICATION -> AudioAttributes.USAGE_VOICE_COMMUNICATION
+                        }
+                    )
                     .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                     .build()
             )

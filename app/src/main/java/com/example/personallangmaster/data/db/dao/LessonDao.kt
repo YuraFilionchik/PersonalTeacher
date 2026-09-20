@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.example.personallangmaster.data.db.Cefr
 import com.example.personallangmaster.data.db.LessonStatus
 import com.example.personallangmaster.data.db.MistakeType
 import com.example.personallangmaster.data.db.entity.LessonEntity
@@ -50,6 +51,13 @@ interface LessonDao {
             "ORDER BY startedAt DESC LIMIT :limit"
     )
     suspend fun recentSummaries(profileId: Long, limit: Int = 3): List<String>
+
+    /** Последние оценки уровня — основа автокоррекции CEFR. */
+    @Query(
+        "SELECT cefrEstimate FROM lesson WHERE profileId = :profileId AND cefrEstimate IS NOT NULL " +
+            "ORDER BY startedAt DESC LIMIT :limit"
+    )
+    suspend fun recentLevelEstimates(profileId: Long, limit: Int = 5): List<Cefr>
 
     @Insert
     suspend fun insertTurns(turns: List<TurnEntity>)

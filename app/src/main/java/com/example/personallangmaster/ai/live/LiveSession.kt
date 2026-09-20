@@ -39,6 +39,8 @@ data class LiveSessionConfig(
     /** Локальный порог тишины: молчание на сервер не отправляется. */
     val vadThresholdDb: Double = -38.0,
     val silenceHangoverMs: Int = 800,
+    /** Громкость речи тренера, 0..1. */
+    val tutorVolume: Float = 1.0f,
 )
 
 /**
@@ -86,7 +88,15 @@ class LiveSession(
         this.config = config
         stopped = false
         reconnectAttempt = 0
-        player.start()
+        player.start(
+            volume = config.tutorVolume,
+            // В hands-free микрофон открыт всегда, и эхоподавлению нужен разговорный поток.
+            output = if (config.manualActivity) {
+                AudioPlayer.Output.MEDIA
+            } else {
+                AudioPlayer.Output.VOICE_COMMUNICATION
+            },
+        )
         connect()
     }
 

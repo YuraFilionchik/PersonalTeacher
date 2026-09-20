@@ -28,4 +28,8 @@ sealed interface Route : NavKey {
     /** Настройки приложения и тренера. */
     @Serializable
     data object Settings : Route
+
+    /** Разбор конкретного урока. */
+    @Serializable
+    data class Review(val lessonId: Long) : Route
 }
