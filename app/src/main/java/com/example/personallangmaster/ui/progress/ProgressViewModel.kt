@@ -33,6 +33,12 @@ data class MistakeTotal(
     val total: Int,
 )
 
+/** За какой период показывать уроки. */
+enum class LessonPeriod { ALL, TODAY, WEEK, MONTH }
+
+/** Какие уроки показывать: все или только в определённом состоянии. */
+enum class LessonFilter { ALL, ANALYZED, NOT_ANALYZED }
+
 data class ProgressUiState(
     val days: List<DayBar> = emptyList(),
     val minutesWeek: Int = 0,
@@ -43,7 +49,12 @@ data class ProgressUiState(
     val spentMonthUsd: Double = 0.0,
     val usageBreakdown: List<UsageByKind> = emptyList(),
     val recentLessons: List<LessonEntity> = emptyList(),
-)
+    val lessonsTotal: Int = 0,
+    val period: LessonPeriod = LessonPeriod.ALL,
+    val filter: LessonFilter = LessonFilter.ALL,
+) {
+    val filtered: Boolean get() = period != LessonPeriod.ALL || filter != LessonFilter.ALL
+}
 
 /**
  * Прогресс: дни, словарь, ошибки и расходы.
@@ -61,6 +72,9 @@ class ProgressViewModel(
 
     private val _state = MutableStateFlow(ProgressUiState())
     val state: StateFlow<ProgressUiState> = _state.asStateFlow()
+
+    /** Полная история; на экран попадает её отфильтрованная часть. */
+    private var allLessons: List<LessonEntity> = emptyList()
 
     init {
         val profiles = profileRepository.activeProfile.filterNotNull()
@@ -130,19 +144,51 @@ class ProgressViewModel(
         profiles
             .flatMapLatest { profile -> lessonDao.observeRecent(profile.id, limit = 30) }
             .onEach { lessons ->
-                _state.update { current ->
-                    // Урок в состоянии ACTIVE — это либо идущий прямо сейчас разговор,
-                    // либо след убитого процесса: в истории ему делать нечего.
-                    current.copy(
-                        recentLessons = lessons.filter { it.status != LessonStatus.ACTIVE }
-                    )
-                }
+                // Урок в состоянии ACTIVE — это либо идущий прямо сейчас разговор,
+                // либо след убитого процесса: в истории ему делать нечего.
+                allLessons = lessons.filter { it.status != LessonStatus.ACTIVE }
+                applyFilters()
             }
             .launchIn(viewModelScope)
 
         profiles
             .onEach { profile -> refreshLessons(profile.id) }
             .launchIn(viewModelScope)
+    }
+
+    fun setPeriod(period: LessonPeriod) {
+        _state.update { it.copy(period = period) }
+        applyFilters()
+    }
+
+    fun setFilter(filter: LessonFilter) {
+        _state.update { it.copy(filter = filter) }
+        applyFilters()
+    }
+
+    private fun applyFilters() {
+        val period = _state.value.period
+        val filter = _state.value.filter
+        val since = when (period) {
+            LessonPeriod.ALL -> 0L
+            LessonPeriod.TODAY -> StatsRepository.startOfToday()
+            LessonPeriod.WEEK -> System.currentTimeMillis() - 7 * StatsRepository.DAY_MILLIS
+            LessonPeriod.MONTH -> System.currentTimeMillis() - 30 * StatsRepository.DAY_MILLIS
+        }
+
+        val visible = allLessons
+            .filter { it.startedAt >= since }
+            .filter { lesson ->
+                when (filter) {
+                    LessonFilter.ALL -> true
+                    LessonFilter.ANALYZED -> lesson.status == LessonStatus.ANALYZED
+                    // «Не разобран» — это и завершённые без разбора, и несостоявшиеся:
+                    // и те и другие ждут решения, разбирать их или забыть.
+                    LessonFilter.NOT_ANALYZED -> lesson.status != LessonStatus.ANALYZED
+                }
+            }
+
+        _state.update { it.copy(recentLessons = visible, lessonsTotal = allLessons.size) }
     }
 
     private fun refreshLessons(profileId: Long) {
@@ -174,6 +220,19 @@ class ProgressViewModel(
             MistakeType.TENSE -> "Времена"
             MistakeType.PREPOSITION -> "Предлоги"
             MistakeType.STYLE -> "Стиль"
+        }
+
+        fun periodTitle(period: LessonPeriod): String = when (period) {
+            LessonPeriod.ALL -> "Все"
+            LessonPeriod.TODAY -> "Сегодня"
+            LessonPeriod.WEEK -> "Неделя"
+            LessonPeriod.MONTH -> "Месяц"
+        }
+
+        fun filterTitle(filter: LessonFilter): String = when (filter) {
+            LessonFilter.ALL -> "Любые"
+            LessonFilter.ANALYZED -> "Разобранные"
+            LessonFilter.NOT_ANALYZED -> "Без разбора"
         }
 
         /** Подпись состояния урока в истории. */

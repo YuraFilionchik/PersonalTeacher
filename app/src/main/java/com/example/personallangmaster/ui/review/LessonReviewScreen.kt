@@ -234,7 +234,11 @@ fun LessonReviewScreen(lessonId: Long, onBack: () -> Unit) {
                 }
             }
 
-            state.error?.let { error ->
+            // Причину уже показала карточка «Урок ещё не разобран» — второй раз
+            // повторять её незачем.
+            val analyzed = state.lesson?.status ==
+                com.example.personallangmaster.data.db.LessonStatus.ANALYZED
+            state.error?.takeIf { analyzed }?.let { error ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()

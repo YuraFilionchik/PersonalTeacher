@@ -19,6 +19,7 @@ import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -195,8 +196,48 @@ fun ProgressScreen(onOpenReview: (Long) -> Unit) {
                 }
             }
 
-            if (state.recentLessons.isNotEmpty()) {
-                SectionTitle("История уроков (${state.recentLessons.size})")
+            if (state.lessonsTotal > 0) {
+                SectionTitle(
+                    if (state.filtered) {
+                        "История уроков: ${state.recentLessons.size} из ${state.lessonsTotal}"
+                    } else {
+                        "История уроков (${state.lessonsTotal})"
+                    }
+                )
+
+                FlowRow(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    LessonPeriod.entries.forEach { period ->
+                        FilterChip(
+                            selected = period == state.period,
+                            onClick = { viewModel.setPeriod(period) },
+                            label = { Text(ProgressViewModel.periodTitle(period)) },
+                        )
+                    }
+                }
+                FlowRow(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    LessonFilter.entries.forEach { filter ->
+                        FilterChip(
+                            selected = filter == state.filter,
+                            onClick = { viewModel.setFilter(filter) },
+                            label = { Text(ProgressViewModel.filterTitle(filter)) },
+                        )
+                    }
+                }
+
+                if (state.recentLessons.isEmpty()) {
+                    Text(
+                        text = "За выбранный период таких уроков нет",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(16.dp),
+                    )
+                }
                 state.recentLessons.forEach { lesson ->
                     Card(
                         modifier = Modifier
