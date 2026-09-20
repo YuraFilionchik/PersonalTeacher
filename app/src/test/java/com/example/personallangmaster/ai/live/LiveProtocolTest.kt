@@ -6,7 +6,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -209,7 +208,6 @@ class LiveProtocolTest {
                 LiveTools.SET_DIFFICULTY,
                 LiveTools.SHOW_CARD,
                 LiveTools.SUGGEST_DRILL,
-                LiveTools.END_LESSON,
             ),
             names,
         )
@@ -222,11 +220,11 @@ class LiveProtocolTest {
     }
 
     @Test
-    fun `пустая схема параметров не содержит required`() {
-        val endLesson = LiveTools.declarations.first().functionDeclarations
-            .first { it.name == LiveTools.END_LESSON }
-        val params: JsonObject? = endLesson.parameters
-        assertNotNull(params)
-        assertNull(params!!["required"])
+    fun `у каждого инструмента есть схема параметров`() {
+        LiveTools.declarations.single().functionDeclarations.forEach { declaration ->
+            val params: JsonObject? = declaration.parameters
+            assertNotNull("${declaration.name}: нет схемы параметров", params)
+            assertEquals("OBJECT", params!!["type"]?.jsonPrimitive?.content)
+        }
     }
 }
