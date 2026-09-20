@@ -222,10 +222,16 @@ private fun keyCheckMessage(state: KeyCheckState): String? = when (state) {
 @Composable
 fun BudgetSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
+    val spentToday by viewModel.spentTodayUsd.collectAsStateWithLifecycle()
+    val spentMonth by viewModel.spentMonthUsd.collectAsStateWithLifecycle()
     var pinDialogOpen by remember { mutableStateOf(false) }
 
     SettingsScaffold(stringResource(R.string.settings_section_budget), onBack) {
         SettingsGroup("Лимиты") {
+            SettingsRow(
+                title = "Израсходовано сегодня",
+                value = "\$${"%.2f".format(spentToday)}",
+            )
             SettingsSliderRow(
                 title = stringResource(R.string.settings_budget_daily_title),
                 valueLabel = "\$${"%.2f".format(settings.dailyLimitUsd)}",
@@ -233,6 +239,11 @@ fun BudgetSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                 range = 0f..5f,
                 steps = 19,
                 onValueChange = { value -> viewModel.update { setDailyLimitUsd(value.toDouble()) } },
+            )
+            SettingsDivider()
+            SettingsRow(
+                title = "Израсходовано в этом месяце",
+                value = "\$${"%.2f".format(spentMonth)}",
             )
             SettingsSliderRow(
                 title = stringResource(R.string.settings_budget_monthly_title),

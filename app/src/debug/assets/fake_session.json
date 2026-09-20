@@ -1,16 +1,32 @@
 {
   "initialEvents": [
     { "delayMs": 400, "type": "STATE", "state": "READY" },
-    { "delayMs": 300, "type": "TUTOR_TEXT", "text": "Hi! I'm Emma, your English coach. " },
-    { "delayMs": 250, "type": "TUTOR_TEXT", "text": "Today we're in a café: I'm the barista, you're the customer. " },
-    { "delayMs": 400, "type": "TUTOR_TEXT", "text": "Tell me what you'd like to order." },
+    {
+      "delayMs": 300,
+      "type": "TUTOR_TEXT",
+      "text": "Hi! I'm Emma, your English coach. "
+    },
+    {
+      "delayMs": 250,
+      "type": "TUTOR_TEXT",
+      "text": "Today we're in a café: I'm the barista, you're the customer. "
+    },
+    {
+      "delayMs": 400,
+      "type": "TUTOR_TEXT",
+      "text": "Tell me what you'd like to order."
+    },
     { "delayMs": 120, "type": "TURN_COMPLETE" }
   ],
   "replies": [
     {
       "events": [
         { "delayMs": 500, "type": "STATE", "state": "THINKING" },
-        { "delayMs": 700, "type": "TUTOR_TEXT", "text": "Sure. What size would you like — small, medium or large?" },
+        {
+          "delayMs": 700,
+          "type": "TUTOR_TEXT",
+          "text": "Sure. What size would you like — small, medium or large?"
+        },
         {
           "delayMs": 300,
           "type": "TOOL_MISTAKE",
@@ -35,7 +51,11 @@
           "example": "A medium latte to go, please.",
           "why": "Без этой фразы заказ прозвучит как «в зале»."
         },
-        { "delayMs": 800, "type": "TUTOR_TEXT", "text": "Medium, got it. Anything to eat with that?" },
+        {
+          "delayMs": 800,
+          "type": "TUTOR_TEXT",
+          "text": "Medium, got it. Anything to eat with that?"
+        },
         {
           "delayMs": 300,
           "type": "TOOL_MISTAKE",
@@ -52,7 +72,11 @@
     {
       "events": [
         { "delayMs": 400, "type": "STATE", "state": "THINKING" },
-        { "delayMs": 700, "type": "TUTOR_TEXT", "text": "Almost — 'tea' has a long /iː/, like in 'see'. Try again: I'd like a cup of tea." },
+        {
+          "delayMs": 700,
+          "type": "TUTOR_TEXT",
+          "text": "Almost — 'tea' has a long /iː/, like in 'see'. Try again: I'd like a cup of tea."
+        },
         {
           "delayMs": 400,
           "type": "TOOL_MISTAKE",
@@ -83,15 +107,27 @@
           "textEn": "Could I have the bill, please?",
           "textRu": "Можно счёт, пожалуйста?"
         },
-        { "delayMs": 700, "type": "TUTOR_TEXT", "text": "Nice. Now ask me for the bill and pay, please." },
+        {
+          "delayMs": 700,
+          "type": "TUTOR_TEXT",
+          "text": "Nice. Now ask me for the bill and pay, please."
+        },
         { "delayMs": 200, "type": "TURN_COMPLETE" }
       ]
     },
     {
       "events": [
         { "delayMs": 400, "type": "STATE", "state": "THINKING" },
-        { "delayMs": 800, "type": "TUTOR_TEXT", "text": "Great job — you ordered everything on your own. " },
-        { "delayMs": 300, "type": "TUTOR_TEXT", "text": "We'll go through the details after the lesson." },
+        {
+          "delayMs": 800,
+          "type": "TUTOR_TEXT",
+          "text": "Great job — you ordered everything on your own. "
+        },
+        {
+          "delayMs": 300,
+          "type": "TUTOR_TEXT",
+          "text": "We'll go through the details after the lesson."
+        },
         { "delayMs": 200, "type": "TURN_COMPLETE" }
       ]
     }

@@ -15,13 +15,17 @@ import com.example.personallangmaster.data.prefs.AppSettings
 import com.example.personallangmaster.data.prefs.SettingsRepository
 import com.example.personallangmaster.data.repo.ProfileRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 
 /** Что происходит с проверкой ключа прямо сейчас. */
 sealed interface KeyCheckState {
@@ -56,6 +60,29 @@ class SettingsViewModel(
 
     private val _promptPreview = MutableStateFlow("")
     val promptPreview: StateFlow<String> = _promptPreview.asStateFlow()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val spentTodayUsd: StateFlow<Double> = profile.filterNotNull().flatMapLatest { p ->
+        val startOfDay = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        database.statsDao().observeCostSince(p.id, startOfDay)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val spentMonthUsd: StateFlow<Double> = profile.filterNotNull().flatMapLatest { p ->
+        val startOfMonth = Calendar.getInstance().apply {
+            set(Calendar.DAY_OF_MONTH, 1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.timeInMillis
+        database.statsDao().observeCostSince(p.id, startOfMonth)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), 0.0)
 
     val repository: SettingsRepository get() = settingsRepository
 
