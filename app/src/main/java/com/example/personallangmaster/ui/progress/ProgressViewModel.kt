@@ -268,6 +268,7 @@ class ProgressViewModel(
             LessonStatus.COMPLETED -> "Не разобран"
             LessonStatus.FAILED -> "Не состоялся"
             LessonStatus.ACTIVE -> "Идёт"
+            LessonStatus.SKIPPED -> "Закрыт без разбора"
         }
 
         fun vocabStateTitle(state: VocabState): String = when (state) {

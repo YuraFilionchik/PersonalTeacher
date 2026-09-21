@@ -12,8 +12,14 @@ enum class Cefr { A1, A2, B1, B2, C1;
 /** Режим проведения урока. */
 enum class LessonMode { FREE_TALK, SCENARIO, PLACEMENT, DRILL }
 
-/** Жизненный цикл урока: от активной сессии до разобранного. */
-enum class LessonStatus { ACTIVE, COMPLETED, FAILED, ANALYZED }
+/**
+ * Жизненный цикл урока: от активной сессии до разобранного.
+ *
+ * `SKIPPED` — урок, который человек закрыл сам: разбирать его не нужно, и
+ * напоминать о нём больше нечего. Фоновый разбор берёт только `COMPLETED`,
+ * поэтому такой урок выпадает из очереди сам собой.
+ */
+enum class LessonStatus { ACTIVE, COMPLETED, FAILED, ANALYZED, SKIPPED }
 
 /** Кто говорит в реплике. */
 enum class Speaker { USER, TUTOR }
