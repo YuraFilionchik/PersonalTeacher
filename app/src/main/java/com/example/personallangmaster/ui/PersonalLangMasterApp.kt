@@ -173,6 +173,9 @@ fun PersonalLangMasterApp(
                 entry<Route.Progress> {
                     ProgressScreen(
                         onOpenReview = { lessonId -> backStack.add(Route.Review(lessonId)) },
+                        onOpenTranscript = { lessonId ->
+                            backStack.add(Route.Review(lessonId, showTranscript = true))
+                        },
                     )
                 }
                 entry<Route.Review> { key ->
