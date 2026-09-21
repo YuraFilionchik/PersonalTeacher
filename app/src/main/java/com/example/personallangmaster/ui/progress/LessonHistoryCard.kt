@@ -148,7 +148,7 @@ fun LessonHistoryCard(
                             lesson.status != LessonStatus.SKIPPED
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Отметить разобранным") },
+                                text = { Text("Закрыть без разбора") },
                                 onClick = { menuOpen = false; onMarkSkipped() },
                             )
                         }
