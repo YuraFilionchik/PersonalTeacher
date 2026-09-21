@@ -17,6 +17,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -24,6 +25,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.YearMonth
+import java.time.ZoneId
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -32,9 +35,6 @@ data class MistakeTotal(
     val type: MistakeType,
     val total: Int,
 )
-
-/** За какой период показывать уроки. */
-enum class LessonPeriod { ALL, TODAY, WEEK, MONTH }
 
 /** Какие уроки показывать: все или только в определённом состоянии. */
 enum class LessonFilter { ALL, ANALYZED, NOT_ANALYZED }
@@ -50,10 +50,13 @@ data class ProgressUiState(
     val usageBreakdown: List<UsageByKind> = emptyList(),
     val recentLessons: List<LessonEntity> = emptyList(),
     val lessonsTotal: Int = 0,
-    val period: LessonPeriod = LessonPeriod.ALL,
+    val month: YearMonth = YearMonth.now(),
+    val calendar: List<CalendarDay> = emptyList(),
+    val selectedDay: LocalDate? = null,
     val filter: LessonFilter = LessonFilter.ALL,
 ) {
-    val filtered: Boolean get() = period != LessonPeriod.ALL || filter != LessonFilter.ALL
+    /** Вперёд дальше текущего месяца ходить некуда: будущих уроков не бывает. */
+    val canGoForward: Boolean get() = month < YearMonth.now()
 }
 
 /**
@@ -73,8 +76,10 @@ class ProgressViewModel(
     private val _state = MutableStateFlow(ProgressUiState())
     val state: StateFlow<ProgressUiState> = _state.asStateFlow()
 
-    /** Полная история; на экран попадает её отфильтрованная часть. */
+    /** Уроки показываемого месяца; на экран попадает их отфильтрованная часть. */
     private var allLessons: List<LessonEntity> = emptyList()
+
+    private val month = MutableStateFlow(YearMonth.now())
 
     init {
         val profiles = profileRepository.activeProfile.filterNotNull()
@@ -141,8 +146,10 @@ class ProgressViewModel(
             .onEach { usage -> _state.update { it.copy(usageBreakdown = usage) } }
             .launchIn(viewModelScope)
 
-        profiles
-            .flatMapLatest { profile -> lessonDao.observeRecent(profile.id, limit = 30) }
+        combine(profiles, month) { profile, month -> profile to month }
+            .flatMapLatest { (profile, month) ->
+                lessonDao.observeBetween(profile.id, startOf(month), startOf(month.plusMonths(1)))
+            }
             .onEach { lessons ->
                 // Урок в состоянии ACTIVE — это либо идущий прямо сейчас разговор,
                 // либо след убитого процесса: в истории ему делать нечего.
@@ -156,28 +163,41 @@ class ProgressViewModel(
             .launchIn(viewModelScope)
     }
 
-    fun setPeriod(period: LessonPeriod) {
-        _state.update { it.copy(period = period) }
-        applyFilters()
-    }
-
     fun setFilter(filter: LessonFilter) {
         _state.update { it.copy(filter = filter) }
         applyFilters()
     }
 
+    /** Сдвиг по месяцам: выбранный день теряет смысл в новом месяце. */
+    fun shiftMonth(months: Long) {
+        val target = month.value.plusMonths(months)
+        if (target > YearMonth.now()) return
+        month.value = target
+        _state.update { it.copy(month = target, selectedDay = null) }
+        applyFilters()
+    }
+
+    /** Возврат к текущему месяцу без выбранного дня. */
+    fun goToToday() {
+        val target = YearMonth.now()
+        month.value = target
+        _state.update { it.copy(month = target, selectedDay = null) }
+        applyFilters()
+    }
+
+    /** Повторный тап по дню снимает выбор и возвращает список за весь месяц. */
+    fun selectDay(date: LocalDate) {
+        _state.update { it.copy(selectedDay = if (it.selectedDay == date) null else date) }
+        applyFilters()
+    }
+
     private fun applyFilters() {
-        val period = _state.value.period
-        val filter = _state.value.filter
-        val since = when (period) {
-            LessonPeriod.ALL -> 0L
-            LessonPeriod.TODAY -> StatsRepository.startOfToday()
-            LessonPeriod.WEEK -> System.currentTimeMillis() - 7 * StatsRepository.DAY_MILLIS
-            LessonPeriod.MONTH -> System.currentTimeMillis() - 30 * StatsRepository.DAY_MILLIS
-        }
+        val current = _state.value
+        val filter = current.filter
+        val selectedDay = current.selectedDay
 
         val visible = allLessons
-            .filter { it.startedAt >= since }
+            .filter { selectedDay == null || LessonCalendar.lessonDate(it) == selectedDay }
             .filter { lesson ->
                 when (filter) {
                     LessonFilter.ALL -> true
@@ -188,8 +208,17 @@ class ProgressViewModel(
                 }
             }
 
-        _state.update { it.copy(recentLessons = visible, lessonsTotal = allLessons.size) }
+        _state.update {
+            it.copy(
+                recentLessons = visible,
+                lessonsTotal = allLessons.size,
+                calendar = LessonCalendar.buildMonth(it.month, allLessons, LocalDate.now()),
+            )
+        }
     }
+
+    private fun startOf(month: YearMonth): Long =
+        month.atDay(1).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
 
     private fun refreshLessons(profileId: Long) {
         viewModelScope.launch {
@@ -222,12 +251,10 @@ class ProgressViewModel(
             MistakeType.STYLE -> "Стиль"
         }
 
-        fun periodTitle(period: LessonPeriod): String = when (period) {
-            LessonPeriod.ALL -> "Все"
-            LessonPeriod.TODAY -> "Сегодня"
-            LessonPeriod.WEEK -> "Неделя"
-            LessonPeriod.MONTH -> "Месяц"
-        }
+        /** «Сентябрь 2026» — заголовок месяца в календаре. */
+        fun monthTitle(month: YearMonth): String = month.month
+            .getDisplayName(TextStyle.FULL_STANDALONE, Locale("ru"))
+            .replaceFirstChar(Char::uppercase) + " " + month.year
 
         fun filterTitle(filter: LessonFilter): String = when (filter) {
             LessonFilter.ALL -> "Любые"

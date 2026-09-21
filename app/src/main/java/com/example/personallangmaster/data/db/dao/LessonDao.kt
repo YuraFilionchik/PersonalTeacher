@@ -32,8 +32,12 @@ interface LessonDao {
     @Query("SELECT * FROM lesson WHERE id = :lessonId")
     suspend fun getById(lessonId: Long): LessonEntity?
 
-    @Query("SELECT * FROM lesson WHERE profileId = :profileId ORDER BY startedAt DESC LIMIT :limit")
-    fun observeRecent(profileId: Long, limit: Int = 50): Flow<List<LessonEntity>>
+    /** Уроки за произвольный отрезок — месяц календаря на экране прогресса. */
+    @Query(
+        "SELECT * FROM lesson WHERE profileId = :profileId " +
+            "AND startedAt >= :from AND startedAt < :to ORDER BY startedAt DESC"
+    )
+    fun observeBetween(profileId: Long, from: Long, to: Long): Flow<List<LessonEntity>>
 
     @Query(
         "SELECT * FROM lesson WHERE profileId = :profileId AND status = :status " +

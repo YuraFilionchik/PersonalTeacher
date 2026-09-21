@@ -39,6 +39,7 @@ import com.example.personallangmaster.data.db.UsageKind
 import com.example.personallangmaster.di.LocalAppContainer
 import com.example.personallangmaster.ui.components.StatTile
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -196,94 +197,92 @@ fun ProgressScreen(onOpenReview: (Long) -> Unit) {
                 }
             }
 
-            if (state.lessonsTotal > 0) {
-                SectionTitle(
-                    if (state.filtered) {
-                        "История уроков: ${state.recentLessons.size} из ${state.lessonsTotal}"
-                    } else {
-                        "История уроков (${state.lessonsTotal})"
-                    }
-                )
+            SectionTitle("Календарь уроков")
+            LessonCalendarGrid(
+                month = state.month,
+                days = state.calendar,
+                selectedDay = state.selectedDay,
+                canGoForward = state.canGoForward,
+                onShiftMonth = viewModel::shiftMonth,
+                onToday = viewModel::goToToday,
+                onSelectDay = viewModel::selectDay,
+            )
 
-                FlowRow(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    LessonPeriod.entries.forEach { period ->
-                        FilterChip(
-                            selected = period == state.period,
-                            onClick = { viewModel.setPeriod(period) },
-                            label = { Text(ProgressViewModel.periodTitle(period)) },
-                        )
-                    }
-                }
-                FlowRow(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    LessonFilter.entries.forEach { filter ->
-                        FilterChip(
-                            selected = filter == state.filter,
-                            onClick = { viewModel.setFilter(filter) },
-                            label = { Text(ProgressViewModel.filterTitle(filter)) },
-                        )
-                    }
-                }
+            SectionTitle(
+                state.selectedDay?.let { day -> "Уроки ${formatDay(day)}" }
+                    ?: "Уроки за месяц (${state.lessonsTotal})"
+            )
 
-                if (state.recentLessons.isEmpty()) {
-                    Text(
-                        text = "За выбранный период таких уроков нет",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(16.dp),
+            FlowRow(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                LessonFilter.entries.forEach { filter ->
+                    FilterChip(
+                        selected = filter == state.filter,
+                        onClick = { viewModel.setFilter(filter) },
+                        label = { Text(ProgressViewModel.filterTitle(filter)) },
                     )
                 }
-                state.recentLessons.forEach { lesson ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 4.dp)
-                            .clickable { onOpenReview(lesson.id) },
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        ),
-                    ) {
-                        Column(Modifier.padding(12.dp)) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                            ) {
-                                Text(
-                                    text = formatDate(lesson.startedAt),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                )
-                                Text(
-                                    text = "${lesson.durationSec / 60} мин · " +
-                                        CostCalculator.formatUsd(lesson.costUsd),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
+            }
 
-                            // Состояние видно сразу: неразобранный урок — это
-                            // предложение открыть его и разобрать, а не потеря.
+            if (state.recentLessons.isEmpty()) {
+                Text(
+                    text = if (state.lessonsTotal == 0) {
+                        "В этом месяце уроков пока нет"
+                    } else {
+                        "Таких уроков здесь нет"
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(16.dp),
+                )
+            }
+            state.recentLessons.forEach { lesson ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                        .clickable { onOpenReview(lesson.id) },
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                ) {
+                    Column(Modifier.padding(12.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
                             Text(
-                                text = ProgressViewModel.lessonStatusTitle(lesson.status),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = when (lesson.status) {
-                                    LessonStatus.ANALYZED -> MaterialTheme.colorScheme.primary
-                                    LessonStatus.FAILED -> MaterialTheme.colorScheme.onSurfaceVariant
-                                    else -> MaterialTheme.colorScheme.tertiary
-                                },
+                                text = formatDate(lesson.startedAt),
+                                style = MaterialTheme.typography.bodyMedium,
                             )
+                            Text(
+                                text = "${lesson.durationSec / 60} мин · " +
+                                    CostCalculator.formatUsd(lesson.costUsd),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
 
-                            lesson.summaryRu?.let { summary ->
-                                Text(
-                                    text = summary.take(100),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
+                        // Состояние видно сразу: неразобранный урок — это
+                        // предложение открыть его и разобрать, а не потеря.
+                        Text(
+                            text = ProgressViewModel.lessonStatusTitle(lesson.status),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = when (lesson.status) {
+                                LessonStatus.ANALYZED -> MaterialTheme.colorScheme.primary
+                                LessonStatus.FAILED -> MaterialTheme.colorScheme.onSurfaceVariant
+                                else -> MaterialTheme.colorScheme.tertiary
+                            },
+                        )
+
+                        lesson.summaryRu?.let { summary ->
+                            Text(
+                                text = summary.take(100),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         }
                     }
                 }
@@ -314,3 +313,6 @@ private fun usageTitle(kind: UsageKind): String = when (kind) {
 private fun formatDate(millis: Long): String = Instant.ofEpochMilli(millis)
     .atZone(ZoneId.systemDefault())
     .format(DateTimeFormatter.ofPattern("d MMMM, HH:mm"))
+
+private fun formatDay(date: LocalDate): String =
+    date.format(DateTimeFormatter.ofPattern("d MMMM"))
