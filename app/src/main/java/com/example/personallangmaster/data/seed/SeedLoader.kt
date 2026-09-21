@@ -121,7 +121,7 @@ class SeedLoader(
          * Версия учебного контента в `assets`. Поднимается всякий раз, когда
          * файлы сида меняются, — именно по ней контент перезаливается в базу.
          */
-        const val SEED_VERSION = 1
+        const val SEED_VERSION = 2
 
         private const val PREFS = "seed"
         private const val KEY_VERSION = "content_version"

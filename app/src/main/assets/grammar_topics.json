@@ -5,8 +5,8 @@
     "title_ru": "Present Simple (Настоящее простое)",
     "title_en": "Present Simple",
     "cefr": "A1",
-    "explanation_ru": "Используется для фактов, привычек и регулярных действий. Добавляем -s/-es для he/she/it.",
-    "explanation_en": "Used for facts, habits, and routines. Add -s/-es for 3rd person singular.",
+    "explanation_ru": "Когда используем: говорим о постоянных фактах, привычках и о том, что повторяется изо дня в день — кто вы, что вам нравится, что происходит всегда.\nФормула: I / you / we / they + глагол как есть. He / she / it + глагол с -s (или -es). Вопрос: Do / Does + подлежащее + глагол. Отрицание: don't / doesn't + глагол.\nПримеры:\n• I work in a school. — Я работаю в школе.\n• She drinks coffee every morning. — Она пьёт кофе каждое утро.\n• Do you like cats? — Ты любишь кошек?\nЧастая ошибка: русскоязычные забывают -s в третьем лице и говорят «He work». Запомни: после he, she, it к глаголу всегда добавляется -s, а в вопросе и отрицании это -s уходит в does/doesn't: «Does he work?».",
+    "explanation_en": "When to use: for permanent facts, habits and routines that repeat.\nFormula: I/you/we/they + base verb. He/she/it + verb with -s/-es. Questions: Do/Does + subject + verb. Negatives: don't/doesn't + verb.\nExamples:\n• I work in a school.\n• She drinks coffee every morning.\n• Does he work on Sundays?\nCommon mistake: forgetting the -s after he, she, it. In questions and negatives the -s moves to does/doesn't.",
     "isSeed": true
   },
   {
@@ -15,8 +15,8 @@
     "title_ru": "Present Continuous (Настоящее длительное)",
     "title_en": "Present Continuous",
     "cefr": "A1",
-    "explanation_ru": "Действие происходит прямо сейчас или вокруг момента речи. Формируется: am/is/are + глагол с -ing.",
-    "explanation_en": "Used for actions happening right now or around now. am/is/are + verb-ing.",
+    "explanation_ru": "Когда используем: действие происходит прямо сейчас или вокруг этого момента — то, что вы делаете в эту минуту, и временные состояния.\nФормула: am / is / are + глагол с -ing. I am, he/she/it is, we/you/they are. Вопрос: Am/Is/Are + подлежащее + глагол с -ing. Отрицание: am not / isn't / aren't.\nПримеры:\n• I am cooking dinner now. — Я сейчас готовлю ужин.\n• She is talking on the phone. — Она разговаривает по телефону.\n• Are you watching TV? — Ты смотришь телевизор?\nЧастая ошибка: говорят «I cooking» или «She is cook», забывая либо is, либо -ing. В этой форме нужны обе части: «am/is/are» и глагол с -ing одновременно.",
+    "explanation_en": "When to use: actions happening right now or around now.\nFormula: am/is/are + verb-ing. Questions: Am/Is/Are + subject + verb-ing. Negatives: am not/isn't/aren't.\nExamples:\n• I am cooking dinner now.\n• She is talking on the phone.\n• Are you watching TV?\nCommon mistake: dropping either am/is/are or the -ing. You need both parts together.",
     "isSeed": true
   },
   {
@@ -25,8 +25,8 @@
     "title_ru": "Past Simple (Прошедшее простое)",
     "title_en": "Past Simple",
     "cefr": "A2",
-    "explanation_ru": "Завершенное действие в прошлом. Добавляем -ed к правильным глаголам, неправильные нужно выучить (V2). Вопрос: Did + V1.",
-    "explanation_en": "Completed actions in the past. Regular verbs take -ed, irregular verbs use V2. Questions use 'Did + base verb'.",
+    "explanation_ru": "Когда используем: рассказываем о завершённом действии в прошлом, часто с указанием времени — yesterday, last week, in 2010.\nФормула: правильные глаголы + -ed (worked, played); неправильные — вторая форма, её учим наизусть (go → went). Вопрос: Did + подлежащее + глагол как есть. Отрицание: didn't + глагол как есть.\nПримеры:\n• I visited my parents last weekend. — Я навестил родителей на прошлых выходных.\n• She went to London two years ago. — Она ездила в Лондон два года назад.\n• Did you see the film? — Ты видел этот фильм?\nЧастая ошибка: после did/didn't русскоязычные ставят вторую форму и говорят «Did you went?». Запомни: did уже несёт прошедшее время, поэтому после него глагол остаётся без изменений — «Did you go?».",
+    "explanation_en": "When to use: completed actions in the past, often with a time word.\nFormula: regular verbs + -ed; irregular verbs use the past form. Questions: Did + subject + base verb. Negatives: didn't + base verb.\nExamples:\n• I visited my parents last weekend.\n• She went to London two years ago.\n• Did you see the film?\nCommon mistake: using the past form after did or didn't. Did already shows past time, so keep the base verb.",
     "isSeed": true
   },
   {
@@ -35,8 +35,8 @@
     "title_ru": "Past Continuous (Прошедшее длительное)",
     "title_en": "Past Continuous",
     "cefr": "A2",
-    "explanation_ru": "Действие, которое длилось в определенный момент в прошлом (часто прерывается коротким Past Simple). was/were + V-ing.",
-    "explanation_en": "Actions in progress at a specific time in the past. was/were + verb-ing.",
+    "explanation_ru": "Когда используем: действие длилось в какой-то момент прошлого, часто его перебивает короткое событие в Past Simple.\nФормула: was / were + глагол с -ing. I/he/she/it was, we/you/they were. Вопрос: Was/Were + подлежащее + глагол с -ing. Отрицание: wasn't / weren't.\nПримеры:\n• I was sleeping when you called. — Я спал, когда ты позвонил.\n• They were playing football at five o'clock. — Они играли в футбол в пять часов.\n• Were you working yesterday evening? — Ты работал вчера вечером?\nЧастая ошибка: забывают was/were и говорят «I sleeping». Здесь, как и в Present Continuous, нужны обе части: was/were и глагол с -ing.",
+    "explanation_en": "When to use: an action in progress at a moment in the past, often interrupted by a shorter past action.\nFormula: was/were + verb-ing. Questions: Was/Were + subject + verb-ing. Negatives: wasn't/weren't.\nExamples:\n• I was sleeping when you called.\n• They were playing football at five o'clock.\n• Were you working yesterday evening?\nCommon mistake: dropping was/were. Use both was/were and the -ing form together.",
     "isSeed": true
   },
   {
@@ -45,8 +45,8 @@
     "title_ru": "Present Perfect (Настоящее завершенное)",
     "title_en": "Present Perfect",
     "cefr": "B1",
-    "explanation_ru": "Действие в прошлом с результатом в настоящем, или жизненный опыт (без точного времени). have/has + V3.",
-    "explanation_en": "Past actions with a result in the present, or life experiences (unspecified time). have/has + past participle.",
+    "explanation_ru": "Когда используем: действие случилось в прошлом, но результат важен сейчас, или говорим о жизненном опыте без точного времени — ever, never, already, yet.\nФормула: have / has + третья форма глагола (done, seen, been). Вопрос: Have/Has + подлежащее + третья форма. Отрицание: haven't / hasn't.\nПримеры:\n• I have lost my keys. — Я потерял ключи (и сейчас их нет).\n• She has been to Paris twice. — Она дважды была в Париже.\n• Have you ever eaten sushi? — Ты когда-нибудь ел суши?\nЧастая ошибка: пытаются перевести это время буквально с русского и указывают точное время «I have seen him yesterday». Present Perfect не дружит с yesterday/last week — если время названо, берите Past Simple: «I saw him yesterday».",
+    "explanation_en": "When to use: past actions with a present result, or life experience with no exact time.\nFormula: have/has + past participle. Questions: Have/Has + subject + past participle. Negatives: haven't/hasn't.\nExamples:\n• I have lost my keys.\n• She has been to Paris twice.\n• Have you ever eaten sushi?\nCommon mistake: adding exact time words like yesterday. With a specific past time, use Past Simple instead.",
     "isSeed": true
   },
   {
@@ -55,8 +55,8 @@
     "title_ru": "Present Perfect Continuous",
     "title_en": "Present Perfect Continuous",
     "cefr": "B2",
-    "explanation_ru": "Действие началось в прошлом и продолжается до сих пор (акцент на длительность). have/has been + V-ing.",
-    "explanation_en": "Action started in the past and continues up to now (focus on duration). have/has been + verb-ing.",
+    "explanation_ru": "Когда используем: действие началось в прошлом и всё ещё продолжается, и мы хотим подчеркнуть, сколько оно длится.\nФормула: have / has been + глагол с -ing. Вопрос: Have/Has + подлежащее + been + глагол с -ing. Отрицание: haven't / hasn't been.\nПримеры:\n• I have been learning English for three years. — Я учу английский три года.\n• She has been waiting for an hour. — Она ждёт уже час.\n• How long have you been living here? — Как долго ты здесь живёшь?\nЧастая ошибка: путают с Present Perfect и говорят «I have learned for three years», хотя речь о непрерывном процессе. Если акцент на длительности действия, выбирайте been + -ing.",
+    "explanation_en": "When to use: an action that started in the past and is still going on, focusing on duration.\nFormula: have/has been + verb-ing. Questions: Have/Has + subject + been + verb-ing. Negatives: haven't/hasn't been.\nExamples:\n• I have been learning English for three years.\n• She has been waiting for an hour.\n• How long have you been living here?\nCommon mistake: using Present Perfect without been for an ongoing activity. When the duration matters, keep been + -ing.",
     "isSeed": true
   },
   {
@@ -65,8 +65,8 @@
     "title_ru": "Past Perfect (Предпрошедшее)",
     "title_en": "Past Perfect",
     "cefr": "B1",
-    "explanation_ru": "Действие завершилось до другого действия в прошлом. had + V3.",
-    "explanation_en": "An action completed before another action in the past. had + past participle.",
+    "explanation_ru": "Когда используем: нужно показать, что одно действие закончилось раньше другого в прошлом — «уже сделал до того, как…».\nФормула: had + третья форма глагола (had done, had left). Вопрос: Had + подлежащее + третья форма. Отрицание: hadn't.\nПримеры:\n• When I arrived, the train had left. — Когда я приехал, поезд уже ушёл.\n• She had finished dinner before I came. — Она закончила ужин до того, как я пришёл.\n• Had you heard the news before he called? — Ты слышал новости до его звонка?\nЧастая ошибка: используют Past Simple для обоих действий, и становится неясно, что было раньше. Действие, которое произошло раньше, всегда ставьте в Past Perfect — had + третья форма.",
+    "explanation_en": "When to use: to show one past action happened before another past action.\nFormula: had + past participle. Questions: Had + subject + past participle. Negatives: hadn't.\nExamples:\n• When I arrived, the train had left.\n• She had finished dinner before I came.\n• Had you heard the news before he called?\nCommon mistake: using Past Simple for both actions. Put the earlier action in Past Perfect.",
     "isSeed": true
   },
   {
@@ -75,8 +75,8 @@
     "title_ru": "Future Simple (will)",
     "title_en": "Future Simple (will)",
     "cefr": "A2",
-    "explanation_ru": "Спонтанные решения, предсказания, обещания. will + V1.",
-    "explanation_en": "Spontaneous decisions, predictions without evidence, promises. will + base verb.",
+    "explanation_ru": "Когда используем: спонтанные решения в момент речи, предсказания «как мне кажется» и обещания.\nФормула: will + глагол как есть (для всех лиц). Вопрос: Will + подлежащее + глагол. Отрицание: won't.\nПримеры:\n• I will help you with the bags. — Я помогу тебе с сумками.\n• I think it will rain tomorrow. — Думаю, завтра пойдёт дождь.\n• Will you come to the party? — Ты придёшь на вечеринку?\nЧастая ошибка: после will добавляют -s или окончание и говорят «He will comes». Will всегда стоит рядом с глаголом в исходной форме, без окончаний.",
+    "explanation_en": "When to use: spontaneous decisions, predictions and promises.\nFormula: will + base verb. Questions: Will + subject + base verb. Negatives: won't.\nExamples:\n• I will help you with the bags.\n• I think it will rain tomorrow.\n• Will you come to the party?\nCommon mistake: adding -s after will. Keep the base verb with no endings.",
     "isSeed": true
   },
   {
@@ -85,8 +85,8 @@
     "title_ru": "Конструкция be going to",
     "title_en": "be going to",
     "cefr": "A2",
-    "explanation_ru": "Запланированные действия (планы) или предсказания на основе очевидных фактов (Look at the clouds, it's going to rain).",
-    "explanation_en": "Plans/intentions or predictions based on present evidence.",
+    "explanation_ru": "Когда используем: планы и намерения, о которых уже решили заранее, и предсказания, когда мы видим признаки прямо сейчас.\nФормула: am / is / are + going to + глагол как есть. Вопрос: Am/Is/Are + подлежащее + going to + глагол. Отрицание: am not / isn't / aren't + going to.\nПримеры:\n• I am going to visit my grandmother on Sunday. — Я собираюсь навестить бабушку в воскресенье.\n• Look at those clouds — it is going to rain. — Посмотри на тучи — сейчас пойдёт дождь.\n• Are you going to stay here? — Ты собираешься остаться здесь?\nЧастая ошибка: путают конструкцию с обычным движением и говорят «I am going to home» — с home предлог to не нужен: «I am going home». А в значении плана после going to всегда идёт глагол: «I am going to buy a car».",
+    "explanation_en": "When to use: plans and intentions, or predictions based on present evidence.\nFormula: am/is/are + going to + base verb. Questions: Am/Is/Are + subject + going to + base verb. Negatives: am not/isn't/aren't + going to.\nExamples:\n• I am going to visit my grandmother on Sunday.\n• Look at those clouds — it is going to rain.\n• Are you going to stay here?\nCommon mistake: treating going to as movement. It expresses a plan or intention, not going somewhere.",
     "isSeed": true
   },
   {
@@ -95,8 +95,8 @@
     "title_ru": "Артикли a/an",
     "title_en": "Indefinite Articles (a/an)",
     "cefr": "A1",
-    "explanation_ru": "Используем перед исчисляемыми существительными в единственном числе, когда говорим о предмете впервые. 'an' перед гласным звуком.",
-    "explanation_en": "Used with singular countable nouns mentioned for the first time. 'an' before a vowel sound.",
+    "explanation_ru": "Когда используем: говорим о предмете впервые, о любом предмете такого вида, или о профессии/роде занятий. Существительное должно быть в единственном числе.\nФормула: a + согласный звук (a cat, a book). an + гласный звук (an apple, an hour — hour начинается с гласного звука).\nПримеры:\n• I saw a dog in the park. — Я увидел собаку в парке.\n• She is an engineer. — Она инженер.\n• Can I have an orange? — Можно мне апельсин?\nЧастая ошибка: русскоязычные вообще забывают артикль и говорят «I saw dog». Когда предмет один и мы называем его впервые, нужен a или an. Выбор зависит от звука, а не от буквы.",
+    "explanation_en": "When to use: for singular nouns mentioned for the first time, or jobs and categories.\nFormula: a + consonant sound. an + vowel sound.\nExamples:\n• I saw a dog in the park.\n• She is an engineer.\n• Can I have an orange?\nCommon mistake: omitting the article. Choose by the sound, not the letter.",
     "isSeed": true
   },
   {
@@ -105,8 +105,8 @@
     "title_ru": "Артикль the",
     "title_en": "Definite Article (the)",
     "cefr": "A1",
-    "explanation_ru": "Используем, когда обе стороны понимают, о каком конкретно предмете идет речь, или предмет уникален (the sun).",
-    "explanation_en": "Used when referring to a specific item known to both speaker and listener, or unique things.",
+    "explanation_ru": "Когда используем: обе стороны понимают, о каком именно предмете речь — он уже упоминался, он единственный в обстановке или уникальный.\nФормула: the + существительное (единственное или множественное число, не важно). the sun, the door, the people in the room.\nПримеры:\n• I saw a dog. The dog was hungry. — Я увидел собаку. Собака была голодной.\n• Close the door, please. — Закрой дверь, пожалуйста.\n• The sun is very bright today. — Солнце сегодня очень яркое.\nЧастая ошибка: ставят the перед предметом, о котором слышат впервые, или не ставят там, где предмет уже понятен. Если предмет уже известен собеседнику — нужен the.",
+    "explanation_en": "When to use: for a specific item both people already know, or unique things.\nFormula: the + noun (singular or plural).\nExamples:\n• I saw a dog. The dog was hungry.\n• Close the door, please.\n• The sun is very bright today.\nCommon mistake: using the for something mentioned for the first time, or dropping it when the item is already clear.",
     "isSeed": true
   },
   {
@@ -115,8 +115,8 @@
     "title_ru": "Нулевой артикль",
     "title_en": "Zero Article",
     "cefr": "A2",
-    "explanation_ru": "Артикль не нужен со множественным числом или неисчисляемыми существительными, если мы говорим о них 'в целом' (I like cats).",
-    "explanation_en": "No article for plural or uncountable nouns when talking about things in general.",
+    "explanation_ru": "Когда используем: говорим о вещах «вообще», о категории в целом — со множественным числом и с неисчисляемыми существительными артикль не нужен.\nФормула: без артикля: cats, people, water, music. Так же — с языками, именами, названиями городов и стран (обычно): English, Anna, London.\nПримеры:\n• I like cats. — Я люблю кошек (вообще).\n• Money is not everything. — Деньги — это не всё.\n• She speaks English. — Она говорит по-английски.\nЧастая ошибка: ставят the перед общими понятиями и говорят «I like the cats», имея в виду всех кошек. Без артикля мы говорим о классе предметов в целом.",
+    "explanation_en": "When to use: for things in general — plural and uncountable nouns, languages, names.\nFormula: no article: cats, water, music, English, Anna, London.\nExamples:\n• I like cats.\n• Money is not everything.\n• She speaks English.\nCommon mistake: adding the before general nouns. Leave the article out for categories in general.",
     "isSeed": true
   },
   {
@@ -125,8 +125,8 @@
     "title_ru": "Множественное число",
     "title_en": "Plural Nouns",
     "cefr": "A1",
-    "explanation_ru": "Обычно добавляем -s. Исключения (man-men, child-children) и правила (y->ies, f->ves).",
-    "explanation_en": "Usually add -s. Learn irregular plurals (man-men, child-children).",
+    "explanation_ru": "Когда используем: когда предметов больше одного.\nФормула: обычно + -s (books, cars). После -s, -sh, -ch, -x, -o: + -es (boxes, watches). Согласная + y → ies (city → cities). Есть неправильные: man → men, child → children, person → people, foot → feet.\nПримеры:\n• I have two brothers. — У меня два брата.\n• She bought three boxes of tea. — Она купила три коробки чая.\n• There are many people here. — Здесь много людей.\nЧастая ошибка: забывают про неправильные формы и говорят «childs» или «mans». Несколько самых частых исключений проще выучить наизусть.",
+    "explanation_en": "When to use: for more than one thing.\nFormula: usually + -s. After -s/-sh/-ch/-x/-o: + -es. Consonant + y → ies. Irregulars: man-men, child-children, foot-feet.\nExamples:\n• I have two brothers.\n• She bought three boxes of tea.\n• There are many people here.\nCommon mistake: using regular endings for irregular nouns like childs or mans.",
     "isSeed": true
   },
   {
@@ -135,8 +135,8 @@
     "title_ru": "Неисчисляемые существительные",
     "title_en": "Uncountable Nouns",
     "cefr": "A2",
-    "explanation_ru": "Слова вроде water, money, advice, information. У них нет формы с -s и нельзя использовать 'a/an'.",
-    "explanation_en": "Substances, concepts, etc. (water, money, advice). No plural form, no 'a/an'.",
+    "explanation_ru": "Когда используем: слова, которые нельзя посчитать поштучно — вещества и абстрактные понятия: water, money, advice, information, news.\nФормула: без -s и без a/an. Для количества используем выражения: a glass of water, a piece of advice, some information. Глагол — в единственном числе: The news is good.\nПримеры:\n• I need some advice. — Мне нужен совет.\n• This information is useful. — Эта информация полезна.\n• There is not much water. — Воды немного.\nЧастая ошибка: добавляют -s и говорят «advices» или «informations». Эти слова в английском всегда без -s, даже если по-русски «советы» во множественном числе.",
+    "explanation_en": "When to use: for things we cannot count one by one — substances and abstract ideas.\nFormula: no -s, no a/an. Use a glass of water, a piece of advice, some information.\nExamples:\n• I need some advice.\n• This information is useful.\n• There is not much water.\nCommon mistake: adding -s to make advices or informations. They stay singular.",
     "isSeed": true
   },
   {
@@ -145,8 +145,8 @@
     "title_ru": "Some и Any",
     "title_en": "Some and Any",
     "cefr": "A1",
-    "explanation_ru": "Some — в утверждениях и просьбах. Any — в вопросах и отрицаниях.",
-    "explanation_en": "Some is for positive sentences/requests. Any is for questions and negative sentences.",
+    "explanation_ru": "Когда используем: some — в утверждениях и в вежливых просьбах. any — в вопросах и отрицаниях, когда речь о «каком-то/сколько-нибудь» количестве.\nФормула: some + существительное (утверждение): I have some money. any + существительное (вопрос/отрицание): Do you have any money? I don't have any money.\nПримеры:\n• I bought some bread. — Я купил немного хлеба.\n• Are there any apples? — Есть ли яблоки?\n• Would you like some tea? — Не хотите ли чаю?\nЧастая ошибка: ставят some в отрицаниях и говорят «I don't have some money». В отрицаниях и вопросах нужен any.",
+    "explanation_en": "When to use: some in positive sentences and polite offers; any in questions and negatives.\nFormula: some + noun in positives. any + noun in questions and negatives.\nExamples:\n• I bought some bread.\n• Are there any apples?\n• Would you like some tea?\nCommon mistake: using some in negatives. Use any for questions and negatives.",
     "isSeed": true
   },
   {
@@ -155,8 +155,8 @@
     "title_ru": "Much, Many, A lot of",
     "title_en": "Much, Many, A lot of",
     "cefr": "A2",
-    "explanation_ru": "Many — исчисляемые (вопросы/отрицания). Much — неисчисляемые (вопросы/отрицания). A lot of — универсально для утверждений.",
-    "explanation_en": "Many for countable, much for uncountable (mostly questions/negatives). A lot of for positive sentences.",
+    "explanation_ru": "Когда используем: говорим о количестве. many — с исчисляемыми существительными, much — с неисчисляемыми; a lot of — универсально и в основном в утверждениях.\nФормула: How many books? How much water? many/much чаще в вопросах и отрицаниях; a lot of/lots of — в утверждениях.\nПримеры:\n• I have a lot of friends. — У меня много друзей.\n• How many eggs do we need? — Сколько нам нужно яиц?\n• We don't have much time. — У нас мало времени.\nЧастая ошибка: говорят «many money» или «much books». Считаемые вещи — many, то, что не посчитать, — much.",
+    "explanation_en": "When to use: many with countable nouns, much with uncountable nouns, a lot of for both in positives.\nFormula: many + countable, much + uncountable. a lot of/lots of + both.\nExamples:\n• I have a lot of friends.\n• How many eggs do we need?\n• We don't have much time.\nCommon mistake: mixing many and much. Countable = many, uncountable = much.",
     "isSeed": true
   },
   {
@@ -165,8 +165,8 @@
     "title_ru": "Сравнительная степень прилагательных",
     "title_en": "Comparative Adjectives",
     "cefr": "A2",
-    "explanation_ru": "Для коротких +er (taller). Для длинных: more + adj (more beautiful). Сравниваем через 'than'.",
-    "explanation_en": "Short adjectives take -er. Long ones take 'more'. Use 'than' to compare.",
+    "explanation_ru": "Когда используем: сравниваем два предмета или человека.\nФормула: короткие слова (1–2 слога) + -er: taller, older. Длинные слова: more + слово: more beautiful. Сравнение через than. Некоторые слова: good → better, bad → worse.\nПримеры:\n• My car is faster than yours. — Моя машина быстрее твоей.\n• This film is more interesting than the book. — Этот фильм интереснее книги.\n• Her English is better than mine. — Её английский лучше моего.\nЧастая ошибка: соединяют оба способа и говорят «more faster». Выбирай что-то одно: либо -er, либо more.",
+    "explanation_en": "When to use: to compare two things or people.\nFormula: short adjectives + -er; long adjectives take more. Use than. Irregulars: good-better, bad-worse.\nExamples:\n• My car is faster than yours.\n• This film is more interesting than the book.\n• Her English is better than mine.\nCommon mistake: using both -er and more together. Choose one form only.",
     "isSeed": true
   },
   {
@@ -175,8 +175,8 @@
     "title_ru": "Превосходная степень",
     "title_en": "Superlative Adjectives",
     "cefr": "A2",
-    "explanation_ru": "Короткие: the ...est (the tallest). Длинные: the most (the most beautiful). Исключения: good-better-best.",
-    "explanation_en": "Short: the ...est. Long: the most... Irregular: good-better-best.",
+    "explanation_ru": "Когда используем: выделяем самый-самый предмет из группы.\nФормула: короткие слова: the + -est (the tallest). Длинные: the most + слово (the most beautiful). Неправильные: good → the best, bad → the worst. Перед прилагательным почти всегда ставим the.\nПримеры:\n• This is the tallest building in the city. — Это самое высокое здание в городе.\n• She is the most popular singer here. — Она самая популярная певица здесь.\n• He is the best student in our class. — Он лучший ученик в нашем классе.\nЧастая ошибка: забывают the или смешивают формы и говорят «the most tallest». the + одна форма: либо -est, либо most.",
+    "explanation_en": "When to use: to pick the most extreme thing in a group.\nFormula: short adjectives take the + -est; long ones take the most. Irregulars: good-best, bad-worst.\nExamples:\n• This is the tallest building in the city.\n• She is the most popular singer here.\n• He is the best student in our class.\nCommon mistake: dropping the or mixing the most tallest. Use one form with the.",
     "isSeed": true
   },
   {
@@ -185,8 +185,8 @@
     "title_ru": "Can и Could (Способность и просьба)",
     "title_en": "Can and Could",
     "cefr": "A1",
-    "explanation_ru": "Can — физическая возможность и умение сейчас. Could — в прошлом или вежливая просьба.",
-    "explanation_en": "Can for present ability. Could for past ability or polite requests.",
+    "explanation_ru": "Когда используем: can — о том, что мы умеем или можем сделать сейчас, и для просьб. could — о способности в прошлом и для более вежливых просьб.\nФормула: can / could + глагол как есть. Отрицание: can't / couldn't. Вопрос: Can/Could + подлежащее + глагол.\nПримеры:\n• I can swim. — Я умею плавать.\n• She could read when she was five. — Она умела читать в пять лет.\n• Could you open the window, please? — Не могли бы вы открыть окно?\nЧастая ошибка: после can/could добавляют to или -s и говорят «I can to swim» или «He cans». После can/could идёт только сам глагол без изменений.",
+    "explanation_en": "When to use: can for present ability and requests; could for past ability and polite requests.\nFormula: can/could + base verb. Negatives: can't/couldn't. Questions: Can/Could + subject + base verb.\nExamples:\n• I can swim.\n• She could read when she was five.\n• Could you open the window, please?\nCommon mistake: adding to or -s after can/could. Use the plain verb only.",
     "isSeed": true
   },
   {
@@ -195,8 +195,8 @@
     "title_ru": "Must и Have to (Обязательство)",
     "title_en": "Must vs Have to",
     "cefr": "B1",
-    "explanation_ru": "Must — внутреннее, личное обязательство. Have to — внешние правила. Mustn't — запрет. Don't have to — нет необходимости (можно не делать).",
-    "explanation_en": "Must is personal obligation. Have to is external rules. Mustn't is prohibition, don't have to is lack of obligation.",
+    "explanation_ru": "Когда используем: must — личное, внутреннее решение, что надо сделать. have to — внешняя обязанность из правил или обстоятельств. mustn't — запрет. don't have to — можно не делать, нет необходимости.\nФормула: must + глагол. have to / has to + глагол. Отрицания: mustn't (нельзя), don't/doesn't have to (не обязательно).\nПримеры:\n• I must call my mum — I promised. — Я должен позвонить маме — я обещал.\n• You have to wear a uniform at work. — На работе нужно носить форму.\n• You don't have to come if you're tired. — Ты не обязан приходить, если устал.\nЧастая ошибка: путают mustn't и don't have to. Mustn't — строгий запрет, а don't have to — просто нет обязанности.",
+    "explanation_en": "When to use: must for personal obligation, have to for external rules. mustn't is prohibition, don't have to is no obligation.\nFormula: must + verb. have to/has to + verb. Negatives: mustn't, don't/doesn't have to.\nExamples:\n• I must call my mum — I promised.\n• You have to wear a uniform at work.\n• You don't have to come if you're tired.\nCommon mistake: mixing mustn't (prohibition) with don't have to (no obligation).",
     "isSeed": true
   },
   {
@@ -205,8 +205,8 @@
     "title_ru": "Should (Совет)",
     "title_en": "Should",
     "cefr": "A2",
-    "explanation_ru": "Используется для советов и рекомендаций ('тебе следует').",
-    "explanation_en": "Used for giving advice or recommendations.",
+    "explanation_ru": "Когда используем: даём совет или рекомендацию — говорим, как лучше поступить.\nФормула: should + глагол как есть. Отрицание: shouldn't. Вопрос: Should + подлежащее + глагол.\nПримеры:\n• You should drink more water. — Тебе следует пить больше воды.\n• He shouldn't work so late. — Ему не следует работать так поздно.\n• Should I call a doctor? — Мне позвонить врачу?\nЧастая ошибка: добавляют to и говорят «You should to rest». После should идёт только сам глагол без to.",
+    "explanation_en": "When to use: to give advice or recommendations.\nFormula: should + base verb. Negatives: shouldn't. Questions: Should + subject + base verb.\nExamples:\n• You should drink more water.\n• He shouldn't work so late.\n• Should I call a doctor?\nCommon mistake: adding to after should. Use the plain verb.",
     "isSeed": true
   },
   {
@@ -215,8 +215,8 @@
     "title_ru": "Модальные глаголы дедукции (must/might/cant)",
     "title_en": "Modals of Deduction",
     "cefr": "B2",
-    "explanation_ru": "Must be — должно быть точно. Might/may be — возможно. Can't be — не может быть.",
-    "explanation_en": "Must be (strong certainty), might/may be (possibility), can't be (impossibility).",
+    "explanation_ru": "Когда используем: делаем выводы о настоящем — насколько мы уверены, что что-то так.\nФормула: must + глагол = почти наверняка так. may/might + глагол = возможно. can't + глагол = не может быть, невозможно.\nПримеры:\n• He must be tired — he worked all night. — Он, должно быть, устал — работал всю ночь.\n• She might be at home. — Она, возможно, дома.\n• That can't be true. — Это не может быть правдой.\nЧастая ошибка: путают can't (невозможно) и mustn't (запрет). Для вывода «не может быть» нужен именно can't, а не mustn't.",
+    "explanation_en": "When to use: to make deductions about the present with different degrees of certainty.\nFormula: must + verb (almost certain), may/might + verb (possible), can't + verb (impossible).\nExamples:\n• He must be tired — he worked all night.\n• She might be at home.\n• That can't be true.\nCommon mistake: using mustn't for deduction. Use can't to mean it is impossible.",
     "isSeed": true
   },
   {
@@ -225,8 +225,8 @@
     "title_ru": "Предлоги времени (in, on, at)",
     "title_en": "Prepositions of Time",
     "cefr": "A1",
-    "explanation_ru": "AT: время (at 5 pm). ON: дни (on Monday). IN: месяцы, годы, сезоны (in May, in 2020).",
-    "explanation_en": "AT for times. ON for days. IN for months, years, seasons.",
+    "explanation_ru": "Когда используем: говорим, когда что-то происходит. at — точное время; on — дни и даты; in — длинные периоды (месяцы, годы, сезоны, части суток).\nФормула: at 5 o'clock, at night. on Monday, on 1 May. in May, in summer, in 2020, in the morning.\nПримеры:\n• The meeting is at three o'clock. — Встреча в три часа.\n• I have a class on Tuesday. — У меня занятие во вторник.\n• We met in 2021. — Мы познакомились в 2021 году.\nЧастая ошибка: калькируют русский и говорят «on the lesson» или «in Monday». Запомни связки: время — at, день — on, месяц/год — in.",
+    "explanation_en": "When to use: at for exact times, on for days and dates, in for longer periods.\nFormula: at 5 o'clock, on Monday, in May/in 2020/in the morning.\nExamples:\n• The meeting is at three o'clock.\n• I have a class on Tuesday.\n• We met in 2021.\nCommon mistake: translating literally from Russian. Time = at, day = on, month/year = in.",
     "isSeed": true
   },
   {
@@ -235,8 +235,8 @@
     "title_ru": "Предлоги места (in, on, at)",
     "title_en": "Prepositions of Place",
     "cefr": "A1",
-    "explanation_ru": "AT: точка/событие (at the door, at a party). ON: поверхность (on the table). IN: внутри объема (in a box, in London).",
-    "explanation_en": "AT for points. ON for surfaces. IN for enclosed spaces.",
+    "explanation_ru": "Когда используем: говорим, где что находится. at — точка или событие; on — на поверхности; in — внутри пространства или в городе/стране.\nФормула: at the door, at work, at a party. on the table, on the wall. in a box, in the car, in London.\nПримеры:\n• He is at the bus stop. — Он на автобусной остановке.\n• The book is on the table. — Книга на столе.\n• They live in Moscow. — Они живут в Москве.\nЧастая ошибка: путают in и on для городов и поверхностей. Внутри объёма и в городе — in, на поверхности — on.",
+    "explanation_en": "When to use: at for points and events, on for surfaces, in for enclosed spaces and cities/countries.\nFormula: at the door, on the table, in a box, in London.\nExamples:\n• He is at the bus stop.\n• The book is on the table.\n• They live in Moscow.\nCommon mistake: mixing in and on. Enclosed space or city = in, surface = on.",
     "isSeed": true
   },
   {
@@ -245,8 +245,8 @@
     "title_ru": "Zero Conditional",
     "title_en": "Zero Conditional",
     "cefr": "A2",
-    "explanation_ru": "Факты и законы природы. If + Present Simple, Present Simple (If you heat ice, it melts).",
-    "explanation_en": "General truths and scientific facts. If + present simple, present simple.",
+    "explanation_ru": "Когда используем: говорим о фактах и законах, которые работают всегда — что бывает, если сделать что-то.\nФормула: If + Present Simple, Present Simple. В обеих частях — настоящее время.\nПримеры:\n• If you heat ice, it melts. — Если нагреть лёд, он тает.\n• If I drink coffee at night, I can't sleep. — Если я пью кофе на ночь, я не могу спать.\n• Plants die if they don't get water. — Растения погибают, если не получают воду.\nЧастая ошибка: ставят will в обеих частях. В Zero Conditional will не нужен — только настоящее время, ведь это всегдашний факт.",
+    "explanation_en": "When to use: for general truths and facts that always happen.\nFormula: If + present simple, present simple.\nExamples:\n• If you heat ice, it melts.\n• If I drink coffee at night, I can't sleep.\n• Plants die if they don't get water.\nCommon mistake: using will in this type. Keep both parts in the present simple.",
     "isSeed": true
   },
   {
@@ -255,8 +255,8 @@
     "title_ru": "First Conditional (Первый тип)",
     "title_en": "First Conditional",
     "cefr": "B1",
-    "explanation_ru": "Реальное будущее. If + Present Simple, will + V1 (If it rains, we will stay home). После if НИКОГДА нет will.",
-    "explanation_en": "Real or probable future situations. If + present simple, will + base verb.",
+    "explanation_ru": "Когда используем: реальная ситуация в будущем и её вероятный результат.\nФормула: If + Present Simple, will + глагол. В части с if — настоящее время, в результате — will.\nПримеры:\n• If it rains, we will stay home. — Если пойдёт дождь, мы останемся дома.\n• I will call you if I finish early. — Я позвоню тебе, если закончу рано.\n• If you study hard, you will pass the exam. — Если будешь усердно учиться, сдашь экзамен.\nЧастая ошибка: ставят will после if и говорят «If it will rain». После if в этом типе идёт только настоящее время, will остаётся во второй части.",
+    "explanation_en": "When to use: real future situations and their likely results.\nFormula: If + present simple, will + base verb.\nExamples:\n• If it rains, we will stay home.\n• I will call you if I finish early.\n• If you study hard, you will pass the exam.\nCommon mistake: putting will after if. Keep the if-part in the present simple.",
     "isSeed": true
   },
   {
@@ -265,8 +265,8 @@
     "title_ru": "Second Conditional (Второй тип)",
     "title_en": "Second Conditional",
     "cefr": "B1",
-    "explanation_ru": "Нереальное настоящее/будущее (мечты). If + Past Simple, would + V1 (If I won the lottery, I would buy a house).",
-    "explanation_en": "Unreal or hypothetical present/future situations. If + past simple, would + base verb.",
+    "explanation_ru": "Когда используем: мечты и воображаемые ситуации в настоящем или будущем — то, что вряд ли случится.\nФормула: If + Past Simple, would + глагол. В части с if — прошедшее время (но смысл — настоящее), в результате — would.\nПримеры:\n• If I won the lottery, I would buy a house. — Если бы я выиграл в лотерею, я бы купил дом.\n• If I were you, I would apologize. — На твоём месте я бы извинился.\n• She would travel more if she had time. — Она бы больше путешествовала, будь у неё время.\nЧастая ошибка: говорят «If I will win» или «If I would win». В части с if нужно прошедшее время, а would — только во второй части.",
+    "explanation_en": "When to use: unreal or imaginary situations in the present or future.\nFormula: If + past simple, would + base verb.\nExamples:\n• If I won the lottery, I would buy a house.\n• If I were you, I would apologize.\n• She would travel more if she had time.\nCommon mistake: using will or would after if. The if-part takes past simple.",
     "isSeed": true
   },
   {
@@ -275,8 +275,8 @@
     "title_ru": "Third Conditional (Третий тип)",
     "title_en": "Third Conditional",
     "cefr": "B2",
-    "explanation_ru": "Нереальное прошлое (сожаления). If + Past Perfect, would have + V3.",
-    "explanation_en": "Unreal past situations (regrets/criticism). If + past perfect, would have + past participle.",
+    "explanation_ru": "Когда используем: сожаления о прошлом — о том, что уже нельзя изменить.\nФормула: If + Past Perfect (had + третья форма), would have + третья форма.\nПримеры:\n• If I had studied harder, I would have passed. — Если бы я учился усерднее, я бы сдал.\n• She would have come if you had invited her. — Она бы пришла, если бы ты её пригласил.\n• If we had left earlier, we wouldn't have missed the train. — Если бы мы вышли раньше, мы бы не опоздали на поезд.\nЧастая ошибка: используют Past Simple вместо Past Perfect и говорят «If I studied harder». Речь о прошлом, поэтому нужна форма had + третья форма.",
+    "explanation_en": "When to use: regrets about the past that cannot be changed.\nFormula: If + past perfect (had + past participle), would have + past participle.\nExamples:\n• If I had studied harder, I would have passed.\n• She would have come if you had invited her.\n• If we had left earlier, we wouldn't have missed the train.\nCommon mistake: using past simple instead of past perfect in the if-part.",
     "isSeed": true
   },
   {
@@ -285,8 +285,8 @@
     "title_ru": "Пассивный залог (Passive Voice)",
     "title_en": "Passive Voice",
     "cefr": "B1",
-    "explanation_ru": "Важно ЧТО сделано, а не КЕМ. Формула: глагол 'to be' в нужном времени + V3 (The house was built in 1990).",
-    "explanation_en": "Focus on the action/object, not the doer. Form: 'to be' + past participle.",
+    "explanation_ru": "Когда используем: важно, что сделано с предметом, а не кто это сделал.\nФормула: be (в нужном времени) + третья форма глагола. Past: was/were + третья форма. Present: am/is/are + третья форма.\nПримеры:\n• The house was built in 1990. — Дом был построен в 1990 году.\n• English is spoken all over the world. — На английском говорят во всём мире.\n• The letter has been sent. — Письмо отправлено.\nЧастая ошибка: забывают be и говорят «The house built». В пассиве всегда есть be в нужном времени плюс третья форма глагола.",
+    "explanation_en": "When to use: when the action or object matters more than the doer.\nFormula: be (in the right tense) + past participle.\nExamples:\n• The house was built in 1990.\n• English is spoken all over the world.\n• The letter has been sent.\nCommon mistake: dropping be. Keep be in the correct tense plus the past participle.",
     "isSeed": true
   },
   {
@@ -295,8 +295,8 @@
     "title_ru": "Герундий vs Инфинитив",
     "title_en": "Gerund vs Infinitive",
     "cefr": "B2",
-    "explanation_ru": "Одни глаголы требуют -ing (enjoy doing), другие to (want to do). Некоторые меняют смысл (stop smoking vs stop to smoke).",
-    "explanation_en": "Verbs followed by -ing vs to-infinitive. Some verbs change meaning (stop, remember, try).",
+    "explanation_ru": "Когда используем: после одних глаголов нужна форма с -ing, после других — to + глагол.\nФормула: глаголы вроде enjoy, mind, avoid, finish + -ing (enjoy doing). Глаголы вроде want, decide, promise, hope + to (want to do). Некоторые меняют смысл: stop smoking (бросить курить) vs stop to smoke (остановиться, чтобы покурить).\nПримеры:\n• I enjoy reading before bed. — Мне нравится читать перед сном.\n• She decided to leave early. — Она решила уйти пораньше.\n• He stopped to buy coffee. — Он остановился, чтобы купить кофе.\nЧастая ошибка: используют to после глаголов типа enjoy и говорят «I enjoy to read». Такие глаголы требуют только -ing.",
+    "explanation_en": "When to use: some verbs take -ing, others take to + verb.\nFormula: enjoy/mind/avoid/finish + -ing. want/decide/promise/hope + to + verb. Some change meaning: stop smoking vs stop to smoke.\nExamples:\n• I enjoy reading before bed.\n• She decided to leave early.\n• He stopped to buy coffee.\nCommon mistake: using to after enjoy-type verbs. They take only -ing.",
     "isSeed": true
   },
   {
@@ -305,8 +305,8 @@
     "title_ru": "Относительные придаточные (who/which/that)",
     "title_en": "Relative Clauses",
     "cefr": "B1",
-    "explanation_ru": "Who — для людей. Which — для вещей. That — для обоих (в определяющих). Whose — чей.",
-    "explanation_en": "Who (people), which (things), that (both in defining clauses).",
+    "explanation_ru": "Когда используем: добавляем пояснение к человеку или предмету одним предложением.\nФормула: who — о людях, which — о вещах, that — и о людях, и о вещах. whose — чей. Whom — о людях как объекте (реже).\nПримеры:\n• The woman who lives next door is a doctor. — Женщина, которая живёт по соседству, врач.\n• I bought a phone which was on sale. — Я купил телефон, который был со скидкой.\n• He is the man whose car was stolen. — Он тот человек, чью машину украли.\nЧастая ошибка: используют which для людей и говорят «the woman which». Для людей нужен who (или that).",
+    "explanation_en": "When to use: to add information about a person or thing in one sentence.\nFormula: who for people, which for things, that for both, whose for possession.\nExamples:\n• The woman who lives next door is a doctor.\n• I bought a phone which was on sale.\n• He is the man whose car was stolen.\nCommon mistake: using which for people. Use who or that for people.",
     "isSeed": true
   },
   {
@@ -315,8 +315,8 @@
     "title_ru": "Косвенная речь (Reported Speech)",
     "title_en": "Reported Speech",
     "cefr": "B2",
-    "explanation_ru": "Сдвиг времен на шаг назад: Present -> Past, will -> would. Замена местоимений (I -> he).",
-    "explanation_en": "Backshift of tenses (Present -> Past). Pronouns and time words change.",
+    "explanation_ru": "Когда используем: пересказываем чьи-то слова, не цитируя дословно.\nФормула: сдвигаем время на шаг назад: Present → Past, Past → Past Perfect, will → would. Меняем местоимения и слова времени (today → that day, here → there).\nПримеры:\n• «I am tired» → She said she was tired. — Она сказала, что устала.\n• «I will call you» → He said he would call me. — Он сказал, что позвонит мне.\n• «We saw him» → They said they had seen him. — Они сказали, что видели его.\nЧастая ошибка: оставляют время без сдвига и говорят «She said she is tired». При пересказе время обычно сдвигается назад.",
+    "explanation_en": "When to use: to report someone's words indirectly.\nFormula: shift tenses back one step. Present → past, past → past perfect, will → would. Change pronouns and time words.\nExamples:\n• 'I am tired' → She said she was tired.\n• 'I will call you' → He said he would call me.\n• 'We saw him' → They said they had seen him.\nCommon mistake: forgetting to shift the tense back.",
     "isSeed": true
   },
   {
@@ -325,8 +325,8 @@
     "title_ru": "Used to (Привычки в прошлом)",
     "title_en": "Used to",
     "cefr": "B1",
-    "explanation_ru": "Действия, которые были регулярны в прошлом, но сейчас не происходят. I used to smoke (раньше курил, сейчас нет).",
-    "explanation_en": "Past habits or states that are no longer true now.",
+    "explanation_ru": "Когда используем: говорим о привычках или состояниях, которые были регулярными в прошлом, но сейчас их нет.\nФормула: used to + глагол. Вопрос: Did + подлежащее + use to + глагол. Отрицание: didn't use to + глагол.\nПримеры:\n• I used to smoke, but I quit. — Раньше я курил, но бросил.\n• She used to live in Spain. — Она раньше жила в Испании.\n• Did you use to play football? — Ты раньше играл в футбол?\nЧастая ошибка: после used to добавляют -ing или вторую форму. После used to идёт только глагол как есть — used to play.",
+    "explanation_en": "When to use: for past habits or states that are no longer true.\nFormula: used to + base verb. Questions: Did + subject + use to + verb. Negatives: didn't use to + verb.\nExamples:\n• I used to smoke, but I quit.\n• She used to live in Spain.\n• Did you use to play football?\nCommon mistake: adding -ing or a past form after used to. Use the base verb.",
     "isSeed": true
   },
   {
@@ -335,8 +335,8 @@
     "title_ru": "Разделительные вопросы (Question Tags)",
     "title_en": "Question Tags",
     "cefr": "B1",
-    "explanation_ru": "Утверждение -> отрицательный хвостик (You are a doctor, aren't you?). Отрицание -> утвердительный.",
-    "explanation_en": "Positive sentence -> negative tag. Negative sentence -> positive tag.",
+    "explanation_ru": "Когда используем: добавляем короткий «хвостик» в конце фразы, чтобы уточнить или получить согласие.\nФормула: утверждение → отрицательный хвостик; отрицание → утвердительный хвостик. Хвостик повторяет вспомогательный глагол и подлежащее: You are tired, aren't you? She doesn't like tea, does she?\nПримеры:\n• You are a doctor, aren't you? — Вы врач, не так ли?\n• He can swim, can't he? — Он умеет плавать, правда?\n• They didn't come, did they? — Они не пришли, не так ли?\nЧастая ошибка: делают оба полюса одинаковыми и говорят «You are tired, are you?». Полюса должны быть противоположными.",
+    "explanation_en": "When to use: to check information or ask for agreement with a short tail.\nFormula: positive sentence → negative tag; negative sentence → positive tag.\nExamples:\n• You are a doctor, aren't you?\n• He can swim, can't he?\n• They didn't come, did they?\nCommon mistake: making both parts the same. The tag must be the opposite.",
     "isSeed": true
   },
   {
@@ -345,8 +345,8 @@
     "title_ru": "Объектные местоимения (me, him, them)",
     "title_en": "Object Pronouns",
     "cefr": "A1",
-    "explanation_ru": "Используются как объект действия (после глагола/предлога): call HIM, look at US.",
-    "explanation_en": "Used as the object of a verb or preposition: me, you, him, her, it, us, them.",
+    "explanation_ru": "Когда используем: когда на человека или предмет направлено действие — после глагола или предлога.\nФормула: me, you, him, her, it, us, them. I → me, he → him, she → her, we → us, they → them.\nПримеры:\n• Call me tomorrow. — Позвони мне завтра.\n• I know him. — Я знаю его.\n• Look at us. — Посмотри на нас.\nЧастая ошибка: используют именительную форму и говорят «Call I» или «with she». После глагола и предлога нужна объектная форма.",
+    "explanation_en": "When to use: as the object of a verb or preposition.\nFormula: me, you, him, her, it, us, them.\nExamples:\n• Call me tomorrow.\n• I know him.\n• Look at us.\nCommon mistake: using subject forms as objects. Use me/him/her/us/them after verbs and prepositions.",
     "isSeed": true
   },
   {
@@ -355,8 +355,8 @@
     "title_ru": "Притяжательные местоимения (mine, yours)",
     "title_en": "Possessive Pronouns",
     "cefr": "A2",
-    "explanation_ru": "Заменяют 'my book' -> 'mine'. Стоят самостоятельно: This book is mine.",
-    "explanation_en": "Replace noun phrases (my car -> mine) and stand alone.",
+    "explanation_ru": "Когда используем: говорим, что вещь чья-то, не повторяя само существительное.\nФормула: my → mine, your → yours, his → his, her → hers, our → ours, their → theirs. Стоят сами по себе, без существительного после.\nПримеры:\n• This book is mine. — Эта книга моя.\n• Is that car yours? — Та машина твоя?\n• The keys are theirs. — Ключи их.\nЧастая ошибка: добавляют существительное и говорят «It is mine book». После mine/yours/hers не нужен предмет — он уже подразумевается.",
+    "explanation_en": "When to use: to show possession without repeating the noun.\nFormula: my → mine, your → yours, her → hers, our → ours, their → theirs.\nExamples:\n• This book is mine.\n• Is that car yours?\n• The keys are theirs.\nCommon mistake: adding a noun after them. mine/yours/hers stand alone.",
     "isSeed": true
   },
   {
@@ -365,8 +365,8 @@
     "title_ru": "Наречия частоты (always, often)",
     "title_en": "Adverbs of Frequency",
     "cefr": "A1",
-    "explanation_ru": "Ставятся перед обычным глаголом (I often read), но ПОСЛЕ 'to be' (I am always late).",
-    "explanation_en": "Go before main verbs, but after the verb 'to be'.",
+    "explanation_ru": "Когда используем: говорим, как часто что-то происходит — always, usually, often, sometimes, never.\nФормула: перед обычным глаголом: I often read. После глагола be: I am always late. Обычно между подлежащим и глаголом.\nПримеры:\n• She always drinks tea in the morning. — Она всегда пьёт чай по утрам.\n• We are never bored together. — Нам никогда не бывает скучно вместе.\n• I sometimes work from home. — Я иногда работаю из дома.\nЧастая ошибка: ставят наречие не на место и говорят «I am late always» или «She drinks always tea». Запомни: перед обычным глаголом, но после am/is/are.",
+    "explanation_en": "When to use: to say how often something happens.\nFormula: before the main verb (I often read), after the verb be (I am always late).\nExamples:\n• She always drinks tea in the morning.\n• We are never bored together.\n• I sometimes work from home.\nCommon mistake: putting the adverb after the verb. It goes before the verb but after be.",
     "isSeed": true
   },
   {
@@ -375,8 +375,8 @@
     "title_ru": "Краткие ответы (So do I / Neither do I)",
     "title_en": "So / Neither do I",
     "cefr": "B1",
-    "explanation_ru": "Согласие: So + вспом.глагол + I (Я тоже). Neither + вспом.глагол + I (Я тоже нет).",
-    "explanation_en": "Agreeing: So (positive), Neither (negative) + auxiliary verb + subject.",
+    "explanation_ru": "Когда используем: коротко соглашаемся с собеседником — «я тоже» или «я тоже нет».\nФормула: So + вспомогательный глагол + подлежащее (для согласия с «да»). Neither + вспомогательный глагол + подлежащее (для согласия с «нет»). Вспомогательный глагол зависит от времени и лица.\nПримеры:\n• I like coffee. — So do I. — Мне нравится кофе. — Мне тоже.\n• She can swim. — So can I. — Она умеет плавать. — Я тоже.\n• I don't like fish. — Neither do I. — Я не люблю рыбу. — Я тоже нет.\nЧастая ошибка: отвечают «Me too» там, где нужен neither, или путают глагол. Для отрицательного согласия нужен Neither + тот же вспомогательный глагол.",
+    "explanation_en": "When to use: to agree briefly — 'me too' or 'me neither'.\nFormula: So + auxiliary + subject (positive). Neither + auxiliary + subject (negative).\nExamples:\n• I like coffee. — So do I.\n• She can swim. — So can I.\n• I don't like fish. — Neither do I.\nCommon mistake: using Me too for negative agreement. Use Neither + auxiliary.",
     "isSeed": true
   },
   {
@@ -385,8 +385,8 @@
     "title_ru": "Конструкция I wish (Сожаления)",
     "title_en": "I wish / If only",
     "cefr": "B2",
-    "explanation_ru": "Настоящее: I wish I had (Past Simple). Прошлое: I wish I had done (Past Perfect). Жалоба: I wish you wouldn't do that.",
-    "explanation_en": "Wish + past (present regret), wish + past perfect (past regret), wish + would (annoyance).",
+    "explanation_ru": "Когда используем: выражаем сожаление о настоящем, о прошлом или раздражение чьим-то поведением.\nФормула: настоящее: I wish + Past Simple (I wish I had). Прошлое: I wish + Past Perfect (I wish I had done). Жалоба на поведение: I wish + would.\nПримеры:\n• I wish I had more free time. — Жаль, что у меня нет больше свободного времени.\n• I wish I had studied harder at school. — Жаль, что я не учился усерднее в школе.\n• I wish you wouldn't smoke here. — Мне бы хотелось, чтобы ты не курил здесь.\nЧастая ошибка: говорят «I wish I have» о настоящем. После wish для сожаления о настоящем нужна форма прошедшего времени — I wish I had.",
+    "explanation_en": "When to use: to express regret about the present or past, or annoyance with someone's behaviour.\nFormula: present: wish + past simple. past: wish + past perfect. annoyance: wish + would.\nExamples:\n• I wish I had more free time.\n• I wish I had studied harder at school.\n• I wish you wouldn't smoke here.\nCommon mistake: using the present after wish for present regrets. Use past simple.",
     "isSeed": true
   },
   {
@@ -395,8 +395,8 @@
     "title_ru": "Causative (have something done)",
     "title_en": "Causative form",
     "cefr": "B2",
-    "explanation_ru": "Кто-то сделал это для вас. I had my hair cut (Мне постригли волосы).",
-    "explanation_en": "Arranging for someone else to do something for you. Have + object + past participle.",
+    "explanation_ru": "Когда используем: кто-то делает что-то для нас — мы организуем услугу, а не делаем сами.\nФормула: have / get + предмет + третья форма глагола (have something done). Время меняется через have/has/had.\nПримеры:\n• I had my hair cut. — Мне постригли волосы.\n• She is having her car repaired. — Ей чинят машину.\n• We got the house painted. — Нам покрасили дом.\nЧастая ошибка: дословно переводят с русского и говорят «I cut my hair» о том, что сделал парикмахер. Если работу сделали для вас — используйте have something done.",
+    "explanation_en": "When to use: when you arrange for someone else to do something for you.\nFormula: have/get + object + past participle (have something done).\nExamples:\n• I had my hair cut.\n• She is having her car repaired.\n• We got the house painted.\nCommon mistake: translating literally when a service was done for you. Use have something done.",
     "isSeed": true
   }
 ]
