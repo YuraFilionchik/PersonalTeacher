@@ -56,6 +56,8 @@ fun ProgressScreen(onOpenReview: (Long) -> Unit) {
             container.statsRepository,
             container.vocabRepository,
             container.database.lessonDao(),
+            container.lessonHistoryRepository,
+            container.appScope,
         )
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
