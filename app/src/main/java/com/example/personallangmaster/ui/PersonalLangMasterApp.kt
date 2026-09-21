@@ -11,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -63,9 +64,21 @@ private val topLevelDestinations = listOf(
  * на планшете) поверх [NavDisplay]. Подэкраны настроек кладутся на тот же стек.
  */
 @Composable
-fun PersonalLangMasterApp() {
+fun PersonalLangMasterApp(
+    pendingRoute: Route? = null,
+    onRouteHandled: () -> Unit = {},
+) {
     val container = LocalAppContainer.current
     val backStack = rememberNavBackStack(Route.Home)
+
+    LaunchedEffect(pendingRoute) {
+        if (pendingRoute != null) {
+            if (backStack.lastOrNull() != pendingRoute) {
+                backStack.add(pendingRoute)
+            }
+            onRouteHandled()
+        }
+    }
 
     // Раздел подсвечивается по корню стека: внутри настроек вкладка остаётся выбранной.
     val rootRoute = backStack.firstOrNull()

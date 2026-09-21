@@ -23,6 +23,8 @@ object Notifications {
 
     const val CHANNEL_REMINDERS = "reminders"
 
+    const val ACTION_START_REVIEW = "com.example.personallangmaster.action.START_REVIEW"
+
     private const val ID_DAILY = 101
     private const val ID_REVIEW = 102
 
@@ -52,17 +54,24 @@ object Notifications {
             ID_REVIEW,
             "Карточки ждут",
             "Слов на повторение: $dueCards — это пять минут",
+            action = ACTION_START_REVIEW
         )
     }
 
-    private fun show(context: Context, id: Int, title: String, text: String) {
+    private fun show(context: Context, id: Int, title: String, text: String, action: String? = null) {
         if (!canNotify(context)) return
         ensureChannel(context)
+
+        val activityIntent = Intent(context, MainActivity::class.java).apply {
+            if (action != null) {
+                this.action = action
+            }
+        }
 
         val intent = PendingIntent.getActivity(
             context,
             id,
-            Intent(context, MainActivity::class.java),
+            activityIntent,
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
 
