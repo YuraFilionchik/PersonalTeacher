@@ -24,9 +24,13 @@ object Notifications {
     const val CHANNEL_REMINDERS = "reminders"
 
     const val ACTION_START_REVIEW = "com.example.personallangmaster.action.START_REVIEW"
+    const val ACTION_OPEN_LESSON_REVIEW = "com.example.personallangmaster.action.OPEN_LESSON_REVIEW"
+
+    const val EXTRA_LESSON_ID = "lessonId"
 
     private const val ID_DAILY = 101
     private const val ID_REVIEW = 102
+    private const val ID_ANALYSIS = 103
 
     fun ensureChannel(context: Context) {
         val channel = NotificationChannel(
@@ -58,13 +62,49 @@ object Notifications {
         )
     }
 
-    private fun show(context: Context, id: Int, title: String, text: String, action: String? = null) {
+    /**
+     * Разбор урока закончился в фоне.
+     *
+     * Показываем только то, что человек и так увидит на экране разбора:
+     * уведомление — это приглашение открыть его, а не пересказ.
+     */
+    fun showAnalysisReady(
+        context: Context,
+        lessonId: Long,
+        summaryRu: String?,
+        mistakes: Int,
+        words: Int,
+    ) {
+        val text = summaryRu?.takeIf { it.isNotBlank() }
+            ?: "Разобрано: ошибок — $mistakes, новых слов — $words"
+
+        show(
+            context,
+            ID_ANALYSIS,
+            "Урок разобран",
+            text,
+            action = ACTION_OPEN_LESSON_REVIEW,
+            lessonId = lessonId,
+        )
+    }
+
+    private fun show(
+        context: Context,
+        id: Int,
+        title: String,
+        text: String,
+        action: String? = null,
+        lessonId: Long? = null,
+    ) {
         if (!canNotify(context)) return
         ensureChannel(context)
 
         val activityIntent = Intent(context, MainActivity::class.java).apply {
             if (action != null) {
                 this.action = action
+            }
+            if (lessonId != null) {
+                putExtra(EXTRA_LESSON_ID, lessonId)
             }
         }
 
@@ -79,6 +119,7 @@ object Notifications {
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle(title)
             .setContentText(text)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(text))
             .setContentIntent(intent)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

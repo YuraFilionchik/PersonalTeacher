@@ -60,6 +60,23 @@ data class HintCard(
     val textRu: String?,
 )
 
+/**
+ * Что показать перед тестом уровня.
+ *
+ * Тест переставляет уровень всего профиля, поэтому запускать его молча,
+ * одним нажатием, неправильно: человек должен понимать, что сейчас будет
+ * и что изменится после.
+ */
+data class PlacementPrompt(
+    val currentLevel: com.example.personallangmaster.data.db.Cefr,
+    /** Уровень зафиксирован в настройках — результат покажем, но не применим. */
+    val levelLocked: Boolean,
+    /** Тест уже проходили: значит это пересдача. */
+    val alreadyPassed: Boolean,
+    val minutes: Int,
+    val estimatedCostUsd: Double,
+)
+
 data class LessonUiState(
     val sessionState: LiveSessionState = LiveSessionState.Idle,
     val mode: LessonMode = LessonMode.FREE_TALK,
@@ -76,6 +93,8 @@ data class LessonUiState(
     val chatMode: Boolean = false,
     val draft: String = "",
     val budgetWarning: String? = null,
+    /** Открыто объяснение теста уровня; null — диалога нет. */
+    val placement: PlacementPrompt? = null,
     val finished: Boolean = false,
 ) {
     val isActive: Boolean
@@ -103,6 +122,8 @@ class LessonViewModel(
     private val statsRepository: com.example.personallangmaster.data.repo.StatsRepository,
     private val audioFileStore: com.example.personallangmaster.core.audio.AudioFileStore,
     private val tts: com.example.personallangmaster.core.speech.TtsController,
+    /** Ставит законченный урок в очередь на разбор — он не должен теряться. */
+    private val analysisScheduler: com.example.personallangmaster.domain.AnalysisScheduler,
     /** Живёт дольше экрана: в нём дописывается урок, если модель успели очистить. */
     private val appScope: kotlinx.coroutines.CoroutineScope,
 ) : ViewModel() {
@@ -156,8 +177,35 @@ class LessonViewModel(
             .launchIn(viewModelScope)
     }
 
+    /**
+     * Объяснение перед тестом уровня: сколько длится, что будет с уровнем
+     * и сколько это стоит. Сам тест запускается уже из диалога.
+     */
+    fun requestPlacement() {
+        viewModelScope.launch {
+            val profile = profileRepository.current()
+            _state.update {
+                it.copy(
+                    placement = PlacementPrompt(
+                        currentLevel = profile?.cefrOverall
+                            ?: com.example.personallangmaster.data.db.Cefr.A1,
+                        levelLocked = profile?.levelLocked == true,
+                        alreadyPassed = profile?.createdFromPlacement == true,
+                        minutes = PLACEMENT_MINUTES,
+                        estimatedCostUsd = CostCalculator.estimateLessonCostUsd(
+                            PLACEMENT_MINUTES.toDouble()
+                        ),
+                    )
+                )
+            }
+        }
+    }
+
+    fun dismissPlacement() = _state.update { it.copy(placement = null) }
+
     /** Запуск урока. Бюджет проверяется до подключения, чтобы не тратить ни токена зря. */
     fun startLesson(mode: LessonMode = LessonMode.FREE_TALK, scenarioId: String? = null) {
+        _state.update { it.copy(placement = null) }
         viewModelScope.launch {
             settings = settingsRepository.current()
             val profile = profileRepository.current()
@@ -412,9 +460,24 @@ class LessonViewModel(
                 )
             }
 
+            // Разбор запускается сам: если ждать открытия экрана разбора,
+            // урок, после которого приложение просто закрыли, пропадает зря.
+            if (lesson != null && hasSomethingToAnalyze) {
+                analysisScheduler.schedule(lesson)
+            }
+
             _state.update { it.copy(finished = true) }
         }
     }
+
+    /**
+     * Есть ли что разбирать. Разбор пустого урока — потраченный впустую вызов
+     * модели; при выключенном хранении транскрипта разбирать нечего в принципе,
+     * потому что реплики в базу не попадают.
+     */
+    private val hasSomethingToAnalyze: Boolean
+        get() = settings.transcriptRetentionAllowed &&
+            transcript.any { it.speaker == Speaker.USER }
 
     /** Загружает сценарий, выбранный в каталоге, чтобы показать его перед стартом. */
     fun prepareScenario(scenarioId: String?) {
@@ -456,6 +519,7 @@ class LessonViewModel(
         val cost = _state.value.costUsd
         val audioPath = audioFileStore.finish()
 
+        val analysable = hasSomethingToAnalyze
         if (lesson != null && !_state.value.finished) {
             appScope.launch {
                 lessonRepository.finishLesson(
@@ -468,6 +532,7 @@ class LessonViewModel(
                     costUsd = cost,
                     audioPath = audioPath,
                 )
+                if (analysable) analysisScheduler.schedule(lesson)
             }
         }
         super.onCleared()
@@ -713,12 +778,13 @@ class LessonViewModel(
             statsRepository: com.example.personallangmaster.data.repo.StatsRepository,
             audioFileStore: com.example.personallangmaster.core.audio.AudioFileStore,
             tts: com.example.personallangmaster.core.speech.TtsController,
+            analysisScheduler: com.example.personallangmaster.domain.AnalysisScheduler,
             appScope: kotlinx.coroutines.CoroutineScope,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T = LessonViewModel(
                 settingsRepository, profileRepository, lessonRepository, statsRepository,
-                audioFileStore, tts, appScope,
+                audioFileStore, tts, analysisScheduler, appScope,
             ) as T
         }
     }

@@ -26,12 +26,26 @@ import com.example.personallangmaster.data.prefs.ProgressionPace
 import com.example.personallangmaster.data.prefs.SettingsRepository
 import com.example.personallangmaster.data.repo.ContentRepository
 import com.example.personallangmaster.data.repo.ProfileRepository
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.time.LocalDate
 
 /** Чем закончился разбор — это же видит экран. */
 sealed interface AnalysisResult {
     data class Success(val analysis: LessonAnalysis, val levelChangedTo: Cefr?) : AnalysisResult
-    data class Failure(val reason: String) : AnalysisResult
+    /**
+     * @param retriable имеет ли смысл повторить попытку позже. Сеть и квота —
+     * имеет, пустой транскрипт и неверный ключ — нет.
+     */
+    data class Failure(val reason: String, val retriable: Boolean = false) : AnalysisResult
+
+    /**
+     * Урок уже разобран — платить второй раз не за что.
+     *
+     * Такое случается штатно: фоновая задача успела разобрать урок раньше,
+     * чем человек открыл экран разбора.
+     */
+    data object AlreadyAnalyzed : AnalysisResult
 }
 
 /**
@@ -51,9 +65,22 @@ class AnalyzeLessonUseCase(
     private val textClient: GeminiTextClient = GeminiTextClient(),
 ) {
 
-    suspend operator fun invoke(lessonId: Long): AnalysisResult {
+    /**
+     * Разбирает урок. Параллельные вызовы выстраиваются в очередь: экран разбора
+     * и фоновая задача легко стартуют одновременно, а каждый разбор — платный.
+     *
+     * @param force разобрать заново, даже если урок уже разобран.
+     */
+    suspend operator fun invoke(lessonId: Long, force: Boolean = false): AnalysisResult =
+        mutex.withLock { analyze(lessonId, force) }
+
+    private suspend fun analyze(lessonId: Long, force: Boolean): AnalysisResult {
         val lesson = lessonDao.getById(lessonId)
             ?: return AnalysisResult.Failure("Урок не найден")
+
+        // Статус проверяем под замком: пока вызов ждал очереди, урок мог
+        // разобрать тот, кто держал замок до нас.
+        if (!force && lesson.status == LessonStatus.ANALYZED) return AnalysisResult.AlreadyAnalyzed
 
         val turns = lessonDao.getTurns(lessonId)
         val userTurns = turns.count { it.speaker == Speaker.USER }
@@ -93,7 +120,8 @@ class AnalyzeLessonUseCase(
         )
 
         return when (result) {
-            is TextResult.Failure -> AnalysisResult.Failure(result.reason)
+            is TextResult.Failure ->
+                AnalysisResult.Failure(result.reason, retriable = !result.invalidKey)
             is TextResult.Success -> {
                 val analysis = result.value
                 persist(lessonId, lesson.profileId, analysis)
@@ -267,6 +295,7 @@ class AnalyzeLessonUseCase(
     }
 
     private companion object {
+        val mutex = Mutex()
         const val MIN_USER_TURNS = 2
         const val PROBLEM_PHONEME_SCORE = 40
         const val LEVEL_WINDOW = 6

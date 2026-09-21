@@ -15,40 +15,53 @@ import kotlinx.serialization.json.Json
 /**
  * Наполняет справочные таблицы учебным контентом из `assets`.
  *
- * Вызывается при каждом старте, но реально работает только когда таблица пуста
- * или контент в файле обновился. Отсутствие или битый файл не ломает приложение:
+ * Вызывается при каждом старте, но реально работает, только когда таблица пуста
+ * или [SEED_VERSION] вырос. Отсутствие или битый файл не ломает приложение:
  * без сценариев остаётся свободный разговор, без фонем — тренажёр без карты звуков.
+ *
+ * Прогресс ученика при обновлении контента не страдает: оценки тем, фонем и
+ * карточки живут в отдельных таблицах и на справочники внешними ключами
+ * не завязаны.
  */
 class SeedLoader(
     private val context: Context,
     private val contentDao: ContentDao,
 ) {
 
+    private val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
     suspend fun seedIfNeeded(force: Boolean = false) = withContext(Dispatchers.IO) {
-        if (force || contentDao.scenarioCount() == 0) {
+        // Контент обновляется вместе с приложением, а не только при первой
+        // установке: иначе исправленные объяснения и новые сценарии никогда
+        // не доедут до телефона, где приложение уже стоит.
+        val refresh = force || prefs.getInt(KEY_VERSION, 0) < SEED_VERSION
+
+        if (refresh || contentDao.scenarioCount() == 0) {
             read<ScenarioDto>(FILE_SCENARIOS)?.let { dtos ->
                 contentDao.insertScenarios(dtos.map(::toEntity))
                 Log.i(TAG, "Загружено сценариев: ${dtos.size}")
             }
         }
-        if (force || contentDao.topicCount() == 0) {
+        if (refresh || contentDao.topicCount() == 0) {
             read<GrammarTopicDto>(FILE_GRAMMAR)?.let { dtos ->
                 contentDao.insertTopics(dtos.map(::toEntity))
                 Log.i(TAG, "Загружено тем грамматики: ${dtos.size}")
             }
         }
-        if (force || contentDao.phonemeCount() == 0) {
+        if (refresh || contentDao.phonemeCount() == 0) {
             read<PhonemeDto>(FILE_PHONEMES)?.let { dtos ->
                 contentDao.insertPhonemes(dtos.map(::toEntity))
                 Log.i(TAG, "Загружено фонем: ${dtos.size}")
             }
         }
-        if (force || contentDao.minimalPairCount() == 0) {
+        if (refresh || contentDao.minimalPairCount() == 0) {
             read<MinimalPairDto>(FILE_PAIRS)?.let { dtos ->
                 contentDao.insertMinimalPairs(dtos.map(::toEntity))
                 Log.i(TAG, "Загружено минимальных пар: ${dtos.size}")
             }
         }
+
+        if (refresh) prefs.edit().putInt(KEY_VERSION, SEED_VERSION).apply()
     }
 
     private inline fun <reified T> read(fileName: String): List<T>? = runCatching {
@@ -103,7 +116,16 @@ class SeedLoader(
         translation2 = dto.translation2,
     )
 
-    private companion object {
+    companion object {
+        /**
+         * Версия учебного контента в `assets`. Поднимается всякий раз, когда
+         * файлы сида меняются, — именно по ней контент перезаливается в базу.
+         */
+        const val SEED_VERSION = 1
+
+        private const val PREFS = "seed"
+        private const val KEY_VERSION = "content_version"
+
         const val TAG = "SeedLoader"
         const val FILE_SCENARIOS = "scenarios.json"
         const val FILE_GRAMMAR = "grammar_topics.json"

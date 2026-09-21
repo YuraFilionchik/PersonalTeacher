@@ -94,6 +94,9 @@ class LessonReviewViewModel(
                     showStored(lessonId)
                     _state.update { it.copy(error = result.reason) }
                 }
+
+                // Разбор успела сделать фоновая задача, пока экран открывался.
+                AnalysisResult.AlreadyAnalyzed -> showStored(lessonId)
             }
         }
     }

@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Chat
 import androidx.compose.material.icons.rounded.Send
 import androidx.compose.material.icons.rounded.Stop
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -81,6 +82,7 @@ fun LessonScreen(
             container.statsRepository,
             container.audioFileStore,
             container.ttsController,
+            container.analysisScheduler,
             container.appScope,
         )
     )
@@ -115,6 +117,27 @@ fun LessonScreen(
 
     LaunchedEffect(scenarioId) { viewModel.prepareScenario(scenarioId) }
 
+    val startLesson: (LessonMode) -> Unit = { mode ->
+        val granted = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.RECORD_AUDIO,
+        ) == PackageManager.PERMISSION_GRANTED
+
+        if (granted) {
+            viewModel.startLesson(mode, state.scenario?.id)
+        } else {
+            micLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
+
+    state.placement?.let { prompt ->
+        PlacementDialog(
+            prompt = prompt,
+            onConfirm = { startLesson(LessonMode.PLACEMENT) },
+            onDismiss = viewModel::dismissPlacement,
+        )
+    }
+
     Scaffold { innerPadding ->
         Column(
             modifier = Modifier
@@ -129,18 +152,8 @@ fun LessonScreen(
                 } else {
                     StartPanel(
                         state = state,
-                        onStart = { mode ->
-                            val granted = ContextCompat.checkSelfPermission(
-                                context,
-                                Manifest.permission.RECORD_AUDIO,
-                            ) == PackageManager.PERMISSION_GRANTED
-
-                            if (granted) {
-                                viewModel.startLesson(mode, state.scenario?.id)
-                            } else {
-                                micLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                            }
-                        },
+                        onStart = startLesson,
+                        onPlacement = viewModel::requestPlacement,
                         onOpenSettings = onOpenSettings,
                     )
                 }
@@ -381,6 +394,7 @@ private fun FinishedBar(
 private fun StartPanel(
     state: LessonUiState,
     onStart: (LessonMode) -> Unit,
+    onPlacement: () -> Unit,
     onOpenSettings: () -> Unit,
 ) {
     Column(
@@ -466,7 +480,9 @@ private fun StartPanel(
         }
         Spacer(Modifier.height(8.dp))
         if (state.scenario == null) {
-            OutlinedButton(onClick = { onStart(LessonMode.PLACEMENT) }) {
+            // Не запускаем тест прямо отсюда: сначала диалог объясняет,
+            // что именно произойдёт с уровнем профиля.
+            OutlinedButton(onClick = onPlacement) {
                 Text("Пройти тест уровня")
             }
             Spacer(Modifier.height(8.dp))
@@ -479,6 +495,56 @@ private fun StartPanel(
             )
         }
     }
+}
+
+/**
+ * Объяснение теста уровня перед запуском.
+ *
+ * Тест переписывает уровень всего профиля — от него зависят и сложность
+ * разговора, и подбор сценариев, — поэтому человек должен согласиться
+ * осознанно, а не промахнуться мимо кнопки «Начать урок».
+ */
+@Composable
+private fun PlacementDialog(
+    prompt: PlacementPrompt,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(if (prompt.alreadyPassed) "Пройти тест заново" else "Тест уровня") },
+        text = {
+            Column {
+                Text(
+                    text = "${prompt.minutes} минут разговора без поправок: тренер начинает " +
+                        "с бытовых тем и постепенно переходит к сложным. Говорите как " +
+                        "получается — задача теста не оценить вас строго, а подобрать " +
+                        "посильную сложность.",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = if (prompt.levelLocked) {
+                        "Уровень зафиксирован в настройках: результат теста будет показан " +
+                            "в разборе, но профиль останется на ${prompt.currentLevel.name}."
+                    } else {
+                        "Сейчас ваш уровень — ${prompt.currentLevel.name}. " +
+                            "После разбора он будет заменён оценкой теста, даже если она ниже."
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = "Примерная стоимость: " +
+                        CostCalculator.formatUsd(prompt.estimatedCostUsd),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        },
+        confirmButton = { Button(onClick = onConfirm) { Text("Начать тест") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Не сейчас") } },
+    )
 }
 
 private fun micState(state: LessonUiState): MicButtonState = when (state.sessionState) {

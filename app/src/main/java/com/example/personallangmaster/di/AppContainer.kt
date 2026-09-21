@@ -15,10 +15,12 @@ import com.example.personallangmaster.data.repo.ProfileRepository
 import com.example.personallangmaster.data.repo.StatsRepository
 import com.example.personallangmaster.data.repo.VocabRepository
 import com.example.personallangmaster.data.seed.SeedLoader
+import com.example.personallangmaster.domain.AnalysisScheduler
 import com.example.personallangmaster.domain.AnalyzeLessonUseCase
 import com.example.personallangmaster.domain.GenerateExercisesUseCase
 import com.example.personallangmaster.domain.GenerateScenarioUseCase
 import com.example.personallangmaster.work.Notifications
+import com.example.personallangmaster.work.WorkAnalysisScheduler
 import com.example.personallangmaster.work.WorkScheduler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -74,6 +76,9 @@ class AppContainer(context: Context) {
             profileRepository = profileRepository,
         )
     }
+    /** Ставит завершённый урок в очередь на разбор. */
+    val analysisScheduler: AnalysisScheduler by lazy { WorkAnalysisScheduler(appContext) }
+
     val generateScenarioUseCase: GenerateScenarioUseCase by lazy {
         GenerateScenarioUseCase(
             settingsRepository = settingsRepository,

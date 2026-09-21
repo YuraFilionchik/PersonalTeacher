@@ -68,8 +68,15 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun handleIntent(intent: Intent?) {
-        if (intent?.action == Notifications.ACTION_START_REVIEW) {
-            pendingRouteState.value = Route.VocabReview
+        pendingRouteState.value = when (intent?.action) {
+            Notifications.ACTION_START_REVIEW -> Route.VocabReview
+
+            Notifications.ACTION_OPEN_LESSON_REVIEW -> {
+                val lessonId = intent.getLongExtra(Notifications.EXTRA_LESSON_ID, -1L)
+                if (lessonId > 0L) Route.Review(lessonId) else null
+            }
+
+            else -> null
         }
     }
 }
