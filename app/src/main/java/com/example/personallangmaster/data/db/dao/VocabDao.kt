@@ -55,6 +55,13 @@ interface VocabDao {
     @Query("DELETE FROM vocab_item WHERE id = :itemId")
     suspend fun delete(itemId: Long)
 
+    /** Слово переживает удаление урока: учить его всё равно нужно. */
+    @Query("UPDATE vocab_item SET sourceLessonId = NULL WHERE sourceLessonId IN (:lessonIds)")
+    suspend fun unlinkLessons(lessonIds: List<Long>)
+
+    @Query("DELETE FROM vocab_item WHERE sourceLessonId IN (:lessonIds)")
+    suspend fun deleteOfLessons(lessonIds: List<Long>)
+
     @Insert
     suspend fun insertReview(review: VocabReviewEntity)
 
