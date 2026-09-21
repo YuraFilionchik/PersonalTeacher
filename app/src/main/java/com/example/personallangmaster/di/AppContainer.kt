@@ -10,6 +10,7 @@ import com.example.personallangmaster.core.speech.TtsController
 import com.example.personallangmaster.data.db.AppDatabase
 import com.example.personallangmaster.data.prefs.SettingsRepository
 import com.example.personallangmaster.data.repo.ContentRepository
+import com.example.personallangmaster.data.repo.LessonHistoryRepository
 import com.example.personallangmaster.data.repo.LessonRepository
 import com.example.personallangmaster.data.repo.ProfileRepository
 import com.example.personallangmaster.data.repo.StatsRepository
@@ -49,6 +50,13 @@ class AppContainer(context: Context) {
             lessonDao = database.lessonDao(),
             vocabDao = database.vocabDao(),
             contentDao = database.contentDao(),
+            statsDao = database.statsDao(),
+        )
+    }
+    val lessonHistoryRepository: LessonHistoryRepository by lazy {
+        LessonHistoryRepository(
+            lessonDao = database.lessonDao(),
+            vocabDao = database.vocabDao(),
             statsDao = database.statsDao(),
         )
     }
