@@ -18,6 +18,7 @@ import com.example.personallangmaster.data.repo.VocabRepository
 import com.example.personallangmaster.domain.LessonHousekeeping
 import com.example.personallangmaster.domain.LessonSelection
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -263,12 +264,17 @@ class ProgressViewModel(
         if (ids.isEmpty()) return
 
         // Одно отложенное удаление за раз: второе подтверждение означает,
-        // что первое человек уже не отменит.
+        // что первое человек уже не отменит. Отменяем и сам таймер первого —
+        // иначе он всё равно долетит и подтвердит уже второе удаление раньше срока.
+        pendingJob?.cancel()
         commitPendingDelete()
 
         hidden = hidden + ids
         pendingDelete = PendingDelete(ids, scope)
-        pendingJob = appScope.launch {
+        // Main.immediate — чтобы таймер трогал pendingDelete/pendingJob с того же
+        // потока, что deleteLessons/onCleared: без этого гонка между потоками
+        // может удвоить удаление одних и тех же уроков.
+        pendingJob = appScope.launch(Dispatchers.Main.immediate) {
             delay(UNDO_MILLIS)
             commitPendingDelete()
         }
