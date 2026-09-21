@@ -29,9 +29,9 @@ sealed interface Route : NavKey {
     @Serializable
     data object Settings : Route
 
-    /** Разбор конкретного урока. */
+    /** Разбор конкретного урока. `showTranscript` сразу раскрывает секцию с репликами. */
     @Serializable
-    data class Review(val lessonId: Long) : Route
+    data class Review(val lessonId: Long, val showTranscript: Boolean = false) : Route
 
     /** Весь словарь профиля. */
     @Serializable

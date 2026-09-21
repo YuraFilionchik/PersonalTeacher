@@ -176,7 +176,11 @@ fun PersonalLangMasterApp(
                     )
                 }
                 entry<Route.Review> { key ->
-                    LessonReviewScreen(lessonId = key.lessonId, onBack = goBack)
+                    LessonReviewScreen(
+                        lessonId = key.lessonId,
+                        showTranscript = key.showTranscript,
+                        onBack = goBack,
+                    )
                 }
                 entry<Route.Settings> {
                     SettingsScreen(

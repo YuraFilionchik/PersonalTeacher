@@ -11,6 +11,7 @@ import com.example.personallangmaster.data.db.Speaker
 import com.example.personallangmaster.data.db.dao.LessonDao
 import com.example.personallangmaster.data.db.entity.LessonEntity
 import com.example.personallangmaster.data.db.entity.MistakeEntity
+import com.example.personallangmaster.data.db.entity.TurnEntity
 import com.example.personallangmaster.domain.AnalysisResult
 import com.example.personallangmaster.domain.AnalyzeLessonUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,7 @@ data class ReviewUiState(
     val loading: Boolean = true,
     val lesson: LessonEntity? = null,
     val mistakes: List<MistakeRow> = emptyList(),
+    val turns: List<TurnEntity> = emptyList(),
     val vocabAdded: Int = 0,
     val nextFocus: List<String> = emptyList(),
     val praise: String = "",
@@ -140,6 +142,7 @@ class LessonReviewViewModel(
                 loading = false,
                 lesson = lesson,
                 mistakes = mistakes,
+                turns = turns,
                 hasRecording = player.isAvailable(lesson.audioPath),
             )
         }
@@ -152,7 +155,7 @@ class LessonReviewViewModel(
      * что записала модель в разборе, дословно.
      */
     private fun findOffset(
-        turns: List<com.example.personallangmaster.data.db.entity.TurnEntity>,
+        turns: List<TurnEntity>,
         mistake: MistakeEntity,
     ): Long? {
         val needle = normalize(mistake.original)

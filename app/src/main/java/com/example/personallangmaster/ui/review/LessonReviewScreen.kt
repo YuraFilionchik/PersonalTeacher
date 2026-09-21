@@ -1,5 +1,6 @@
 package com.example.personallangmaster.ui.review
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +13,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.VolumeUp
@@ -19,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -31,6 +35,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.personallangmaster.data.db.MistakeType
+import com.example.personallangmaster.data.db.Speaker
 import com.example.personallangmaster.di.LocalAppContainer
 
 /**
@@ -48,7 +56,11 @@ import com.example.personallangmaster.di.LocalAppContainer
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LessonReviewScreen(lessonId: Long, onBack: () -> Unit) {
+fun LessonReviewScreen(
+    lessonId: Long,
+    showTranscript: Boolean = false,
+    onBack: () -> Unit,
+) {
     val container = LocalAppContainer.current
     val viewModel: LessonReviewViewModel = viewModel(
         factory = LessonReviewViewModel.factory(
@@ -59,6 +71,7 @@ fun LessonReviewScreen(lessonId: Long, onBack: () -> Unit) {
         )
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
+    var transcriptOpen by remember { mutableStateOf(showTranscript) }
 
     LaunchedEffect(lessonId) { viewModel.load(lessonId) }
 
@@ -252,6 +265,45 @@ fun LessonReviewScreen(lessonId: Long, onBack: () -> Unit) {
                         Spacer(Modifier.height(8.dp))
                         OutlinedButton(onClick = { viewModel.retry(lessonId) }) {
                             Text("Попробовать снова")
+                        }
+                    }
+                }
+            }
+
+            if (state.turns.isNotEmpty()) {
+                HorizontalDivider(Modifier.padding(top = 16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { transcriptOpen = !transcriptOpen }
+                        .padding(start = 16.dp, end = 16.dp, top = 20.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Транскрипт (реплик: ${state.turns.size})",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    Icon(
+                        imageVector = if (transcriptOpen) Icons.Rounded.ExpandLess
+                        else Icons.Rounded.ExpandMore,
+                        contentDescription = if (transcriptOpen) "Свернуть" else "Развернуть",
+                    )
+                }
+
+                if (transcriptOpen) {
+                    state.turns.forEach { turn ->
+                        val mine = turn.speaker == Speaker.USER
+                        Column(Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
+                            Text(
+                                text = if (mine) "Я" else "Тренер",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Medium,
+                                color = if (mine) MaterialTheme.colorScheme.primary
+                                else MaterialTheme.colorScheme.tertiary,
+                            )
+                            Text(turn.text, style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }
