@@ -14,7 +14,8 @@ data class CalendarDay(
     val inMonth: Boolean,
     val isToday: Boolean,
     val total: Int,
-    val analyzed: Int,
+    /** Решённые уроки дня: разобранные и закрытые без разбора — по ним больше нечего спрашивать. */
+    val settled: Int,
 )
 
 /** Раскладка месяца по клеткам: неделя начинается с понедельника. */
@@ -45,7 +46,11 @@ object LessonCalendar {
                     inMonth = inMonth,
                     isToday = date == today,
                     total = dayLessons.size,
-                    analyzed = dayLessons.count { it.status == LessonStatus.ANALYZED },
+                    // SKIPPED — тоже принятое решение, а не то, что ждёт разбора:
+                    // календарь не должен звать разобрать урок, который уже закрыли осознанно.
+                    settled = dayLessons.count {
+                        it.status == LessonStatus.ANALYZED || it.status == LessonStatus.SKIPPED
+                    },
                 )
             }
             .toList()

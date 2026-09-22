@@ -11,6 +11,7 @@ import com.example.personallangmaster.data.db.Speaker
 import com.example.personallangmaster.data.db.dao.LessonDao
 import com.example.personallangmaster.data.db.entity.LessonEntity
 import com.example.personallangmaster.data.db.entity.MistakeEntity
+import com.example.personallangmaster.data.db.entity.TurnEntity
 import com.example.personallangmaster.domain.AnalysisResult
 import com.example.personallangmaster.domain.AnalyzeLessonUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,7 @@ data class ReviewUiState(
     val loading: Boolean = true,
     val lesson: LessonEntity? = null,
     val mistakes: List<MistakeRow> = emptyList(),
+    val turns: List<TurnEntity> = emptyList(),
     val vocabAdded: Int = 0,
     val nextFocus: List<String> = emptyList(),
     val praise: String = "",
@@ -62,7 +64,12 @@ class LessonReviewViewModel(
         }
     }
 
-    fun load(lessonId: Long, analyzeIfNeeded: Boolean = true) {
+    /**
+     * @param force разобрать, даже если урок закрыт без разбора (SKIPPED) —
+     * без этого параметра [AnalyzeLessonUseCase] сам откажет в повторном платном
+     * вызове, и кнопка «Разобрать всё равно» иначе была бы бутафорской.
+     */
+    fun load(lessonId: Long, analyzeIfNeeded: Boolean = true, force: Boolean = false) {
         viewModelScope.launch {
             _state.update { it.copy(loading = true, error = null) }
 
@@ -77,7 +84,7 @@ class LessonReviewViewModel(
                 return@launch
             }
 
-            when (val result = analyzeLesson(lessonId)) {
+            when (val result = analyzeLesson(lessonId, force)) {
                 is AnalysisResult.Success -> {
                     showStored(lessonId)
                     _state.update {
@@ -101,8 +108,11 @@ class LessonReviewViewModel(
         }
     }
 
-    /** Повторить разбор: полезно, когда первый раз не было сети. */
-    fun retry(lessonId: Long) = load(lessonId)
+    /**
+     * Повторить разбор: полезно, когда первый раз не было сети, а для урока,
+     * закрытого без разбора, [force] — это единственный путь всё же его разобрать.
+     */
+    fun retry(lessonId: Long, force: Boolean = false) = load(lessonId, force = force)
 
     // --- Запись урока ---
 
@@ -140,6 +150,7 @@ class LessonReviewViewModel(
                 loading = false,
                 lesson = lesson,
                 mistakes = mistakes,
+                turns = turns,
                 hasRecording = player.isAvailable(lesson.audioPath),
             )
         }
@@ -152,7 +163,7 @@ class LessonReviewViewModel(
      * что записала модель в разборе, дословно.
      */
     private fun findOffset(
-        turns: List<com.example.personallangmaster.data.db.entity.TurnEntity>,
+        turns: List<TurnEntity>,
         mistake: MistakeEntity,
     ): Long? {
         val needle = normalize(mistake.original)

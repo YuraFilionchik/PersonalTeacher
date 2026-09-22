@@ -45,6 +45,13 @@ interface StatsDao {
     @Query("DELETE FROM usage_log WHERE at < :before")
     suspend fun deleteUsageOlderThan(before: Long)
 
+    /** Деньги потрачены независимо от того, сохранился ли урок: месячный итог должен сойтись. */
+    @Query("UPDATE usage_log SET lessonId = NULL WHERE lessonId IN (:lessonIds)")
+    suspend fun unlinkLessons(lessonIds: List<Long>)
+
+    @Query("DELETE FROM usage_log WHERE lessonId IN (:lessonIds)")
+    suspend fun deleteOfLessons(lessonIds: List<Long>)
+
     @Upsert
     suspend fun upsertDailyStat(stat: DailyStatEntity)
 

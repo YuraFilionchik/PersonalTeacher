@@ -140,27 +140,27 @@ private fun DayCell(
         )
 
         Spacer(Modifier.height(3.dp))
-        LessonDots(total = day.total, analyzed = day.analyzed)
+        LessonDots(total = day.total, settled = day.settled)
     }
 }
 
-/** Точки по урокам дня: залитая — разобран, контурная — ждёт разбора. */
+/** Точки по урокам дня: залитая — решённый (разобран или закрыт без разбора), контурная — ждёт разбора. */
 @Composable
-private fun LessonDots(total: Int, analyzed: Int) {
+private fun LessonDots(total: Int, settled: Int) {
     if (total == 0) {
         Spacer(Modifier.height(6.dp))
         return
     }
 
     val shown = minOf(total, MAX_DOTS)
-    val shownAnalyzed = minOf(analyzed, shown)
+    val shownSettled = minOf(settled, shown)
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(shown) { index ->
-            val filled = index < shownAnalyzed
+            val filled = index < shownSettled
             Box(
                 modifier = Modifier
                     .size(6.dp)

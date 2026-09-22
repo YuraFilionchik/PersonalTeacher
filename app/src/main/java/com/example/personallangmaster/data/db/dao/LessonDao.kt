@@ -32,6 +32,22 @@ interface LessonDao {
     @Query("SELECT * FROM lesson WHERE id = :lessonId")
     suspend fun getById(lessonId: Long): LessonEntity?
 
+    @Query("SELECT * FROM lesson WHERE id IN (:lessonIds)")
+    suspend fun getByIds(lessonIds: List<Long>): List<LessonEntity>
+
+    /** Реплики уйдут сами: у них внешний ключ на урок с каскадом. */
+    @Query("DELETE FROM lesson WHERE id IN (:lessonIds)")
+    suspend fun deleteLessons(lessonIds: List<Long>)
+
+    @Query("UPDATE lesson SET audioPath = NULL WHERE id IN (:lessonIds)")
+    suspend fun clearAudioPaths(lessonIds: List<Long>)
+
+    @Query("UPDATE lesson SET note = :note WHERE id = :lessonId")
+    suspend fun setNote(lessonId: Long, note: String?)
+
+    @Query("UPDATE lesson SET status = :status WHERE id = :lessonId")
+    suspend fun setStatus(lessonId: Long, status: LessonStatus)
+
     /** Уроки за произвольный отрезок — месяц календаря на экране прогресса. */
     @Query(
         "SELECT * FROM lesson WHERE profileId = :profileId " +
@@ -107,4 +123,14 @@ interface LessonDao {
 
     @Query("UPDATE mistake SET resolved = 1 WHERE id IN (:ids)")
     suspend fun markResolved(ids: List<Long>)
+
+    /**
+     * Обнуляет ссылку на урок, сохраняя саму ошибку: статистика и рекомендации
+     * тем продолжают на неё опираться даже после удаления разговора.
+     */
+    @Query("UPDATE mistake SET lessonId = NULL WHERE lessonId IN (:lessonIds)")
+    suspend fun unlinkMistakes(lessonIds: List<Long>)
+
+    @Query("DELETE FROM mistake WHERE lessonId IN (:lessonIds)")
+    suspend fun deleteMistakesOfLessons(lessonIds: List<Long>)
 }

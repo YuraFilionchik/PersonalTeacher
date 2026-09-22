@@ -1,7 +1,8 @@
 package com.example.personallangmaster.ui.progress
 
-import androidx.compose.foundation.clickable
+import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -15,32 +16,48 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MenuBook
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.personallangmaster.R
 import com.example.personallangmaster.core.cost.CostCalculator
-import com.example.personallangmaster.data.db.LessonStatus
 import com.example.personallangmaster.data.db.UsageKind
 import com.example.personallangmaster.di.LocalAppContainer
+import com.example.personallangmaster.domain.LessonHousekeeping
 import com.example.personallangmaster.ui.components.StatTile
-import java.time.Instant
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 /**
@@ -48,7 +65,10 @@ import java.time.format.DateTimeFormatter
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun ProgressScreen(onOpenReview: (Long) -> Unit) {
+fun ProgressScreen(
+    onOpenReview: (Long) -> Unit,
+    onOpenTranscript: (Long) -> Unit,
+) {
     val container = LocalAppContainer.current
     val viewModel: ProgressViewModel = viewModel(
         factory = ProgressViewModel.factory(
@@ -56,12 +76,60 @@ fun ProgressScreen(onOpenReview: (Long) -> Unit) {
             container.statsRepository,
             container.vocabRepository,
             container.database.lessonDao(),
+            container.lessonHistoryRepository,
+            container.appScope,
         )
     )
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val snackbarHost = remember { SnackbarHostState() }
+
+    var deleteRequest by remember { mutableStateOf<List<Long>?>(null) }
+    var skipRequest by remember { mutableStateOf<Long?>(null) }
+    var clearRecordingsRequest by remember { mutableStateOf(false) }
+
+    // Сообщение и отмена живут здесь: ViewModel не должна знать про Snackbar.
+    // Ключ — token, а не само сообщение: у двух одинаковых по тексту сообщений
+    // (например, "Урок удалён" после двух разных удалений) без него эффект
+    // не перезапустился бы, второй снекбар не показался бы, а «Отменить»
+    // у первого отменяло бы уже не тот урок.
+    LaunchedEffect(state.message?.token) {
+        val message = state.message ?: return@LaunchedEffect
+        if (message.undoable) {
+            // Окно отмены и время показа снекбара должны совпадать: показываем
+            // снекбар ровно UNDO_MILLIS, чтобы «Отменить» не пропадал с экрана,
+            // пока удаление ещё можно отменить.
+            val dismissJob = launch {
+                delay(ProgressViewModel.UNDO_MILLIS)
+                snackbarHost.currentSnackbarData?.dismiss()
+            }
+            val result = snackbarHost.showSnackbar(
+                message = message.text,
+                actionLabel = "Отменить",
+                duration = SnackbarDuration.Indefinite,
+            )
+            dismissJob.cancel()
+            if (result == SnackbarResult.ActionPerformed) viewModel.undoDelete() else viewModel.consumeMessage()
+        } else {
+            snackbarHost.showSnackbar(message = message.text, duration = SnackbarDuration.Short)
+            viewModel.consumeMessage()
+        }
+    }
+
+    LaunchedEffect(state.shareText) {
+        val text = state.shareText ?: return@LaunchedEffect
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_SUBJECT, "PersonalLangMaster: транскрипт урока")
+            putExtra(Intent.EXTRA_TEXT, text)
+        }
+        context.startActivity(Intent.createChooser(intent, "Поделиться транскриптом"))
+        viewModel.consumeShare()
+    }
 
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.nav_progress)) }) },
+        snackbarHost = { SnackbarHost(snackbarHost) },
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -208,10 +276,55 @@ fun ProgressScreen(onOpenReview: (Long) -> Unit) {
                 onSelectDay = viewModel::selectDay,
             )
 
-            SectionTitle(
-                state.selectedDay?.let { day -> "Уроки ${formatDay(day)}" }
-                    ?: "Уроки за месяц (${state.lessonsTotal})"
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 4.dp, top = 20.dp, bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = state.selectedDay?.let { day -> "Уроки ${formatDay(day)}" }
+                        ?: "Уроки за месяц (${state.lessonsTotal})",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+
+                var listMenuOpen by remember { mutableStateOf(false) }
+                Box {
+                    IconButton(onClick = { listMenuOpen = true }) {
+                        Icon(Icons.Rounded.MoreVert, contentDescription = "Действия со списком")
+                    }
+                    DropdownMenu(
+                        expanded = listMenuOpen,
+                        onDismissRequest = { listMenuOpen = false },
+                    ) {
+                        DropdownMenuItem(
+                            text = {
+                                Text("Удалить несостоявшиеся за месяц (${state.failedCount})")
+                            },
+                            enabled = state.failedCount > 0,
+                            onClick = {
+                                listMenuOpen = false
+                                deleteRequest = viewModel.failedLessonIds()
+                            },
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    "Очистить записи за месяц · " +
+                                        LessonHousekeeping.formatSize(state.recordingBytes)
+                                )
+                            },
+                            enabled = state.recordingLessons > 0,
+                            onClick = {
+                                listMenuOpen = false
+                                clearRecordingsRequest = true
+                            },
+                        )
+                    }
+                }
+            }
 
             FlowRow(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
@@ -223,6 +336,27 @@ fun ProgressScreen(onOpenReview: (Long) -> Unit) {
                         onClick = { viewModel.setFilter(filter) },
                         label = { Text(ProgressViewModel.filterTitle(filter)) },
                     )
+                }
+            }
+
+            if (state.selection.active) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Выбрано: ${state.selection.count}",
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Row {
+                        TextButton(onClick = { deleteRequest = state.selection.ids.toList() }) {
+                            Text("Удалить")
+                        }
+                        TextButton(onClick = viewModel::clearSelection) { Text("Снять") }
+                    }
                 }
             }
 
@@ -239,57 +373,69 @@ fun ProgressScreen(onOpenReview: (Long) -> Unit) {
                 )
             }
             state.recentLessons.forEach { lesson ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp)
-                        .clickable { onOpenReview(lesson.id) },
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
-                ) {
-                    Column(Modifier.padding(12.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                        ) {
-                            Text(
-                                text = formatDate(lesson.startedAt),
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                            Text(
-                                text = "${lesson.durationSec / 60} мин · " +
-                                    CostCalculator.formatUsd(lesson.costUsd),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-
-                        // Состояние видно сразу: неразобранный урок — это
-                        // предложение открыть его и разобрать, а не потеря.
-                        Text(
-                            text = ProgressViewModel.lessonStatusTitle(lesson.status),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = when (lesson.status) {
-                                LessonStatus.ANALYZED -> MaterialTheme.colorScheme.primary
-                                LessonStatus.FAILED -> MaterialTheme.colorScheme.onSurfaceVariant
-                                else -> MaterialTheme.colorScheme.tertiary
-                            },
-                        )
-
-                        lesson.summaryRu?.let { summary ->
-                            Text(
-                                text = summary.take(100),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
+                LessonHistoryCard(
+                    lesson = lesson,
+                    selectionActive = state.selection.active,
+                    selected = lesson.id in state.selection.ids,
+                    recordingSize = state.recordingSizes[lesson.id]
+                        ?.let(LessonHousekeeping::formatSize),
+                    onOpen = {
+                        if (state.selection.active) viewModel.toggleSelection(lesson.id)
+                        else onOpenReview(lesson.id)
+                    },
+                    onLongPress = { viewModel.startSelection(lesson.id) },
+                    onOpenTranscript = { onOpenTranscript(lesson.id) },
+                    onShareTranscript = { viewModel.requestShare(lesson.id) },
+                    onEditNote = { viewModel.openNote(lesson.id) },
+                    onMarkSkipped = { skipRequest = lesson.id },
+                    onDeleteRecording = { viewModel.deleteRecordings(listOf(lesson.id)) },
+                    onDelete = { deleteRequest = listOf(lesson.id) },
+                )
             }
 
             Spacer(Modifier.height(32.dp))
         }
+    }
+
+    deleteRequest?.let { ids ->
+        DeleteLessonsDialog(
+            count = ids.size,
+            onDismiss = { deleteRequest = null },
+            onConfirm = { scope ->
+                viewModel.deleteLessons(ids, scope)
+                deleteRequest = null
+            },
+        )
+    }
+
+    skipRequest?.let { lessonId ->
+        MarkSkippedDialog(
+            onDismiss = { skipRequest = null },
+            onConfirm = {
+                viewModel.markSkipped(lessonId)
+                skipRequest = null
+            },
+        )
+    }
+
+    if (clearRecordingsRequest) {
+        ClearRecordingsDialog(
+            count = state.recordingLessons,
+            sizeLabel = LessonHousekeeping.formatSize(state.recordingBytes),
+            onDismiss = { clearRecordingsRequest = false },
+            onConfirm = {
+                viewModel.deleteRecordings(viewModel.recordingLessonIds())
+                clearRecordingsRequest = false
+            },
+        )
+    }
+
+    state.note?.let { request ->
+        LessonNoteDialog(
+            initial = request.text,
+            onDismiss = viewModel::dismissNote,
+            onSave = { text -> viewModel.saveNote(request.lessonId, text) },
+        )
     }
 }
 
@@ -309,10 +455,6 @@ private fun usageTitle(kind: UsageKind): String = when (kind) {
     UsageKind.TEXT_IN -> "Текст: запросы"
     UsageKind.TEXT_OUT -> "Текст: разборы и упражнения"
 }
-
-private fun formatDate(millis: Long): String = Instant.ofEpochMilli(millis)
-    .atZone(ZoneId.systemDefault())
-    .format(DateTimeFormatter.ofPattern("d MMMM, HH:mm"))
 
 private fun formatDay(date: LocalDate): String =
     date.format(DateTimeFormatter.ofPattern("d MMMM"))

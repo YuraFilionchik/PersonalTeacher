@@ -1374,7 +1374,8 @@ git commit -m "Диалоги удаления урока, закрытия бе
 
 **Files:**
 - Create: `app/src/main/java/com/example/personallangmaster/ui/progress/LessonHistoryCard.kt`
-- Modify: `app/src/main/java/com/example/personallangmaster/ui/progress/ProgressScreen.kt` (удалить старую отрисовку карточки — она заменяется вызовом нового компонента в Task 10)
+
+`ProgressScreen.kt` эта задача **не трогает**: старую отрисовку карточки заменяет Task 10, иначе экран останется в полуразобранном виде между двумя задачами.
 
 **Interfaces:**
 - Consumes: `ProgressViewModel.lessonStatusTitle`, `LessonEntity`.
@@ -1869,9 +1870,14 @@ import com.example.personallangmaster.domain.LessonHousekeeping
                 }
 ```
 
-Это не скомпилируется, пока у `Route.Review` нет параметра `showTranscript` — он добавляется в Task 11. Выполняйте Task 11 сразу следом.
+Здесь используется параметр `Route.Review.showTranscript`, который добавляет Task 11. **Поэтому Task 11 выполняется раньше Task 10**: она самодостаточна (у параметра маршрута и у параметра экрана есть значения по умолчанию, старые вызовы продолжают компилироваться), а Task 10 после неё собирается целиком. Если Task 11 ещё не сделана — сделайте её первой.
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 8: Собрать проект**
+
+Run: `./gradlew :app:assembleDebug`
+Expected: BUILD SUCCESSFUL
+
+- [ ] **Step 9: Commit**
 
 ```bash
 git add app/src/main/java/com/example/personallangmaster/ui/progress/ProgressScreen.kt app/src/main/java/com/example/personallangmaster/ui/PersonalLangMasterApp.kt

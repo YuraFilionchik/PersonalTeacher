@@ -73,6 +73,8 @@ data class LessonEntity(
     val vocabularyScore: Int? = null,
     val audioPath: String? = null,
     val status: LessonStatus = LessonStatus.ACTIVE,
+    /** Своя пометка от руки: «говорили про работу», «плохая связь». */
+    val note: String? = null,
 )
 
 /** Реплика диалога. Хранится, если в настройках не отключено хранение транскриптов. */
