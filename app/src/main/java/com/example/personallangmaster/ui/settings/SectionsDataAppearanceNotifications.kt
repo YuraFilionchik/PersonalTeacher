@@ -5,12 +5,16 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,9 +24,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.personallangmaster.R
 import com.example.personallangmaster.data.prefs.AudioRecording
@@ -34,7 +42,21 @@ import com.example.personallangmaster.data.prefs.WaveStyle
 @Composable
 fun DataSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
     val settings by viewModel.settings.collectAsStateWithLifecycle()
+    val backupState by viewModel.backupState.collectAsStateWithLifecycle()
+    val container = com.example.personallangmaster.di.LocalAppContainer.current
     var confirmClear by remember { mutableStateOf(false) }
+    var exportDialog by remember { mutableStateOf(false) }
+    var includeApiKey by remember { mutableStateOf(false) }
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument("application/json")
+    ) { uri -> if (uri != null) viewModel.exportBackup(uri, includeApiKey) }
+
+    // Тип фильтруем широко: файловые менеджеры нередко отдают JSON как
+    // octet-stream, и строгий фильтр просто прячет собственный же бэкап.
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri -> if (uri != null) viewModel.prepareImport(uri) }
 
     SettingsScaffold(stringResource(R.string.settings_section_data), onBack) {
         SettingsGroup("Транскрипты") {
@@ -99,20 +121,119 @@ fun DataSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
         SettingsGroup("Перенос и сброс") {
             SettingsRow(
                 title = stringResource(R.string.settings_data_export_title),
-                subtitle = "Появится вместе с модулем резервных копий",
-                enabled = false,
+                subtitle = "Файл с профилем, настройками, словарём и прогрессом",
+                enabled = backupState !is BackupUiState.Running,
+                onClick = {
+                    includeApiKey = false
+                    exportDialog = true
+                },
             )
             SettingsRow(
                 title = stringResource(R.string.settings_data_import_title),
-                subtitle = "Появится вместе с модулем резервных копий",
-                enabled = false,
+                subtitle = "Восстановить из ранее сохранённого файла",
+                enabled = backupState !is BackupUiState.Running,
+                onClick = { importLauncher.launch(arrayOf("application/json", "*/*")) },
             )
             SettingsRow(
                 title = stringResource(R.string.settings_data_clear_title),
                 subtitle = "Профиль, история, словарь и настройки",
                 onClick = { confirmClear = true },
             )
+            SettingsNote(
+                "Уроки и транскрипты в файл не попадают: копия нужна для переноса профиля, " +
+                    "а не для архива разговоров."
+            )
         }
+    }
+
+    if (exportDialog) {
+        AlertDialog(
+            onDismissRequest = { exportDialog = false },
+            title = { Text(stringResource(R.string.settings_data_export_title)) },
+            text = {
+                Column {
+                    Text(
+                        "В файл попадут профиль и уровень, все настройки, словарь вместе с " +
+                            "расписанием повторений, серия дней и статистика."
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 12.dp)
+                            .clickable { includeApiKey = !includeApiKey },
+                    ) {
+                        Checkbox(checked = includeApiKey, onCheckedChange = { includeApiKey = it })
+                        Column(modifier = Modifier.padding(start = 4.dp)) {
+                            Text("Положить ключ API")
+                            Text(
+                                "Ключ запишется открытым текстом — тогда файл надо беречь как пароль",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        exportDialog = false
+                        exportLauncher.launch(viewModel.suggestedBackupFileName())
+                    }
+                ) { Text("Сохранить") }
+            },
+            dismissButton = {
+                TextButton(onClick = { exportDialog = false }) {
+                    Text(stringResource(R.string.dialog_cancel))
+                }
+            },
+        )
+    }
+
+    when (val state = backupState) {
+        is BackupUiState.Confirm -> AlertDialog(
+            onDismissRequest = viewModel::dismissBackupState,
+            title = { Text(stringResource(R.string.settings_data_import_title)) },
+            text = {
+                Column {
+                    Text(
+                        "Профиль «${state.summary.name}», уровень ${state.summary.level}" +
+                            backupDateSuffix(state.summary.exportedAt) + ".\n" +
+                            "Слов в словаре: ${state.summary.vocabCount}, дней статистики: " +
+                            "${state.summary.dayCount}." +
+                            if (state.summary.hasApiKey) "\nВ файле есть ключ API." else ""
+                    )
+                    SettingsNote(
+                        "Текущий профиль со всей историей уроков будет удалён и заменён " +
+                            "содержимым файла. Отменить это нельзя."
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.confirmImport(state.backup) { container.rescheduleReminders() }
+                    }
+                ) { Text("Заменить") }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::dismissBackupState) {
+                    Text(stringResource(R.string.dialog_cancel))
+                }
+            },
+        )
+
+        is BackupUiState.Message -> AlertDialog(
+            onDismissRequest = viewModel::dismissBackupState,
+            title = { Text(if (state.isError) "Не получилось" else "Готово") },
+            text = { Text(state.text) },
+            confirmButton = {
+                TextButton(onClick = viewModel::dismissBackupState) { Text("Понятно") }
+            },
+        )
+
+        else -> Unit
     }
 
     if (confirmClear) {
@@ -135,6 +256,14 @@ fun DataSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
         )
     }
 }
+
+/** «, сохранён 21.09.2026» — пустая строка, если дата в файле не проставлена. */
+private fun backupDateSuffix(exportedAt: Long): String =
+    if (exportedAt <= 0L) {
+        ""
+    } else {
+        ", сохранён " + SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(Date(exportedAt))
+    }
 
 @Composable
 fun AppearanceSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {

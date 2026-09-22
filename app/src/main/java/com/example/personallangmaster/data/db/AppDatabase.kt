@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.personallangmaster.data.db.dao.BackupDao
 import com.example.personallangmaster.data.db.dao.ContentDao
 import com.example.personallangmaster.data.db.dao.LessonDao
 import com.example.personallangmaster.data.db.dao.ProfileDao
@@ -63,6 +64,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun vocabDao(): VocabDao
     abstract fun contentDao(): ContentDao
     abstract fun statsDao(): StatsDao
+    abstract fun backupDao(): BackupDao
 
     companion object {
         private const val NAME = "personallangmaster.db"

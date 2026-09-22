@@ -90,6 +90,7 @@ fun PersonalLangMasterApp(
             container.settingsRepository,
             container.profileRepository,
             container.database,
+            container.backupRepository,
         )
     )
 

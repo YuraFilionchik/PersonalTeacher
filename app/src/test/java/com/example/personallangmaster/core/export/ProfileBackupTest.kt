@@ -8,54 +8,72 @@ import org.junit.Test
 
 class ProfileBackupTest {
 
-    @Test
-    fun `exportToJson and importFromJson works correctly`() {
-        val original = ProfileBackup(
-            version = 1,
+    private fun sample() = ProfileBackup(
+        exportedAt = 1_700_000_000_000L,
+        profile = ProfileBackupData(
             name = "Test User",
             targetLang = "en",
             cefrOverall = "B1",
-            interests = "Coding",
-            goals = null,
-            vocabItems = listOf(
-                VocabBackupItem("apple", "яблоко", 2.5, 5, "REVIEW")
-            ),
-            stats = StatsBackup(10, 15, 120)
-        )
+            interests = listOf("Coding"),
+            goals = "Работа",
+        ),
+        settings = SettingsBackup(tutorName = "Kate", strictness = 4),
+        vocab = listOf(
+            VocabBackupItem(
+                term = "apple",
+                translationRu = "яблоко",
+                ease = 2.5,
+                intervalDays = 5,
+                state = "REVIEW",
+            )
+        ),
+        progress = ProgressBackup(
+            streak = StreakBackup(current = 10, longest = 15),
+            dailyStats = listOf(DailyStatBackup(epochDay = 20_000, minutesSpoken = 12.0)),
+            grammar = listOf(GrammarProgressBackup(topicId = "present_simple", mastery = 60)),
+            phonemes = listOf(PhonemeScoreBackup(phoneme = "θ", score = 40, attempts = 7)),
+        ),
+    )
+
+    @Test
+    fun `экспорт и импорт сохраняют содержимое`() {
+        val original = sample()
 
         val jsonString = ProfileBackupUtils.exportToJson(original)
         assertTrue(jsonString.contains("Test User"))
         assertTrue(jsonString.contains("apple"))
-        assertTrue(jsonString.contains("120"))
 
         val imported = ProfileBackupUtils.importFromJson(jsonString)
+        assertEquals(original, imported)
+    }
+
+    @Test
+    fun `ключ API не попадает в файл, если его не клали`() {
+        val jsonString = ProfileBackupUtils.exportToJson(sample())
+        assertTrue(jsonString.contains("\"apiKey\": null"))
+    }
+
+    @Test
+    fun `битый файл не разбирается`() {
+        assertNull(ProfileBackupUtils.importFromJson("{ invalid json }"))
+    }
+
+    @Test
+    fun `файл более новой версии отвергается`() {
+        val jsonString = """{"version":99,"profile":{"name":"Future User"}}"""
+        assertNull(ProfileBackupUtils.importFromJson(jsonString))
+    }
+
+    @Test
+    fun `минимальный файл читается на умолчаниях`() {
+        val jsonString = """{"version":2,"profile":{"name":"Minimal User"}}"""
+        val imported = ProfileBackupUtils.importFromJson(jsonString)
+
         assertNotNull(imported)
-        assertEquals(original.name, imported?.name)
-        assertEquals(1, imported?.vocabItems?.size)
-        assertEquals("apple", imported?.vocabItems?.get(0)?.term)
-        assertEquals(10, imported?.stats?.currentStreak)
-    }
-
-    @Test
-    fun `importFromJson handles invalid json gracefully`() {
-        val imported = ProfileBackupUtils.importFromJson("{ invalid json }")
-        assertNull(imported)
-    }
-
-    @Test
-    fun `importFromJson rejects unsupported versions`() {
-        val jsonString = """{"version":2,"name":"Future User","targetLang":"en","cefrOverall":"B2"}"""
-        val imported = ProfileBackupUtils.importFromJson(jsonString)
-        assertNull(imported)
-    }
-    
-    @Test
-    fun `importFromJson accepts missing optional fields`() {
-        val jsonString = """{"version":1,"name":"Minimal User","targetLang":"en","cefrOverall":"A1"}"""
-        val imported = ProfileBackupUtils.importFromJson(jsonString)
-        assertNotNull(imported)
-        assertEquals("Minimal User", imported?.name)
-        assertTrue(imported?.vocabItems?.isEmpty() == true)
-        assertNull(imported?.stats)
+        assertEquals("Minimal User", imported?.profile?.name)
+        assertEquals("A2", imported?.profile?.cefrOverall)
+        assertTrue(imported?.vocab?.isEmpty() == true)
+        assertNull(imported?.progress?.streak)
+        assertEquals("Alex", imported?.settings?.tutorName)
     }
 }

@@ -1,5 +1,6 @@
 package com.example.personallangmaster.ui.settings
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -13,6 +14,10 @@ import com.example.personallangmaster.data.db.Cefr
 import com.example.personallangmaster.data.db.entity.ProfileEntity
 import com.example.personallangmaster.data.prefs.AppSettings
 import com.example.personallangmaster.data.prefs.SettingsRepository
+import com.example.personallangmaster.core.export.ProfileBackup
+import com.example.personallangmaster.data.repo.BackupOutcome
+import com.example.personallangmaster.data.repo.BackupRepository
+import com.example.personallangmaster.data.repo.BackupSummary
 import com.example.personallangmaster.data.repo.ProfileRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,7 +30,21 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+
+/** Что происходит с резервной копией прямо сейчас. */
+sealed interface BackupUiState {
+    data object Idle : BackupUiState
+    data object Running : BackupUiState
+
+    /** Файл прочитан и ждёт подтверждения: показываем, что именно приедет. */
+    data class Confirm(val backup: ProfileBackup, val summary: BackupSummary) : BackupUiState
+
+    data class Message(val text: String, val isError: Boolean = false) : BackupUiState
+}
 
 /** Что происходит с проверкой ключа прямо сейчас. */
 sealed interface KeyCheckState {
@@ -42,6 +61,7 @@ class SettingsViewModel(
     private val settingsRepository: SettingsRepository,
     private val profileRepository: ProfileRepository,
     private val database: AppDatabase,
+    private val backupRepository: BackupRepository,
     private val keyChecker: GeminiKeyChecker = GeminiKeyChecker(),
 ) : ViewModel() {
 
@@ -200,6 +220,62 @@ class SettingsViewModel(
         onDone()
     }
 
+    // --- Резервная копия ---
+
+    private val _backupState = MutableStateFlow<BackupUiState>(BackupUiState.Idle)
+    val backupState: StateFlow<BackupUiState> = _backupState.asStateFlow()
+
+    /** Имя файла по умолчанию: по нему копии сортируются по дате сами собой. */
+    fun suggestedBackupFileName(): String {
+        val stamp = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+        return "personalteacher-$stamp.json"
+    }
+
+    fun exportBackup(uri: Uri, includeApiKey: Boolean) = viewModelScope.launch {
+        _backupState.value = BackupUiState.Running
+        _backupState.value = when (val outcome = backupRepository.exportTo(uri, includeApiKey)) {
+            BackupOutcome.Success -> BackupUiState.Message("Профиль сохранён в файл")
+            BackupOutcome.NoProfile ->
+                BackupUiState.Message("Профиль ещё не создан — сохранять нечего", isError = true)
+            BackupOutcome.BadFile ->
+                BackupUiState.Message("Файл не подошёл", isError = true)
+            is BackupOutcome.Failed ->
+                BackupUiState.Message("Не удалось сохранить: ${outcome.message}", isError = true)
+        }
+    }
+
+    /** Читает выбранный файл и показывает, что в нём, — до всякой записи в базу. */
+    fun prepareImport(uri: Uri) = viewModelScope.launch {
+        _backupState.value = BackupUiState.Running
+        val backup = backupRepository.readBackup(uri)
+        _backupState.value = if (backup == null) {
+            BackupUiState.Message(
+                "Файл не похож на резервную копию или сделан более новой версией приложения",
+                isError = true,
+            )
+        } else {
+            BackupUiState.Confirm(backup, backupRepository.summarize(backup))
+        }
+    }
+
+    /** Применяет ранее прочитанный файл поверх текущих данных. */
+    fun confirmImport(backup: ProfileBackup, onRestored: () -> Unit = {}) = viewModelScope.launch {
+        _backupState.value = BackupUiState.Running
+        _backupState.value = when (val outcome = backupRepository.restore(backup)) {
+            BackupOutcome.Success -> {
+                onRestored()
+                BackupUiState.Message("Профиль восстановлен")
+            }
+            is BackupOutcome.Failed ->
+                BackupUiState.Message("Не удалось восстановить: ${outcome.message}", isError = true)
+            else -> BackupUiState.Message("Не удалось восстановить профиль", isError = true)
+        }
+    }
+
+    fun dismissBackupState() {
+        _backupState.value = BackupUiState.Idle
+    }
+
     private data class Memory(
         val summaries: List<String> = emptyList(),
         val mistakes: List<String> = emptyList(),
@@ -212,10 +288,16 @@ class SettingsViewModel(
             settingsRepository: SettingsRepository,
             profileRepository: ProfileRepository,
             database: AppDatabase,
+            backupRepository: BackupRepository,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T =
-                SettingsViewModel(settingsRepository, profileRepository, database) as T
+                SettingsViewModel(
+                    settingsRepository,
+                    profileRepository,
+                    database,
+                    backupRepository,
+                ) as T
         }
     }
 }

@@ -180,6 +180,102 @@ class SettingsRepository(
     suspend fun setOnboardingCompleted(completed: Boolean) =
         edit { it[Keys.onboardingCompleted] = completed }
 
+    /**
+     * Заменяет все настройки снимком из резервной копии.
+     *
+     * Пишется одной транзакцией: наполовину применённые настройки — это
+     * чужой тренер с твоими лимитами расходов. Ключ API переносится, только
+     * если он был в файле; иначе остаётся тот, что уже сохранён на устройстве,
+     * потому что Keystore на другое устройство не переезжает.
+     */
+    suspend fun replaceAll(settings: AppSettings, rawApiKey: String? = null) {
+        val existingKey = current().apiKeyEncrypted
+        val importedKey = rawApiKey?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { keyVault.encrypt(it) }
+
+        context.dataStore.edit { prefs ->
+            prefs.clear()
+
+            prefs[Keys.apiKeyEncrypted] = importedKey ?: existingKey
+
+            prefs[Keys.personaId] = settings.personaId
+            prefs[Keys.tutorName] = settings.tutorName
+            prefs[Keys.voiceName] = settings.voiceName
+            prefs[Keys.accent] = settings.accent.name
+            prefs[Keys.speechRate] = settings.speechRate.coerceIn(1, 5)
+            prefs[Keys.verbosity] = settings.verbosity.name
+            prefs[Keys.customPromptExtra] = settings.customPromptExtra
+
+            prefs[Keys.strictness] = settings.strictness.coerceIn(0, 4)
+            prefs[Keys.correctGrammar] = settings.correctGrammar
+            prefs[Keys.correctVocab] = settings.correctVocab
+            prefs[Keys.correctPronunciation] = settings.correctPronunciation
+            prefs[Keys.correctWordOrder] = settings.correctWordOrder
+            prefs[Keys.correctNaturalness] = settings.correctNaturalness
+            prefs[Keys.correctArticles] = settings.correctArticles
+            prefs[Keys.correctionLanguage] = settings.correctionLanguage.name
+            prefs[Keys.explanationLanguage] = settings.explanationLanguage.name
+            prefs[Keys.nativeLanguageUse] = settings.nativeLanguageUse.name
+            prefs[Keys.initiative] = settings.initiative.name
+            prefs[Keys.lessonMinutes] = settings.lessonMinutes.coerceIn(0, 120)
+            prefs[Keys.autoAnalyzeLesson] = settings.autoAnalyzeLesson
+
+            prefs[Keys.levelLocked] = settings.levelLocked
+            prefs[Keys.progressionPace] = settings.progressionPace.name
+
+            prefs[Keys.micMode] = settings.micMode.name
+            prefs[Keys.vadThresholdDb] = settings.vadThresholdDb.coerceIn(-60.0, -20.0)
+            prefs[Keys.silenceHangoverMs] = settings.silenceHangoverMs.coerceIn(200, 3000)
+            prefs[Keys.bargeInEnabled] = settings.bargeInEnabled
+            prefs[Keys.noiseSuppression] = settings.noiseSuppression
+            prefs[Keys.audioOutput] = settings.audioOutput.name
+            prefs[Keys.tutorVolume] = settings.tutorVolume.coerceIn(0f, 1f)
+
+            prefs[Keys.liveModelId] = settings.liveModelId
+            prefs[Keys.textModelId] = settings.textModelId
+            prefs[Keys.cheapModelId] = settings.cheapModelId
+            prefs[Keys.temperature] = settings.temperature.coerceIn(0f, 2f)
+            prefs[Keys.transcriptionEnabled] = settings.transcriptionEnabled
+            prefs[Keys.contextCompression] = settings.contextCompression
+            prefs[Keys.sessionResumption] = settings.sessionResumption
+
+            prefs[Keys.dailyLimitUsd] = settings.dailyLimitUsd.coerceAtLeast(0.0)
+            prefs[Keys.monthlyLimitUsd] = settings.monthlyLimitUsd.coerceAtLeast(0.0)
+            prefs[Keys.dailyLimitMinutes] = settings.dailyLimitMinutes.coerceAtLeast(0)
+            prefs[Keys.limitBehavior] = settings.limitBehavior.name
+            prefs[Keys.idleAutoStopSeconds] = settings.idleAutoStopSeconds.coerceIn(0, 300)
+            prefs[Keys.parentPinHash] = settings.parentPinHash
+            prefs[Keys.priceTextIn] = settings.priceTextInPerMTok
+            prefs[Keys.priceTextOut] = settings.priceTextOutPerMTok
+            prefs[Keys.priceAudioIn] = settings.priceAudioInPerMTok
+            prefs[Keys.priceAudioOut] = settings.priceAudioOutPerMTok
+            prefs[Keys.usdToRubRate] = settings.usdToRubRate
+
+            prefs[Keys.transcriptRetention] = settings.transcriptRetention.name
+            prefs[Keys.transcriptRetentionDays] = settings.transcriptRetentionDays.coerceIn(1, 3650)
+            prefs[Keys.audioRecording] = settings.audioRecording.name
+            prefs[Keys.audioRetentionDays] = settings.audioRetentionDays.coerceIn(1, 365)
+
+            prefs[Keys.themeMode] = settings.themeMode.name
+            prefs[Keys.dynamicColor] = settings.dynamicColor
+            prefs[Keys.subtitleMode] = settings.subtitleMode.name
+            prefs[Keys.subtitleFontScale] = settings.subtitleFontScale.coerceIn(0.8f, 2.0f)
+            prefs[Keys.largeElements] = settings.largeElements
+            prefs[Keys.waveStyle] = settings.waveStyle.name
+
+            prefs[Keys.reminderEnabled] = settings.reminderEnabled
+            prefs[Keys.reminderMinuteOfDay] = settings.reminderMinuteOfDay.coerceIn(0, 24 * 60 - 1)
+            prefs[Keys.reminderDays] = settings.reminderDays
+                .takeIf { it.isNotEmpty() }
+                ?.map(Int::toString)?.toSet()
+                ?: setOf("1", "2", "3", "4", "5", "6", "7")
+            prefs[Keys.reviewReminderEnabled] = settings.reviewReminderEnabled
+
+            prefs[Keys.onboardingCompleted] = settings.onboardingCompleted
+        }
+    }
+
     /** Полный сброс настроек. Ключ шифрования тоже уничтожается. */
     suspend fun clearAll() {
         context.dataStore.edit { it.clear() }
