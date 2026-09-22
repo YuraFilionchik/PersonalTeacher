@@ -47,8 +47,16 @@ data class MistakeTotal(
 /** Какие уроки показывать: все или только в определённом состоянии. */
 enum class LessonFilter { ALL, ANALYZED, NOT_ANALYZED }
 
-/** Сообщение внизу экрана. Отменять можно только удаление — пока оно не выполнено. */
-data class HistoryMessage(val text: String, val undoable: Boolean = false)
+/**
+ * Сообщение внизу экрана. Отменять можно только удаление — пока оно не выполнено.
+ *
+ * [token] — счётчик, растущий на каждое новое сообщение. Без него два одинаковых
+ * по содержимому сообщения (например, «Урок удалён» после двух разных удалений)
+ * не различить как data class: `LaunchedEffect(state.message)` не перезапустится
+ * на равном значении, второй снекбар не покажется, а «Отменить» у первого будет
+ * отменять уже не тот урок.
+ */
+data class HistoryMessage(val text: String, val undoable: Boolean = false, val token: Long = 0L)
 
 /** Открытый диалог пометки вместе с тем, что в нём уже написано. */
 data class NoteRequest(val lessonId: Long, val text: String)
@@ -116,6 +124,14 @@ class ProgressViewModel(
 
     private var pendingDelete: PendingDelete? = null
     private var pendingJob: Job? = null
+
+    /** Счётчик для [HistoryMessage.token] — см. его kdoc. */
+    private var messageToken = 0L
+
+    private fun historyMessage(text: String, undoable: Boolean = false): HistoryMessage {
+        messageToken += 1
+        return HistoryMessage(text, undoable, messageToken)
+    }
 
     private data class PendingDelete(val ids: List<Long>, val scope: DeleteScope)
 
@@ -282,7 +298,7 @@ class ProgressViewModel(
         _state.update {
             it.copy(
                 selection = it.selection.clear(),
-                message = HistoryMessage(
+                message = historyMessage(
                     text = if (ids.size == 1) "Урок удалён" else "Удалено уроков: ${ids.size}",
                     undoable = true,
                 ),
@@ -307,6 +323,9 @@ class ProgressViewModel(
     private fun commitPendingDelete() {
         val pending = pendingDelete ?: return
         pendingDelete = null
+        // Урок закоммичен — держать его id в hidden больше незачем: без этого
+        // набор рос бы всю жизнь экрана.
+        hidden = hidden - pending.ids.toSet()
         appScope.launch { history.delete(pending.ids, pending.scope) }
     }
 
@@ -317,7 +336,7 @@ class ProgressViewModel(
             _state.update {
                 it.copy(
                     selection = it.selection.clear(),
-                    message = HistoryMessage(
+                    message = historyMessage(
                         "Освободилось ${LessonHousekeeping.formatSize(freed)}"
                     ),
                 )
@@ -330,7 +349,7 @@ class ProgressViewModel(
     fun markSkipped(lessonId: Long) {
         viewModelScope.launch {
             history.markSkipped(lessonId)
-            _state.update { it.copy(message = HistoryMessage("Урок закрыт без разбора")) }
+            _state.update { it.copy(message = historyMessage("Урок закрыт без разбора")) }
         }
     }
 
@@ -357,7 +376,7 @@ class ProgressViewModel(
             val text = history.transcript(lessonId)
             _state.update {
                 if (text.isBlank()) {
-                    it.copy(message = HistoryMessage("Транскрипт этого урока не сохранился"))
+                    it.copy(message = historyMessage("Транскрипт этого урока не сохранился"))
                 } else {
                     it.copy(shareText = text)
                 }
@@ -448,8 +467,13 @@ class ProgressViewModel(
     companion object {
         private const val DAYS = 7
 
-        /** Сколько секунд у человека есть на «Отменить». */
-        private const val UNDO_MILLIS = 5_000L
+        /**
+         * Сколько времени у человека есть на «Отменить».
+         *
+         * Не private: экран показывает снекбар ровно на этот срок, чтобы кнопка
+         * «Отменить» не пропадала с экрана раньше, чем удаление реально отменяемо.
+         */
+        const val UNDO_MILLIS = 5_000L
 
         fun mistakeTitle(type: MistakeType): String = when (type) {
             MistakeType.GRAMMAR -> "Грамматика"

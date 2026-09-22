@@ -66,15 +66,35 @@ class LessonCalendarTest {
 
         val cell = grid.single { it.date == day }
         assertEquals(2, cell.total)
-        assertEquals(1, cell.analyzed)
+        assertEquals(1, cell.settled)
         assertEquals(1, grid.single { it.date == LocalDate.of(2026, 9, 11) }.total)
+    }
+
+    @Test
+    fun `закрытый без разбора урок не считается ожидающим разбора`() {
+        val day = LocalDate.of(2026, 9, 12)
+        val grid = LessonCalendar.buildMonth(
+            month,
+            listOf(
+                lessonAt(day, LessonStatus.SKIPPED),
+                lessonAt(day, LessonStatus.COMPLETED, hour = 18),
+            ),
+            today,
+            zone,
+        )
+
+        val cell = grid.single { it.date == day }
+        assertEquals(2, cell.total)
+        // SKIPPED — тоже решённый урок: календарь не должен звать разобрать то,
+        // что человек уже осознанно закрыл.
+        assertEquals(1, cell.settled)
     }
 
     @Test
     fun `день без уроков пустой, а не отрицательный`() {
         val grid = LessonCalendar.buildMonth(month, emptyList(), today, zone)
 
-        assertTrue(grid.all { it.total == 0 && it.analyzed == 0 })
+        assertTrue(grid.all { it.total == 0 && it.settled == 0 })
     }
 
     @Test

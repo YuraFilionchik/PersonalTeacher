@@ -55,6 +55,7 @@ class AppContainer(context: Context) {
     }
     val lessonHistoryRepository: LessonHistoryRepository by lazy {
         LessonHistoryRepository(
+            database = database,
             lessonDao = database.lessonDao(),
             vocabDao = database.vocabDao(),
             statsDao = database.statsDao(),

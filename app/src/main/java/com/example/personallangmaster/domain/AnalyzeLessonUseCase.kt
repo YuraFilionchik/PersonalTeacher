@@ -79,8 +79,12 @@ class AnalyzeLessonUseCase(
             ?: return AnalysisResult.Failure("Урок не найден")
 
         // Статус проверяем под замком: пока вызов ждал очереди, урок мог
-        // разобрать тот, кто держал замок до нас.
-        if (!force && lesson.status == LessonStatus.ANALYZED) return AnalysisResult.AlreadyAnalyzed
+        // разобрать тот, кто держал замок до нас. SKIPPED сюда же: урок закрыли
+        // без разбора осознанно, и это решение не должен отменять случайный
+        // повторный вызов — только явный force.
+        if (!force && (lesson.status == LessonStatus.ANALYZED || lesson.status == LessonStatus.SKIPPED)) {
+            return AnalysisResult.AlreadyAnalyzed
+        }
 
         val turns = lessonDao.getTurns(lessonId)
         val userTurns = turns.count { it.speaker == Speaker.USER }

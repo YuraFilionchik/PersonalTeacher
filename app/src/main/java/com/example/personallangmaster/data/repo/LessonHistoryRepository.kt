@@ -1,5 +1,7 @@
 package com.example.personallangmaster.data.repo
 
+import androidx.room.withTransaction
+import com.example.personallangmaster.data.db.AppDatabase
 import com.example.personallangmaster.data.db.LessonStatus
 import com.example.personallangmaster.data.db.dao.LessonDao
 import com.example.personallangmaster.data.db.dao.StatsDao
@@ -27,6 +29,7 @@ enum class DeleteScope {
  * стоит человеку потерянных данных, а не сорванной реплики.
  */
 class LessonHistoryRepository(
+    private val database: AppDatabase,
     private val lessonDao: LessonDao,
     private val vocabDao: VocabDao,
     private val statsDao: StatsDao,
@@ -37,28 +40,42 @@ class LessonHistoryRepository(
      *
      * Ошибки, слова и расходы ссылаются на урок обычным полем без внешнего ключа,
      * поэтому решение по ним принимается явно: иначе они начнут указывать в пустоту.
+     *
+     * Все четыре DAO-вызова идут одной транзакцией: крах посередине не должен
+     * оставить слова удалёнными при живом уроке или наоборот. Файл записи —
+     * необратимая операция, поэтому его трогаем только после того, как
+     * транзакция точно закоммитилась: до этого момента должно быть что открыть
+     * и что переслушать, если что-то пошло не так.
      */
     suspend fun delete(lessonIds: List<Long>, scope: DeleteScope) {
         if (lessonIds.isEmpty()) return
 
-        // Файл записи не должен пережить урок: ссылки на него уже не останется.
-        deleteRecordings(lessonIds)
+        // Пути читаем заранее: после удаления строк урока в базе взять их будет неоткуда.
+        val audioPaths = lessonDao.getByIds(lessonIds).mapNotNull { it.audioPath }
 
-        when (scope) {
-            DeleteScope.KEEP_RESULTS -> {
-                lessonDao.unlinkMistakes(lessonIds)
-                vocabDao.unlinkLessons(lessonIds)
-                statsDao.unlinkLessons(lessonIds)
+        database.withTransaction {
+            when (scope) {
+                DeleteScope.KEEP_RESULTS -> {
+                    lessonDao.unlinkMistakes(lessonIds)
+                    vocabDao.unlinkLessons(lessonIds)
+                    statsDao.unlinkLessons(lessonIds)
+                }
+
+                DeleteScope.WITH_RESULTS -> {
+                    lessonDao.deleteMistakesOfLessons(lessonIds)
+                    vocabDao.deleteOfLessons(lessonIds)
+                    statsDao.deleteOfLessons(lessonIds)
+                }
             }
 
-            DeleteScope.WITH_RESULTS -> {
-                lessonDao.deleteMistakesOfLessons(lessonIds)
-                vocabDao.deleteOfLessons(lessonIds)
-                statsDao.deleteOfLessons(lessonIds)
-            }
+            lessonDao.deleteLessons(lessonIds)
         }
 
-        lessonDao.deleteLessons(lessonIds)
+        if (audioPaths.isNotEmpty()) {
+            withContext(Dispatchers.IO) {
+                audioPaths.forEach { path -> runCatching { File(path).delete() } }
+            }
+        }
     }
 
     /** Удаляет файлы записей и ссылки на них. Возвращает, сколько места освободилось. */
@@ -93,6 +110,9 @@ class LessonHistoryRepository(
                 val path = lesson.audioPath
                 if (path.isNullOrBlank()) return@mapNotNull null
                 val size = runCatching { File(path).length() }.getOrDefault(0L)
+                // Файла уже нет или он пуст — записи фактически не осталось:
+                // не в счёт ни в меню, ни в «Записей: N».
+                if (size <= 0L) return@mapNotNull null
                 lesson.id to size
             }.toMap()
         }

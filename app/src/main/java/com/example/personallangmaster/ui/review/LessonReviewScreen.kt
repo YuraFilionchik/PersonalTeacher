@@ -44,9 +44,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.personallangmaster.data.db.LessonStatus
 import com.example.personallangmaster.data.db.MistakeType
 import com.example.personallangmaster.data.db.Speaker
 import com.example.personallangmaster.di.LocalAppContainer
+import com.example.personallangmaster.domain.TranscriptFormatter
 
 /**
  * Разбор урока: что получилось, что поправить и что пошло в словарь.
@@ -73,7 +75,9 @@ fun LessonReviewScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     var transcriptOpen by remember { mutableStateOf(showTranscript) }
 
-    LaunchedEffect(lessonId) { viewModel.load(lessonId) }
+    // Транскрипт открывают почитать, а не заплатить за разбор — открытие с этим
+    // экраном не должно само по себе запускать платный вызов.
+    LaunchedEffect(lessonId) { viewModel.load(lessonId, analyzeIfNeeded = !showTranscript) }
 
     Scaffold(
         topBar = {
@@ -114,7 +118,37 @@ fun LessonReviewScreen(
             state.lesson?.let { lesson ->
                 // Разобранным урок становится только после успешного разбора —
                 // поэтому состояние видно прямо здесь, а не угадывается.
-                if (lesson.status != com.example.personallangmaster.data.db.LessonStatus.ANALYZED) {
+                if (lesson.status == LessonStatus.SKIPPED) {
+                    // Это состояние выбрал сам человек («Закрыть без разбора») —
+                    // карточка не должна выглядеть приглашением сделать то, от
+                    // чего он только что отказался.
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                    ) {
+                        Column(Modifier.padding(12.dp)) {
+                            Text(
+                                "Урок закрыт без разбора",
+                                style = MaterialTheme.typography.titleSmall,
+                            )
+                            Text(
+                                text = state.error
+                                    ?: "Ошибки и слова из него не появлялись — это было решение, " +
+                                        "а не сбой.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            OutlinedButton(onClick = { viewModel.retry(lessonId, force = true) }) {
+                                Text("Разобрать всё равно")
+                            }
+                        }
+                    }
+                } else if (lesson.status != LessonStatus.ANALYZED) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -249,8 +283,7 @@ fun LessonReviewScreen(
 
             // Причину уже показала карточка «Урок ещё не разобран» — второй раз
             // повторять её незачем.
-            val analyzed = state.lesson?.status ==
-                com.example.personallangmaster.data.db.LessonStatus.ANALYZED
+            val analyzed = state.lesson?.status == LessonStatus.ANALYZED
             state.error?.takeIf { analyzed }?.let { error ->
                 Card(
                     modifier = Modifier
@@ -270,7 +303,11 @@ fun LessonReviewScreen(
                 }
             }
 
-            if (state.turns.isNotEmpty()) {
+            // Пустые реплики — след распознавания без результата: та же выборка,
+            // что и в тексте, который уходит при «Поделиться транскриптом»,
+            // иначе счётчик здесь и текст там расходятся.
+            val visibleTurns = TranscriptFormatter.nonBlank(state.turns)
+            if (visibleTurns.isNotEmpty()) {
                 HorizontalDivider(Modifier.padding(top = 16.dp))
                 Row(
                     modifier = Modifier
@@ -281,7 +318,7 @@ fun LessonReviewScreen(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "Транскрипт (реплик: ${state.turns.size})",
+                        text = "Транскрипт (реплик: ${visibleTurns.size})",
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -293,7 +330,7 @@ fun LessonReviewScreen(
                 }
 
                 if (transcriptOpen) {
-                    state.turns.forEach { turn ->
+                    visibleTurns.forEach { turn ->
                         val mine = turn.speaker == Speaker.USER
                         Column(Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
                             Text(

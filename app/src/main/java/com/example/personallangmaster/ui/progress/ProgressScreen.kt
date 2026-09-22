@@ -55,6 +55,8 @@ import com.example.personallangmaster.data.db.UsageKind
 import com.example.personallangmaster.di.LocalAppContainer
 import com.example.personallangmaster.domain.LessonHousekeeping
 import com.example.personallangmaster.ui.components.StatTile
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -87,14 +89,31 @@ fun ProgressScreen(
     var clearRecordingsRequest by remember { mutableStateOf(false) }
 
     // Сообщение и отмена живут здесь: ViewModel не должна знать про Snackbar.
-    LaunchedEffect(state.message) {
+    // Ключ — token, а не само сообщение: у двух одинаковых по тексту сообщений
+    // (например, "Урок удалён" после двух разных удалений) без него эффект
+    // не перезапустился бы, второй снекбар не показался бы, а «Отменить»
+    // у первого отменяло бы уже не тот урок.
+    LaunchedEffect(state.message?.token) {
         val message = state.message ?: return@LaunchedEffect
-        val result = snackbarHost.showSnackbar(
-            message = message.text,
-            actionLabel = if (message.undoable) "Отменить" else null,
-            duration = SnackbarDuration.Short,
-        )
-        if (result == SnackbarResult.ActionPerformed) viewModel.undoDelete() else viewModel.consumeMessage()
+        if (message.undoable) {
+            // Окно отмены и время показа снекбара должны совпадать: показываем
+            // снекбар ровно UNDO_MILLIS, чтобы «Отменить» не пропадал с экрана,
+            // пока удаление ещё можно отменить.
+            val dismissJob = launch {
+                delay(ProgressViewModel.UNDO_MILLIS)
+                snackbarHost.currentSnackbarData?.dismiss()
+            }
+            val result = snackbarHost.showSnackbar(
+                message = message.text,
+                actionLabel = "Отменить",
+                duration = SnackbarDuration.Indefinite,
+            )
+            dismissJob.cancel()
+            if (result == SnackbarResult.ActionPerformed) viewModel.undoDelete() else viewModel.consumeMessage()
+        } else {
+            snackbarHost.showSnackbar(message = message.text, duration = SnackbarDuration.Short)
+            viewModel.consumeMessage()
+        }
     }
 
     LaunchedEffect(state.shareText) {
@@ -281,7 +300,9 @@ fun ProgressScreen(
                         onDismissRequest = { listMenuOpen = false },
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Удалить все несостоявшиеся (${state.failedCount})") },
+                            text = {
+                                Text("Удалить несостоявшиеся за месяц (${state.failedCount})")
+                            },
                             enabled = state.failedCount > 0,
                             onClick = {
                                 listMenuOpen = false
@@ -291,7 +312,7 @@ fun ProgressScreen(
                         DropdownMenuItem(
                             text = {
                                 Text(
-                                    "Очистить все записи · " +
+                                    "Очистить записи за месяц · " +
                                         LessonHousekeeping.formatSize(state.recordingBytes)
                                 )
                             },

@@ -64,7 +64,12 @@ class LessonReviewViewModel(
         }
     }
 
-    fun load(lessonId: Long, analyzeIfNeeded: Boolean = true) {
+    /**
+     * @param force разобрать, даже если урок закрыт без разбора (SKIPPED) —
+     * без этого параметра [AnalyzeLessonUseCase] сам откажет в повторном платном
+     * вызове, и кнопка «Разобрать всё равно» иначе была бы бутафорской.
+     */
+    fun load(lessonId: Long, analyzeIfNeeded: Boolean = true, force: Boolean = false) {
         viewModelScope.launch {
             _state.update { it.copy(loading = true, error = null) }
 
@@ -79,7 +84,7 @@ class LessonReviewViewModel(
                 return@launch
             }
 
-            when (val result = analyzeLesson(lessonId)) {
+            when (val result = analyzeLesson(lessonId, force)) {
                 is AnalysisResult.Success -> {
                     showStored(lessonId)
                     _state.update {
@@ -103,8 +108,11 @@ class LessonReviewViewModel(
         }
     }
 
-    /** Повторить разбор: полезно, когда первый раз не было сети. */
-    fun retry(lessonId: Long) = load(lessonId)
+    /**
+     * Повторить разбор: полезно, когда первый раз не было сети, а для урока,
+     * закрытого без разбора, [force] — это единственный путь всё же его разобрать.
+     */
+    fun retry(lessonId: Long, force: Boolean = false) = load(lessonId, force = force)
 
     // --- Запись урока ---
 
