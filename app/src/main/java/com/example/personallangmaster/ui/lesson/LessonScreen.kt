@@ -111,10 +111,6 @@ fun LessonScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        LessonForegroundService.stopRequestFlow.collect { viewModel.endLesson() }
-    }
-
     LaunchedEffect(scenarioId) { viewModel.prepareScenario(scenarioId) }
 
     val startLesson: (LessonMode) -> Unit = { mode ->

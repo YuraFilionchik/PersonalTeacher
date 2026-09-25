@@ -25,6 +25,8 @@ import java.util.Locale
 data class MistakeRow(
     val mistake: MistakeEntity,
     val audioOffsetMs: Long?,
+    /** Где реплика кончилась: начало следующей. null — последняя в записи. */
+    val audioEndMs: Long? = null,
 )
 
 data class ReviewUiState(
@@ -122,13 +124,15 @@ class LessonReviewViewModel(
         player.play(path)
     }
 
-    /** Играет то место записи, где прозвучала ошибка. */
+    /** Играет только ту реплику, где прозвучала ошибка, а не остаток урока. */
     fun playMistake(row: MistakeRow) {
         val path = _state.value.lesson?.audioPath ?: return
+        val start = row.audioOffsetMs ?: 0L
         // Отступаем на секунду назад: фраза почти всегда начинается чуть раньше
         // того места, где детектор речи закрыл предыдущую реплику.
-        val from = (row.audioOffsetMs ?: 0L) - PREROLL_MS
-        player.play(path, fromMs = from.coerceAtLeast(0L))
+        val from = (start - PREROLL_MS).coerceAtLeast(0L)
+        val until = (row.audioEndMs ?: (start + MAX_FRAGMENT_MS)) + POSTROLL_MS
+        player.play(path, fromMs = from, untilMs = until)
     }
 
     fun pausePlayback() = player.pause()
@@ -143,7 +147,7 @@ class LessonReviewViewModel(
         val mistakes = lessonDao.unresolvedMistakes(profileId = lesson.profileId, limit = 100)
             .filter { it.lessonId == lessonId }
             .sortedByDescending { it.severity }
-            .map { mistake -> MistakeRow(mistake, findOffset(turns, mistake)) }
+            .map { mistake -> mistakeRow(turns, mistake) }
 
         _state.update {
             it.copy(
@@ -162,17 +166,26 @@ class LessonReviewViewModel(
      * Сравниваем по нормализованному тексту: расшифровка редко совпадает с тем,
      * что записала модель в разборе, дословно.
      */
-    private fun findOffset(
+    private fun mistakeRow(
         turns: List<TurnEntity>,
         mistake: MistakeEntity,
-    ): Long? {
+    ): MistakeRow {
         val needle = normalize(mistake.original)
-        if (needle.isEmpty()) return null
+        if (needle.isEmpty()) return MistakeRow(mistake, audioOffsetMs = null)
 
-        return turns
-            .filter { it.speaker == Speaker.USER && it.audioOffsetMs != null }
-            .firstOrNull { turn -> normalize(turn.text).contains(needle) }
-            ?.audioOffsetMs
+        val withAudio = turns.filter { it.audioOffsetMs != null }
+        val index = withAudio.indexOfFirst { turn ->
+            turn.speaker == Speaker.USER && normalize(turn.text).contains(needle)
+        }
+        if (index < 0) return MistakeRow(mistake, audioOffsetMs = null)
+
+        // Смещение реплики записывается в момент её начала, поэтому следующая
+        // реплика — чья угодно — и есть конец нужной фразы.
+        return MistakeRow(
+            mistake = mistake,
+            audioOffsetMs = withAudio[index].audioOffsetMs,
+            audioEndMs = withAudio.getOrNull(index + 1)?.audioOffsetMs,
+        )
     }
 
     private fun normalize(value: String): String = value
@@ -189,6 +202,12 @@ class LessonReviewViewModel(
 
     companion object {
         private const val PREROLL_MS = 1_000L
+
+        /** Хвост после реплики: её конец отмечен с той же неточностью, что и начало. */
+        private const val POSTROLL_MS = 500L
+
+        /** Если за ошибкой реплик нет — сколько играть, чтобы не крутить урок до конца. */
+        private const val MAX_FRAGMENT_MS = 15_000L
 
         fun factory(
             lessonDao: LessonDao,

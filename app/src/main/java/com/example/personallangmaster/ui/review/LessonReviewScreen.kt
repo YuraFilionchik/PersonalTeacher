@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +43,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.personallangmaster.data.db.LessonStatus
@@ -78,6 +81,11 @@ fun LessonReviewScreen(
     // Транскрипт открывают почитать, а не заплатить за разбор — открытие с этим
     // экраном не должно само по себе запускать платный вызов.
     LaunchedEffect(lessonId) { viewModel.load(lessonId, analyzeIfNeeded = !showTranscript) }
+
+    // Запись звучит, только пока разбор на экране: при смене вкладки модель
+    // экрана может пережить уход, а с ней и плеер.
+    DisposableEffect(Unit) { onDispose { viewModel.pausePlayback() } }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { viewModel.pausePlayback() }
 
     Scaffold(
         topBar = {

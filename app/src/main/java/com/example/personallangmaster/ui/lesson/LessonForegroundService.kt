@@ -20,7 +20,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
@@ -31,6 +33,9 @@ import kotlinx.coroutines.launch
  * без переднего сервиса урок прерывался бы каждый раз, когда телефон кладут на стол.
  * Сама сессия живёт в [LessonViewModel] — сервис только удерживает процесс
  * и показывает уведомление с таймером и кнопкой «Завершить».
+ *
+ * Сервис гаснет сам, как только [lessonRunning] падает в false: так уведомление
+ * не переживает урок, даже если экран урока к этому моменту уже закрыт.
  */
 class LessonForegroundService : Service() {
 
@@ -41,37 +46,65 @@ class LessonForegroundService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when (intent?.action) {
-            ACTION_STOP -> {
-                stopRequests.tryEmit(Unit)
-                stopSelf()
-                return START_NOT_STICKY
-            }
-        }
-
-        startedAt = System.currentTimeMillis()
         createChannel()
-        startInForeground(buildNotification(0))
+        // Урока нет — нечего и показывать. Сюда же попадает нажатие «Завершить»:
+        // сервис гасим сразу, не дожидаясь, пока модель урока отработает запрос.
+        if (intent?.action == ACTION_STOP || !lessonRunning.value) {
+            if (intent?.action == ACTION_STOP) {
+                stopRequests.tryEmit(Unit)
+            } else {
+                // Запущен через startForegroundService: без startForeground система
+                // уронит приложение, даже если сервис тут же гаснет.
+                startInForeground(buildNotification(0))
+            }
+            shutDown()
+            return START_NOT_STICKY
+        }
 
-        val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-        scope = serviceScope
-        ticker = serviceScope.launch {
-            while (isActive) {
-                delay(1_000)
-                val seconds = ((System.currentTimeMillis() - startedAt) / 1000).toInt()
-                notificationManager().notify(NOTIFICATION_ID, buildNotification(seconds))
+        // Повторный старт при уже идущем уроке — не новый урок: таймер не сбрасываем
+        // и второй не запускаем, иначе старый продолжал бы обновлять уведомление вечно.
+        if (ticker?.isActive != true) startedAt = System.currentTimeMillis()
+        startInForeground(buildNotification(elapsedSeconds()))
+
+        if (ticker?.isActive != true) {
+            // Главный поток: тикер и остановка идут строго по очереди, и тикер
+            // не может опубликовать уведомление сразу после того, как его сняли.
+            val serviceScope = scope ?: CoroutineScope(SupervisorJob() + Dispatchers.Main)
+                .also { scope = it }
+            ticker = serviceScope.launch {
+                while (isActive && lessonRunning.value) {
+                    delay(1_000)
+                    if (!lessonRunning.value) break
+                    notificationManager().notify(NOTIFICATION_ID, buildNotification(elapsedSeconds()))
+                }
+            }
+            serviceScope.launch {
+                lessonRunning.first { !it }
+                shutDown()
             }
         }
 
-        return START_STICKY
+        // Процесс убит — урок вместе с ним: воскрешать пустое уведомление незачем.
+        return START_NOT_STICKY
     }
 
     override fun onDestroy() {
         ticker?.cancel()
         scope?.cancel()
         scope = null
+        notificationManager().cancel(NOTIFICATION_ID)
         super.onDestroy()
     }
+
+    private fun shutDown() {
+        ticker?.cancel()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        notificationManager().cancel(NOTIFICATION_ID)
+        stopSelf()
+    }
+
+    private fun elapsedSeconds(): Int =
+        ((System.currentTimeMillis() - startedAt) / 1000).toInt()
 
     private fun startInForeground(notification: Notification) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -134,16 +167,24 @@ class LessonForegroundService : Service() {
         private const val NOTIFICATION_ID = 42
         const val ACTION_STOP = "com.example.personallangmaster.STOP_LESSON"
 
-        /** Нажатие «Завершить» в уведомлении: экран урока слушает этот поток. */
+        /** Нажатие «Завершить» в уведомлении: модель урока слушает этот поток. */
         private val stopRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
         val stopRequestFlow = stopRequests.asSharedFlow()
 
+        /**
+         * Идёт ли урок. Выставляет модель урока — она знает это точно и
+         * сбрасывает флаг даже тогда, когда её очищают вместе с экраном.
+         */
+        val lessonRunning = MutableStateFlow(false)
+
         fun start(context: Context) {
+            lessonRunning.value = true
             val intent = Intent(context, LessonForegroundService::class.java)
             context.startForegroundService(intent)
         }
 
         fun stop(context: Context) {
+            lessonRunning.value = false
             context.stopService(Intent(context, LessonForegroundService::class.java))
         }
     }

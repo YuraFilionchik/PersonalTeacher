@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -323,20 +324,34 @@ private fun DrillContent(
                             style = MaterialTheme.typography.titleMedium,
                         )
 
-                        is AttemptState.Heard -> Text(
-                            text = if (attempt.correct) {
-                                "Похоже! Услышал: «${attempt.text}»"
-                            } else {
-                                "Услышал «${attempt.text}» — попробуйте ещё раз"
-                            },
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (attempt.correct) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.tertiary
-                            },
-                            textAlign = TextAlign.Center,
-                        )
+                        is AttemptState.Heard -> Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = if (attempt.correct) {
+                                    "Похоже! Услышал: «${attempt.text}»"
+                                } else {
+                                    "Услышал «${attempt.text}» — попробуйте ещё раз"
+                                },
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = if (attempt.correct) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.tertiary
+                                },
+                                textAlign = TextAlign.Center,
+                            )
+                            // После удачной попытки повтор не нужен: иначе одно задание
+                            // засчитывалось бы как несколько верных.
+                            if (!attempt.correct) {
+                                Spacer(Modifier.height(8.dp))
+                                FilledTonalButton(onClick = onSpeak) {
+                                    Icon(Icons.Rounded.Mic, contentDescription = null)
+                                    Spacer(Modifier.width(8.dp))
+                                    Text("Ещё раз")
+                                }
+                            }
+                        }
 
                         is AttemptState.Failed -> Column(
                             horizontalAlignment = Alignment.CenterHorizontally

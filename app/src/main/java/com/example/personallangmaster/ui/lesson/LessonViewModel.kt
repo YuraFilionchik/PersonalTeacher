@@ -175,6 +175,18 @@ class LessonViewModel(
         session.events
             .onEach(::handleEvent)
             .launchIn(viewModelScope)
+
+        // «Завершить» из уведомления слушает модель, а не экран: экран могли
+        // закрыть сменой вкладки, а урок при этом идёт.
+        LessonForegroundService.stopRequestFlow
+            .onEach { if (_state.value.isActive) endLesson() }
+            .launchIn(viewModelScope)
+
+        // Урок кончился по любой причине (ошибка сети, конец сессии) — гасим
+        // уведомление, не дожидаясь экрана.
+        _state
+            .onEach { if (!it.isActive) LessonForegroundService.lessonRunning.value = false }
+            .launchIn(viewModelScope)
     }
 
     /**
@@ -510,6 +522,7 @@ class LessonViewModel(
      * в живущей дольше области, а не теряем.
      */
     override fun onCleared() {
+        LessonForegroundService.lessonRunning.value = false
         timerJob?.cancel()
         tts.stop()
         session.stop()
