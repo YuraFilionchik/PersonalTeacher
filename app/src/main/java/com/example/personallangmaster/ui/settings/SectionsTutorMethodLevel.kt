@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -58,9 +57,9 @@ fun TutorSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
                 subtitle = stringResource(R.string.settings_tutor_name_subtitle),
                 value = settings.tutorName,
             )
-            OutlinedTextField(
-                value = settings.tutorName,
-                onValueChange = { name -> viewModel.update { setTutorName(name) } },
+            SettingsTextField(
+                storedValue = settings.tutorName,
+                onSave = { name -> viewModel.update { setTutorName(name) } },
                 label = { Text("Имя тренера") },
                 singleLine = true,
                 modifier = Modifier
@@ -122,9 +121,9 @@ fun TutorSettingsScreen(viewModel: SettingsViewModel, onBack: () -> Unit) {
         SettingsDivider()
         SettingsGroup("Продвинутое") {
             SettingsNote(stringResource(R.string.settings_tutor_custom_prompt_subtitle))
-            OutlinedTextField(
-                value = settings.customPromptExtra,
-                onValueChange = { text -> viewModel.update { setCustomPromptExtra(text) } },
+            SettingsTextField(
+                storedValue = settings.customPromptExtra,
+                onSave = { text -> viewModel.update { setCustomPromptExtra(text) } },
                 label = { Text(stringResource(R.string.settings_tutor_custom_prompt_title)) },
                 placeholder = { Text("Например: чаще спрашивай про мою работу") },
                 minLines = 3,
