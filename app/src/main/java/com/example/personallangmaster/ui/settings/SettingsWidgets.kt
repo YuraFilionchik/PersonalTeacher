@@ -21,6 +21,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -29,14 +30,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 
 /**
  * Строительные блоки экранов настроек.
@@ -280,3 +286,61 @@ fun SettingsNote(text: String) {
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
     )
 }
+
+/**
+ * Текстовое поле настройки. Набранный текст живёт в локальном состоянии,
+ * а в хранилище уходит с задержкой: если привязать поле прямо к потоку
+ * настроек, каждое нажатие делает асинхронную запись, поле перерисовывается
+ * устаревшим значением и стирает только что набранные символы.
+ */
+@Composable
+fun SettingsTextField(
+    storedValue: String,
+    onSave: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    singleLine: Boolean = false,
+    minLines: Int = 1,
+) {
+    var text by rememberSaveable { mutableStateOf(storedValue) }
+    var edited by rememberSaveable { mutableStateOf(false) }
+
+    // Пока пользователь не начал печатать, подхватываем значение из хранилища:
+    // на первом кадре поток отдаёт умолчания, настоящие настройки приходят чуть позже.
+    LaunchedEffect(storedValue) {
+        if (!edited) text = storedValue
+    }
+
+    LaunchedEffect(text) {
+        if (edited && text != storedValue) {
+            delay(SAVE_DEBOUNCE_MS)
+            onSave(text)
+        }
+    }
+
+    // Уход с экрана раньше, чем истекла задержка, не должен терять последние символы.
+    val latestText by rememberUpdatedState(text)
+    val latestStored by rememberUpdatedState(storedValue)
+    val latestOnSave by rememberUpdatedState(onSave)
+    DisposableEffect(Unit) {
+        onDispose {
+            if (edited && latestText != latestStored) latestOnSave(latestText)
+        }
+    }
+
+    OutlinedTextField(
+        value = text,
+        onValueChange = { value ->
+            edited = true
+            text = value
+        },
+        label = label,
+        placeholder = placeholder,
+        singleLine = singleLine,
+        minLines = minLines,
+        modifier = modifier,
+    )
+}
+
+private const val SAVE_DEBOUNCE_MS = 400L
